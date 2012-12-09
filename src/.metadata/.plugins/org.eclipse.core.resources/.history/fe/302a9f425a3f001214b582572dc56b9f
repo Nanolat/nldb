@@ -1,0 +1,18 @@
+/*
+ * nldbtree.cpp
+ *
+ *  Created on: Dec 5, 2012
+ *      Author: kangmo
+ */
+
+#include "nldbtree.h"
+
+nldb_tree::nldb_tree() {
+	// TODO Auto-generated constructor stub
+
+}
+
+nldb_tree::~nldb_tree() {
+	// TODO Auto-generated destructor stub
+}
+

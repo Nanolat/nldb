@@ -1,0 +1,114 @@
+/*
+ * nldbtree.h
+ *
+ *  Created on: Dec 5, 2012
+ *      Author: kangmo
+ */
+
+#ifndef NLDBTREE_H_
+#define NLDBTREE_H_
+
+
+
+template<int key_size, int keys_per_node> class nldb_tree {
+protected:
+	class node {
+	};
+
+	class key
+	{
+		char key_   [key_size];
+	};
+
+
+	class internal_node : public node
+	{
+		// The number of keys in this node.
+		int    key_count_;
+
+		// The sorted keys
+		key    keys_[keys_per_node];
+		// The children for keys.
+		node * right_children_[keys_per_node];
+
+		// The child node which has keys less than than the first key.
+		node * left_child_;
+	};
+
+
+	class leaf node : public node
+	{
+		// The number of keys in this node.
+		int    key_count_;
+		// The sorted keys.
+		key    keys_[keys_per_node];
+		// The value for each sorted keys.
+		void * values_[keys_per_node];
+		// The parent node.
+		node * parent_;
+		// The next sibling node
+		node * next_;
+		// The previous sibling
+		node * prev_;
+	};
+
+	class node_factory {
+		leaf_node * new_leaf_node()
+		{
+
+		}
+	};
+
+	internal_node * root;
+
+	int split_node(internal node * node, internal_node ** new_node )
+	{
+
+	}
+
+	int split_node(leaf node * node, leaf_node ** new_node )
+	{
+
+	}
+
+public:
+	nldb_tree();
+	virtual ~nldb_tree();
+
+	int put (const void * key, const int key_len, const void * value, const int value_len)
+	{
+
+	}
+
+	int get (const void * key, const int key_len, void * value, int value_len ) const
+	{
+
+	}
+
+	int del (const void * key, const int key_len)
+	{
+
+	}
+
+	int search_forward(const void * key, const int key_len)
+	{
+
+	}
+
+	int search_backward(const void * key, const int key_len)
+	{
+
+	}
+
+	int move_forward(void * key, int key_len, void * value, int value_len, bool * end_of_iter)
+	{
+
+	}
+
+	int move_backward(void * key, int key_len, void * value, int value_len, bool * end_of_iter)
+	{
+
+	}
+};
+
+#endif /* NLDBTREE_H_ */

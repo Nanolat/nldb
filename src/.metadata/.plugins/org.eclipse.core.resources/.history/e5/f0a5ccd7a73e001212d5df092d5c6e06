@@ -1,0 +1,37 @@
+/*
+ * nldbtree.h
+ *
+ *  Created on: Dec 5, 2012
+ *      Author: kangmo
+ */
+
+#ifndef NLDBTREE_H_
+#define NLDBTREE_H_
+
+
+
+template<int key_size, int value_size, int keys_per_node> class nldb_tree {
+	class key_value {
+		char key_   [key_size];
+		char value_ [value_size];
+		node * child
+	};
+
+	class node {
+		char      min_key_ [key_size];
+		// The key-value pair.
+		key_value kv_[keys_per_node];
+		// The parent node
+		node * parent_;
+		// The next sibling node which has greater key
+		node * next_;
+	};
+
+public:
+	nldb_tree();
+	virtual ~nldb_tree();
+
+
+};
+
+#endif /* NLDBTREE_H_ */

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;include/llcep/linq.h&apos; to &apos;llq.h&apos;" description="Rename resource &apos;linq.h&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="llcep/linq.h" name="llq.h" stamp="1350025640074" updateReferences="true"/>
+</session>

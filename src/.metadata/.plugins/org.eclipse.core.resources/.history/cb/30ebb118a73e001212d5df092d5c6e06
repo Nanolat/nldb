@@ -1,0 +1,26 @@
+/*
+ * nldbtree.h
+ *
+ *  Created on: Dec 5, 2012
+ *      Author: kangmo
+ */
+
+#ifndef NLDBTREE_H_
+#define NLDBTREE_H_
+
+
+
+class nldb_tree {
+	class node {
+		;
+		node * parent_;
+		node * next_;
+	};
+public:
+	nldb_tree();
+	virtual ~nldb_tree();
+
+
+};
+
+#endif /* NLDBTREE_H_ */

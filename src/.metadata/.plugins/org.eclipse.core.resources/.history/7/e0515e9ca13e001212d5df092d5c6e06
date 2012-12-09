@@ -1,0 +1,33 @@
+################################################################################
+# Automatically-generated file. Do not edit!
+################################################################################
+
+# Add inputs and outputs from these tool invocations to the build variables 
+CPP_SRCS += \
+../main.cpp \
+../nldb_cursor_dirty_test.cpp \
+../nldb_cursor_test.cpp \
+../nldb_test.cpp 
+
+OBJS += \
+./main.o \
+./nldb_cursor_dirty_test.o \
+./nldb_cursor_test.o \
+./nldb_test.o 
+
+CPP_DEPS += \
+./main.d \
+./nldb_cursor_dirty_test.d \
+./nldb_cursor_test.d \
+./nldb_test.d 
+
+
+# Each subdirectory must supply rules for building sources it contributes
+%.o: ../%.cpp
+	@echo 'Building file: $<'
+	@echo 'Invoking: GCC C++ Compiler'
+	g++ -I"/home/kangmo/nldb/src/externals/gtest/include" -I"/home/kangmo/nldb/src/include" -O0 -g3 -Wall -c -fmessage-length=0 -std=c++0x -std=gnu++0x -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
+	@echo 'Finished building: $<'
+	@echo ' '
+
+

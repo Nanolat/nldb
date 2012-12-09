@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;gtest/nldb_dirty_cursor_test.cpp&apos; to &apos;nldb_cursor_dirty_test.cpp&apos;" description="Rename resource &apos;nldb_dirty_cursor_test.cpp&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="nldb_dirty_cursor_test.cpp" name="nldb_cursor_dirty_test.cpp" stamp="1354325852581" updateReferences="true"/>
+</session>

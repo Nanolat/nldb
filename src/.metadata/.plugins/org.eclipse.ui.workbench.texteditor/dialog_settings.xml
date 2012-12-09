@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
+		<item value="312" key="DIALOG_WIDTH"/>
+		<item value="280" key="DIALOG_Y_ORIGIN"/>
+		<item value="437" key="DIALOG_HEIGHT"/>
+		<item value="0" key="DIALOG_X_ORIGIN"/>
+		<item value="1|Ubuntu|11.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
+	</section>
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
+		<item value="false" key="wrap"/>
+		<item value="false" key="isRegEx"/>
+		<item value="true" key="casesensitive"/>
+		<item value="false" key="incremental"/>
+		<item value="false" key="wholeword"/>
+		<item value="data_" key="selection"/>
+		<list key="findhistory">
+			<item value="data_"/>
+			<item value="get_data"/>
+			<item value="search_"/>
+			<item value="search_first_ge_key_position"/>
+			<item value="find_serving_node"/>
+			<item value="set_key_and_data"/>
+			<item value="find_leaf_node"/>
+			<item value="find_leaf"/>
+		</list>
+		<list key="replacehistory">
+			<item value="nldb_plugin_array_tree_t"/>
+			<item value="nldb_"/>
+			<item value=""/>
+			<item value="NLDB_"/>
+			<item value="llq"/>
+			<item value="LLQ_"/>
+		</list>
+	</section>
+	<section name="org.eclipse.ui.texteditor.GotoLineAction$GotoLineDialog_dialogBounds">
+		<item value="372" key="DIALOG_Y_ORIGIN"/>
+		<item value="404" key="DIALOG_X_ORIGIN"/>
+	</section>
+</section>

@@ -1,0 +1,66 @@
+/*
+ * nldbtree.h
+ *
+ *  Created on: Dec 5, 2012
+ *      Author: kangmo
+ */
+
+#ifndef NLDBTREE_H_
+#define NLDBTREE_H_
+
+
+
+template<int key_size, int keys_per_node> class nldb_tree {
+	class node {
+	};
+
+	class internal_key
+	{
+		char key_   [key_size];
+		// The child node which has keys greater than the given key.
+		node * right_child_;
+	};
+
+	class internal_node : public node
+	{
+		// The number of keys in this node.
+		int key_count;
+		// The indirect index which has index to kv_ in ascending order.
+		int sorted_key_index[keys_per_node];
+		internal_key keys[keys_per_node];
+
+		// The child node which has keys less than than the first key.
+		node * left_child_;
+	};
+
+	class key_value
+	{
+		char key_   [key_size];
+		void * value
+	};
+
+	class leaf node : public node
+	{
+		// The number of keys in this node.
+		int key_count_;
+		// The indirect index which has index to kvs_ in ascending order.
+		int sorted_key_index[keys_per_node];
+
+		// The key-value pairs. The keys are not sorted in this array.
+		key_value pairs_[keys_per_node];
+		// The parent node.
+		node * parent_;
+		// The next sibling node
+		node * next_;
+		// The previous sibling
+		node * prev_;
+	};
+
+public:
+	nldb_tree();
+	virtual ~nldb_tree();
+
+
+};
+
+#endif /* NLDBTREE_H_ */

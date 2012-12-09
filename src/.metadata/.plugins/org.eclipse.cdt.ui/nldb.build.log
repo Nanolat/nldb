@@ -1,0 +1,49 @@
+
+**** Build of configuration Release for project nldb ****
+
+make all 
+Building file: ../nldb_array_tree.cpp
+Invoking: GCC C++ Compiler
+g++ -I"/home/kangmo/nldb/src/externals/boost" -I"/home/kangmo/nldb/src/include" -I"/home/kangmo/nldb/src/txbase" -I"/home/kangmo/nldb/src/disruptor--" -I"/home/kangmo/nldb/src/externals/tokyocabinet" -I"/home/kangmo/nldb/src/externals/leveldb/include" -I"/home/kangmo/nldb/src/externals/libxs/include" -O3 -Wall -c -fmessage-length=0 -std=c++0x  -static-libgcc -static-libstdc++ -nodefaultlibs -shared -fPIC -fPIC -MMD -MP -MF"nldb_array_tree.d" -MT"nldb_array_tree.d" -o "nldb_array_tree.o" "../nldb_array_tree.cpp"
+Finished building: ../nldb_array_tree.cpp
+ 
+Building file: ../nldb_plugin_array_tree.cpp
+Invoking: GCC C++ Compiler
+g++ -I"/home/kangmo/nldb/src/externals/boost" -I"/home/kangmo/nldb/src/include" -I"/home/kangmo/nldb/src/txbase" -I"/home/kangmo/nldb/src/disruptor--" -I"/home/kangmo/nldb/src/externals/tokyocabinet" -I"/home/kangmo/nldb/src/externals/leveldb/include" -I"/home/kangmo/nldb/src/externals/libxs/include" -O3 -Wall -c -fmessage-length=0 -std=c++0x  -static-libgcc -static-libstdc++ -nodefaultlibs -shared -fPIC -fPIC -MMD -MP -MF"nldb_plugin_array_tree.d" -MT"nldb_plugin_array_tree.d" -o "nldb_plugin_array_tree.o" "../nldb_plugin_array_tree.cpp"
+Finished building: ../nldb_plugin_array_tree.cpp
+ 
+Building file: ../nldb_plugin_leveldb.cpp
+Invoking: GCC C++ Compiler
+g++ -I"/home/kangmo/nldb/src/externals/boost" -I"/home/kangmo/nldb/src/include" -I"/home/kangmo/nldb/src/txbase" -I"/home/kangmo/nldb/src/disruptor--" -I"/home/kangmo/nldb/src/externals/tokyocabinet" -I"/home/kangmo/nldb/src/externals/leveldb/include" -I"/home/kangmo/nldb/src/externals/libxs/include" -O3 -Wall -c -fmessage-length=0 -std=c++0x  -static-libgcc -static-libstdc++ -nodefaultlibs -shared -fPIC -fPIC -MMD -MP -MF"nldb_plugin_leveldb.d" -MT"nldb_plugin_leveldb.d" -o "nldb_plugin_leveldb.o" "../nldb_plugin_leveldb.cpp"
+Finished building: ../nldb_plugin_leveldb.cpp
+ 
+Building file: ../nldb_plugin_tc.cpp
+Invoking: GCC C++ Compiler
+g++ -I"/home/kangmo/nldb/src/externals/boost" -I"/home/kangmo/nldb/src/include" -I"/home/kangmo/nldb/src/txbase" -I"/home/kangmo/nldb/src/disruptor--" -I"/home/kangmo/nldb/src/externals/tokyocabinet" -I"/home/kangmo/nldb/src/externals/leveldb/include" -I"/home/kangmo/nldb/src/externals/libxs/include" -O3 -Wall -c -fmessage-length=0 -std=c++0x  -static-libgcc -static-libstdc++ -nodefaultlibs -shared -fPIC -fPIC -MMD -MP -MF"nldb_plugin_tc.d" -MT"nldb_plugin_tc.d" -o "nldb_plugin_tc.o" "../nldb_plugin_tc.cpp"
+Finished building: ../nldb_plugin_tc.cpp
+ 
+Building file: ../nldb_repl_slave_thread.cpp
+Invoking: GCC C++ Compiler
+g++ -I"/home/kangmo/nldb/src/externals/boost" -I"/home/kangmo/nldb/src/include" -I"/home/kangmo/nldb/src/txbase" -I"/home/kangmo/nldb/src/disruptor--" -I"/home/kangmo/nldb/src/externals/tokyocabinet" -I"/home/kangmo/nldb/src/externals/leveldb/include" -I"/home/kangmo/nldb/src/externals/libxs/include" -O3 -Wall -c -fmessage-length=0 -std=c++0x  -static-libgcc -static-libstdc++ -nodefaultlibs -shared -fPIC -fPIC -MMD -MP -MF"nldb_repl_slave_thread.d" -MT"nldb_repl_slave_thread.d" -o "nldb_repl_slave_thread.o" "../nldb_repl_slave_thread.cpp"
+In file included from ../nldb_transaction_log_buffer.h:28:0,
+                 from ../nldb_repl_slave_thread.cpp:35:
+../nldb_transaction_log_redoer.h: In constructor ‘TxTransactionLogRedoer::TxTransactionLogRedoer(nldb_db_holder_t*&, nldb_rc_t (* const&)(nldb_trigger_type_t, const nldb_table_id_t&, const nldb_key_t&, const nldb_value_t&))’:
+../nldb_transaction_log_redoer.h:48:54: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+../nldb_repl_slave_thread.cpp: In function ‘void replication_slave_thread_func(nldb_db_holder_t*&, const string&, short unsigned int, nldb_rc_t (* const&)(nldb_trigger_type_t, const nldb_table_id_t&, const nldb_key_t&, const nldb_value_t&))’:
+../nldb_repl_slave_thread.cpp:142:119: warning: format ‘%d’ expects argument of type ‘int’, but argument 2 has type ‘size_t {aka long unsigned int}’ [-Wformat]
+../nldb_transaction_log_redoer.h:99:54: warning: ‘table’ may be used uninitialized in this function [-Wuninitialized]
+../nldb_transaction_log_redoer.h:79:18: note: ‘table’ was declared here
+Finished building: ../nldb_repl_slave_thread.cpp
+ 
+Building file: ../nldb_sorted_array.cpp
+Invoking: GCC C++ Compiler
+g++ -I"/home/kangmo/nldb/src/externals/boost" -I"/home/kangmo/nldb/src/include" -I"/home/kangmo/nldb/src/txbase" -I"/home/kangmo/nldb/src/disruptor--" -I"/home/kangmo/nldb/src/externals/tokyocabinet" -I"/home/kangmo/nldb/src/externals/leveldb/include" -I"/home/kangmo/nldb/src/externals/libxs/include" -O3 -Wall -c -fmessage-length=0 -std=c++0x  -static-libgcc -static-libstdc++ -nodefaultlibs -shared -fPIC -fPIC -MMD -MP -MF"nldb_sorted_array.d" -MT"nldb_sorted_array.d" -o "nldb_sorted_array.o" "../nldb_sorted_array.cpp"
+Finished building: ../nldb_sorted_array.cpp
+ 
+Building target: libnldb.so
+Invoking: GCC C++ Linker
+g++ -L"/home/kangmo/nldb/src/externals/tokyocabinet" -L"/home/kangmo/nldb/src/externals/leveldb" -L"/home/kangmo/nldb/src/externals/libxs/src/.libs" -L"/home/kangmo/nldb/src/externals/boost/stage/lib" -shared -o "libnldb.so"  ./nldb.o ./nldb_array_tree.o ./nldb_plugin_array_tree.o ./nldb_plugin_leveldb.o ./nldb_plugin_tc.o ./nldb_repl_slave_thread.o ./nldb_sorted_array.o   -l:libleveldb.a -l:libxs.a -l:libtokyocabinet.a -l:libbz2.so -l:libboost_thread.so -l:libz.so -l:libpthread.so -l:libdl.so -l:librt.so
+Finished building target: libnldb.so
+ 
+
+**** Build Finished ****
