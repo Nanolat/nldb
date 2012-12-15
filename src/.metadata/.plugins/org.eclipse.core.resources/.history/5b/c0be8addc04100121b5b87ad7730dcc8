@@ -1,8 +1,0 @@
-################################################################################
-# Automatically-generated file. Do not edit!
-################################################################################
-
-USER_OBJS :=
-
-LIBS := -l:libleveldb.a -l:libxs.a -l:libtokyocabinet.a -l:libbz2.so -l:libboost_thread.so -l:libz.so -l:libpthread.so -l:libdl.so -l:librt.so
-

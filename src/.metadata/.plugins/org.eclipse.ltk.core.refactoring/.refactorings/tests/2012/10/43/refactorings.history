@@ -1,3 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">&#x0A;<refactoring comment="Rename resource &apos;tests/long_event.h&apos; to &apos;test_long_event.h&apos;" description="Rename resource &apos;long_event.h&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="long_event.h" name="test_long_event.h" stamp="1351142863877" updateReferences="true"/>&#x0A;<refactoring comment="Rename resource &apos;tests/stub_event.h&apos; to &apos;test_stub_event.h&apos;" description="Rename resource &apos;stub_event.h&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="stub_event.h" name="test_stub_event.h" stamp="1351142874266" updateReferences="true"/>
-</session>
