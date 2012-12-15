@@ -19,6 +19,7 @@
 #include "nldb_plugin_array_tree.h"
 
 #include "nldb_array_tree.h"
+#include "nldb_debuggable_array_tree.h"
 
 #include <boost/pool/pool.hpp>
 #include <txbase/tx_assert.h>
@@ -36,11 +37,15 @@ nldb_rc_t nldb_plugin_array_tree_t::table_drop(nldb_plugin_table_desc_t & table_
 	return NLDB_OK;
 }
 
-const int KEY_SPACE_SIZE = 256;
+const int KEY_SPACE_SIZE = 64;
 class table_context_t
 {
 public :
+#if defined(DEBUG)
+	typedef nldb_debuggable_array_tree<KEY_SPACE_SIZE> tree_t;
+#else
 	typedef nldb_array_tree<KEY_SPACE_SIZE> tree_t;
+#endif
 
 private :
 
@@ -75,7 +80,7 @@ public :
 
 	inline bool isInitialized()
 	{
-		return initialized_ = true;
+		return initialized_;
 	}
 
 	table_context_t()
@@ -98,6 +103,8 @@ public :
 			return rc;
 
 		value_pool_ = new boost::pool<>(value_length_);
+
+		initialized_ = true;
 
 		return NLDB_OK;
 	}
@@ -182,7 +189,7 @@ nldb_rc_t nldb_plugin_array_tree_t::table_put(nldb_table_context_t table_ctx, co
 
 	table_context_t * ctx = (table_context_t*) table_ctx;
 
-	check_context_initialized(ctx, key.length, value.length);
+	tx_assert( check_context_initialized(ctx, key.length, value.length) == NLDB_OK );
 
 	void * value_ptr = ctx->value_pool().malloc();
 	memcpy(value_ptr, value.data, value.length);
@@ -211,8 +218,15 @@ nldb_rc_t nldb_plugin_array_tree_t::table_get(nldb_table_context_t table_ctx, co
 	rc = ctx->tree().get(key.data, &value_ptr);
 	if (rc) return rc;
 
-	value->length = ctx->value_length();
-	value->data = value_ptr;
+	if (value_ptr )
+	{
+		value->length = ctx->value_length();
+		value->data = value_ptr;
+	}
+	else
+	{
+		return NLDB_ERROR_KEY_NOT_FOUND;
+	}
 
 	return NLDB_OK;
 }
@@ -269,7 +283,7 @@ public :
 		SEEK_BACKWARD = 2
 	} direction;
 
-	table_context_t::tree_t::iterator iter_;
+	table_context_t::tree_t::iterator_t iter_;
 	table_context_t * table_ctx_;
 
 	direction dir_;
@@ -347,7 +361,7 @@ nldb_rc_t nldb_plugin_array_tree_t::cursor_move_forward (nldb_cursor_context_t c
 		key->length = the_table_ctx->key_length();
 		key->data = key_data;
 
-		value->length = the_table_ctx->key_length();
+		value->length = the_table_ctx->value_length();
 		value->data = value_data;
 	}
 	else
@@ -409,7 +423,7 @@ nldb_rc_t nldb_plugin_array_tree_t::cursor_move_backward(nldb_cursor_context_t c
 		key->length = the_table_ctx->key_length();
 		key->data = key_data;
 
-		value->length = the_table_ctx->key_length();
+		value->length = the_table_ctx->value_length();
 		value->data = value_data;
 	}
 	else

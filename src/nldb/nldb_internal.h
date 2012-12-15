@@ -28,6 +28,40 @@
 // For linux platform, we need to define _snprintf, which exists only in windows platform.
 #define _snprintf snprintf
 
+// How long should we sleep for master and slaves to handshake each other?
+#define XS_HANDSHAKE_SLEEP_SECONDS (10)
+
+// for ntohs, ntohl
+#include <arpa/inet.h>
+// for be64toh
+#include <endian.h>
+
+// The keys in tree are encoded in big endian to simply use memcmp for key comparison.
+// To get the key from three nodes, we need to convert the key from big endian to host machine encoding.
+inline unsigned long long get_uint64_key(const void * key, int key_length)
+{
+	unsigned long long k;
+	switch(key_length)
+	{
+	case 1:
+		k = (unsigned long long) *((unsigned char*)key);
+		break;
+	case 2:
+		k = (unsigned long long) ntohs( *((unsigned short*)key) ) ;
+		break;
+	case 4:
+		k = (unsigned long long) ntohl( *((unsigned int*)key) ) ;
+		break;
+	case 8:
+		k = be64toh( *((unsigned long long*)key) );
+		break;
+	default:
+		k = 0;
+		break;
+	}
+	return k;
+}
+
 #endif
 
 

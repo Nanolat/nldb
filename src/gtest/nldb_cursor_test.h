@@ -44,21 +44,21 @@ class NLDBCursorTest : public NLDBTest {
     	ASSERT_TRUE( nldb_tx_begin(tx) == 0 );
 
     	// put values with random order.
-    	ASSERT_TRUE( nldb_table_put( tx, pers_table, KEY(r3), VALUE(r3) ) == 0 );
-    	ASSERT_TRUE( nldb_table_put( tx, pers_table, KEY(r7), VALUE(r7) ) == 0 );
-    	ASSERT_TRUE( nldb_table_put( tx, pers_table, KEY(r2), VALUE(r2) ) == 0 );
-    	ASSERT_TRUE( nldb_table_put( tx, pers_table, KEY(r1), VALUE(r1) ) == 0 );
-    	ASSERT_TRUE( nldb_table_put( tx, pers_table, KEY(r4), VALUE(r4) ) == 0 );
-    	ASSERT_TRUE( nldb_table_put( tx, pers_table, KEY(r5), VALUE(r5) ) == 0 );
-    	ASSERT_TRUE( nldb_table_put( tx, pers_table, KEY(r8), VALUE(r8) ) == 0 );
-    	ASSERT_TRUE( nldb_table_put( tx, pers_table, KEY(r6), VALUE(r6) ) == 0 );
+    	ASSERT_TRUE( nldb_table_put( tx, vol_table, KEY(r3), VALUE(r3) ) == 0 );
+    	ASSERT_TRUE( nldb_table_put( tx, vol_table, KEY(r7), VALUE(r7) ) == 0 );
+    	ASSERT_TRUE( nldb_table_put( tx, vol_table, KEY(r2), VALUE(r2) ) == 0 );
+    	ASSERT_TRUE( nldb_table_put( tx, vol_table, KEY(r1), VALUE(r1) ) == 0 );
+    	ASSERT_TRUE( nldb_table_put( tx, vol_table, KEY(r4), VALUE(r4) ) == 0 );
+    	ASSERT_TRUE( nldb_table_put( tx, vol_table, KEY(r5), VALUE(r5) ) == 0 );
+    	ASSERT_TRUE( nldb_table_put( tx, vol_table, KEY(r8), VALUE(r8) ) == 0 );
+    	ASSERT_TRUE( nldb_table_put( tx, vol_table, KEY(r6), VALUE(r6) ) == 0 );
 
 
     	ASSERT_TRUE( nldb_tx_commit(tx) == 0 );
 
 		ASSERT_TRUE( nldb_tx_begin(tx) == 0 );
 
-		ASSERT_TRUE( nldb_cursor_open(tx, pers_table, &cursor) == 0 );
+		ASSERT_TRUE( nldb_cursor_open(tx, vol_table, &cursor) == 0 );
 
     }
 

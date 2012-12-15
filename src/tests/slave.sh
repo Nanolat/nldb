@@ -1,1 +1,1 @@
-./tests lldb-slave
+./tests nldb-slave

@@ -24,16 +24,19 @@
 // for memcmp
 #include <string.h>
 
+// for debugging printf
+#include <stdio.h>
+
 #include <txbase/tx_assert.h>
 
 const int NLDB_TREE_MIN_KEY_SIZE = 1;
-/*
- * nldb_sorted_array : a sorted array of fixed size keys. Each key maps to a void* data.
- */
 
+#include "nldb_internal.h"
+/*
+ * nldb_array_tree : a balanced tree whose nodes have sorted array of fixed size keys.
+ */
 template<int key_space_size> class nldb_array_tree {
 protected:
-
 	class node_t {
 	public :
 		// The magic value to check if the node memory is not corrupt
@@ -47,12 +50,12 @@ protected:
 		// Magic value.
 		NODE_MAGIC_VALUE magic_;
 	public :
-		inline bool is_internal_node()
+		inline bool is_internal_node() const
 		{
 			return (magic_ == INTERNAL_NODE_MAGIC) ? true : false;
 		}
 
-		inline bool is_leaf_node()
+		inline bool is_leaf_node() const
 		{
 			return (magic_ == LEAF_NODE_MAGIC) ? true : false;
 		}
@@ -76,7 +79,7 @@ protected:
 
 	class leaf_node_t : public node_t
 	{
-	private:
+	protected:
 		// The sorted keys in an array. Each key has a mapping from a key to pointer of the value.
 		nldb_sorted_array<key_space_size> keys_with_values_;
 
@@ -88,38 +91,60 @@ protected:
 
 		leaf_node_t(const key_length_t & key_length) : node_t( node_t::LEAF_NODE_MAGIC )
 		{
+			tx_debug_assert( node_t::is_leaf_node() );
+
 			tx_debug_assert( key_length > 0 );
 
+			// The internal node should be able to store at least three keys.
+			tx_debug_assert( key_space_size/key_length >= 2 );
+
 			keys_with_values_.init(key_length);
+
+			next_ = NULL;
+			prev_ = NULL;
 		}
 		virtual ~leaf_node_t()
 		{
+			tx_debug_assert( node_t::is_leaf_node() );
 		}
 
 		bool is_empty() const
 		{
+			tx_debug_assert( node_t::is_leaf_node() );
+
 			return keys_with_values_.is_empty();
 		}
 
 		bool is_full() const
 		{
+			tx_debug_assert( node_t::is_leaf_node() );
+
 			return keys_with_values_.is_full();
 		}
 
+		// Return NULL if no key exists in this node.
+		// Otherwise return the minimum key in this node.
 		const void * min_key() const
 		{
+			tx_debug_assert( node_t::is_leaf_node() );
+
 			return keys_with_values_.min_key();
 		}
 
 		nldb_sorted_array<key_space_size> & keys_with_values()
 		{
+			tx_debug_assert( node_t::is_leaf_node() );
+
 			return keys_with_values_;
 		}
 
 		nldb_rc_t put (const void * key, const void * value)
 		{
+			tx_debug_assert( node_t::is_leaf_node() );
+
 			tx_debug_assert( key != NULL );
 			tx_debug_assert( value != NULL );
+
 
 			nldb_rc_t rc = keys_with_values_.put(key, value);
 			if (rc) return rc;
@@ -128,6 +153,8 @@ protected:
 		}
 		nldb_rc_t get (const void * key, void ** value ) const
 		{
+			tx_debug_assert( node_t::is_leaf_node() );
+
 			tx_debug_assert( key != NULL );
 			tx_debug_assert( value != NULL );
 
@@ -138,6 +165,8 @@ protected:
 		}
 		nldb_rc_t del (const void * key, void ** value)
 		{
+			tx_debug_assert( node_t::is_leaf_node() );
+
 			tx_debug_assert( key != NULL );
 			tx_debug_assert( value != NULL );
 
@@ -149,6 +178,8 @@ protected:
 
 		nldb_rc_t merge_with(leaf_node_t * node)
 		{
+			tx_debug_assert( node_t::is_leaf_node() );
+
 			tx_debug_assert( node != NULL );
 
 			// Not implemented yet. Merging nodes is P2. We will implement the feature after the first release of NLDB.
@@ -157,27 +188,59 @@ protected:
 
 		nldb_rc_t split(leaf_node_t ** right_node )
 		{
+			tx_debug_assert( node_t::is_leaf_node() );
+
 			tx_debug_assert( right_node != NULL );
 
-			leaf_node_t * node = node_factory::new_leaf_node(keys_with_values_.key_length());
+			// A leaf node should have at least two keys before the split operation
+			tx_debug_assert( keys_with_values_.key_count() >= 2 );
+
+			leaf_node_t * new_node = node_factory::new_leaf_node(keys_with_values_.key_length());
 
 			// Move half of keys in this node to "node".
-			keys_with_values_.split( & node->keys_with_values() );
-			// Not implemented yet.
+			nldb_rc_t rc = keys_with_values_.split( & new_node->keys_with_values() );
+			if(rc) return rc;
+
+			// Check link consistency
+			tx_debug_assert(this->prev_ == NULL || this->prev_->next_ == this);
+			tx_debug_assert(this->next_ == NULL || this->next_->prev_ == this);
 
 			// Maintain the double linked list on the leaf nodes.
-			node->prev_ = this;
-			node->next_ = this->next_;
-			this->next_ = node;
+			new_node->prev_ = this;
+			new_node->next_ = this->next_;
+
+			if ( this->next_ )
+				this->next_->prev_ = new_node;
+
+			this->next_ = new_node;
+
+			*right_node = new_node;
 
 			return NLDB_OK;
 		}
+/*
+ 	 	// Unused function.
+		// Remove the leaf node from the leaf-level linked list
+		void unlink()
+		{
+			if (this->prev_)
+			{
+				this->prev_->next_ = this->next_;
+			}
 
+			if (this->next_)
+			{
+				this->next_->prev_ = this->prev_;
+			}
+			this->next_ = NULL;
+			this->prev_ = NULL;
+		}
+*/
 	};
 
 	class internal_node_t : public node_t
 	{
-	private:
+	protected:
 		// The sorted keys in an array. Each key has a mapping from a key to the right children node.
 		nldb_sorted_array<key_space_size> keys_with_right_children_;
 
@@ -186,16 +249,24 @@ protected:
 	public :
 		internal_node_t(const key_length_t & key_length) : node_t( node_t::INTERNAL_NODE_MAGIC )
 		{
+			tx_debug_assert( node_t::is_internal_node() );
+
 			tx_debug_assert( key_length > 0 );
 
-			keys_with_right_children_.init(key_length);
+			// The internal node should be able to store at least three keys.
+			tx_debug_assert( key_space_size/key_length >= 3 );
+
+			keys_with_right_children_.init(key_length );
 		}
 		virtual ~internal_node_t()
 		{
+			tx_debug_assert( node_t::is_internal_node() );
 		}
 
 		void set_left_child(node_t * left_child)
 		{
+			tx_debug_assert( node_t::is_internal_node() );
+
 			tx_debug_assert( left_child != NULL );
 
 			left_child_ = left_child;
@@ -205,31 +276,43 @@ protected:
 
 		node_t * left_child() const
 		{
+			tx_debug_assert( node_t::is_internal_node() );
+
 			return left_child_;
 		}
 
 		bool is_empty() const
 		{
+			tx_debug_assert( node_t::is_internal_node() );
+
 			return keys_with_right_children_.is_empty();
 		}
 
 		bool is_full() const
 		{
+			tx_debug_assert( node_t::is_internal_node() );
+
 			return keys_with_right_children_.is_full();
 		}
 
 		const void * min_key() const
 		{
+			tx_debug_assert( node_t::is_internal_node() );
+
 			return keys_with_right_children_.min_key();
 		}
 
 		nldb_sorted_array<key_space_size> & keys_with_right_children()
 		{
+			tx_debug_assert( node_t::is_internal_node() );
+
 			return keys_with_right_children_;
 		}
 
 		nldb_rc_t put (const void * key, node_t * node )
 		{
+			tx_debug_assert( node_t::is_internal_node() );
+
 			tx_debug_assert( key != NULL );
 			tx_debug_assert( node != NULL );
 
@@ -246,11 +329,13 @@ protected:
 		// Set the root of the subtree to *node.
 		nldb_rc_t find_serving_node (const void * key, node_t ** node ) const
 		{
+			tx_debug_assert( node_t::is_internal_node() );
+
 			tx_debug_assert( key != NULL );
 			tx_debug_assert( node != NULL );
 
 			// find the node that is mapped with the first greater than or equal to the given key.
-			nldb_rc_t rc = keys_with_right_children_.find_first_ge_key(key, (void**)node);
+			nldb_rc_t rc = keys_with_right_children_.find_first_le_key(key, (void**)node);
 			if (rc) return rc;
 
 			// keys_with_right_children_ does not have the serving node for the key.
@@ -264,15 +349,18 @@ protected:
 
 		nldb_rc_t del (const void * key, node_t ** deleted_node )
 		{
+			tx_debug_assert( node_t::is_internal_node() );
+
 			tx_debug_assert( key != NULL );
 			tx_debug_assert( deleted_node != NULL );
 
 			node_t * node;
 
-			nldb_rc_t rc = keys_with_right_children_.get(key, (void**)&node);
+			nldb_rc_t rc = keys_with_right_children_.del(key, (void**)&node);
 			if (rc) return rc;
 
-			node->set_parent(NULL);
+			if (node)
+				node->set_parent(NULL);
 
 			*deleted_node = node;
 
@@ -281,6 +369,8 @@ protected:
 
 		nldb_rc_t merge_with(internal_node_t * node)
 		{
+			tx_debug_assert( node_t::is_internal_node() );
+
 			tx_debug_assert( node != NULL );
 
 			// Not implemented yet. Merging nodes is P2. We will implement the feature after the first release of NLDB.
@@ -289,24 +379,54 @@ protected:
 
 		nldb_rc_t split(internal_node_t ** right_node, void ** mid_key )
 		{
+			tx_debug_assert( node_t::is_internal_node() );
+
 			tx_debug_assert( right_node != NULL );
 			tx_debug_assert( mid_key != NULL );
 
-			internal_node_t * node = node_factory::new_internal_node(keys_with_right_children_.key_length());
+			internal_node_t * new_node = node_factory::new_internal_node(keys_with_right_children_.key_length());
+
+			// An internal node should have at least two keys before the split operation
+			// The original node should have at least three keys.
+			// One for the left node, one for the right node, and the last one for the key in between them.
+			tx_debug_assert( keys_with_right_children_.key_count() >= 3);
 
 			// Move half of keys in this node to "node".
-			keys_with_right_children_.split( & node->keys_with_right_children() );
-			// Not implemented yet.
+			nldb_rc_t rc = keys_with_right_children_.split( & new_node->keys_with_right_children() );
+			if (rc) return rc;
+
+			// Update parent of the children who moved to new_node.
+
+			{
+				typename nldb_sorted_array<key_space_size>::iterator_t iter;
+				rc = new_node->keys_with_right_children().iter_forward(&iter);
+				if (rc) return rc;
+
+				while(1) {
+					void * dummy_key = NULL;
+					node_t * child   = NULL;
+					rc = new_node->keys_with_right_children().iter_next(iter, &dummy_key, (void**)&child);
+					if (rc) return rc;
+
+					if (child == NULL) break;
+
+					(void) child->set_parent(new_node);
+				}
+			}
 
 			// The key in the middle between the two split nodes.
 			void * mid_key_node = NULL;
-			keys_with_right_children_.remove_max_key(mid_key, & mid_key_node);
+			rc = keys_with_right_children_.remove_max_key(mid_key, & mid_key_node);
+			if (rc) return rc;
+
 
 			// Even after removing the maximum key, the node should have at least a key.
 			tx_assert(keys_with_right_children_.key_count() > 0 );
 
 			// Set the node attached with the mid key to the left child of the new split node.
-			node->set_left_child((node_t*)mid_key_node);
+			(void)new_node->set_left_child((node_t*)mid_key_node);
+
+			*right_node = new_node;
 
 			return NLDB_OK;
 		}
@@ -401,6 +521,8 @@ protected:
 
 			nldb_rc_t rc = internal_node->find_serving_node(key, &n);
 			if (rc) return rc;
+
+			tx_debug_assert(n);
 		}
 
 		tx_debug_assert( n->is_leaf_node() );
@@ -430,7 +552,30 @@ protected:
 			nldb_rc_t rc = node->split( &right_node, & mid_key );
 			if (rc) return rc;
 
+			tx_debug_assert(right_node);
+
+			// At this point, mid_key is a pointer to a key in the key_space_ of the node.
+			// If we put the 'key' parameter in the node, the mid_key can be changed to point to another key.
+			// So, we first modify parent nodes, before puting the 'key' parameter in either node or right_node.
+			if ( node->parent() ) // not a root node
+			{
+				rc = put_to_internal_node( (internal_node_t*) node->parent(), mid_key, right_node);
+				if (rc) return rc;
+			}
+			else // root node
+			{
+				// create a new root node
+				internal_node_t * new_root_node = node_factory::new_internal_node(key_length_);
+				// Set the old root node as the left child of the new root node
+				new_root_node->set_left_child(node);
+				// Set the right node as the 2nd child of the new root node.
+				new_root_node->put(mid_key, right_node);
+				// Yes! the new root node is elected!
+				root_node_ = new_root_node;
+			}
+
 			int cmp = compare_keys(key, mid_key);
+
 			if ( cmp < 0 )
 			{
 				rc = node->put(key, key_node);
@@ -447,23 +592,6 @@ protected:
 				// The key and key_node is from the child of this node, which is splitted before this function was called.
 				// It does not make sense the key in the middle of the splitted child node exists in the parent(this) node.
 				tx_assert(0);
-			}
-
-			if ( node->parent() ) // not a root node
-			{
-				rc = put_to_internal_node( (internal_node_t*) node->parent(), mid_key, right_node);
-				if (rc) return rc;
-			}
-			else // root node
-			{
-				// create a new root node
-				internal_node_t * new_root_node = node_factory::new_internal_node(key_length_);
-				// Set the old root node as the left child of the new root node
-				new_root_node->set_left_child(node);
-				// Set the right node as the 2nd child of the new root node.
-				new_root_node->put(mid_key, right_node);
-				// Yes! the new root node is elected!
-				root_node_ = new_root_node;
 			}
 		}
 		else
@@ -490,9 +618,12 @@ protected:
 			nldb_rc_t rc = node->split( &right_node );
 			if (rc) return rc;
 
-			const void * mid_key = right_node->min_key();
+			tx_debug_assert( right_node != NULL );
 
-			if ( compare_keys(mid_key, key) < 0 )
+			const void * mid_key = right_node->min_key();
+			tx_debug_assert(mid_key);
+
+			if ( compare_keys(key, mid_key) < 0 )
 			{
 				rc = node->put(key, value);
 				if (rc) return rc;
@@ -514,7 +645,8 @@ protected:
 		return NLDB_OK;
 	}
 
-	nldb_rc_t del_from_internal_node(internal_node_t * node, const void * key, node_t ** deleted_node)
+	/*
+	nldb_rc_t del_from_internal_node(internal_node_t * node, const void * key, node_t ** out_deleted_node)
 	{
 		tx_debug_assert( is_initialized() );
 
@@ -523,9 +655,18 @@ protected:
 		tx_debug_assert( deleted_node != NULL );
 
 		const void * old_min_key = node->min_key();
+		tx_debug_assert(old_min_key);
 
-		nldb_rc_t rc = node->del(key, deleted_node);
+		nldb_rc_t rc = node->del(key, out_deleted_node);
 		if (rc) return rc;
+
+		if ( *out_deleted_node == NULL)
+		{
+			return NLDB_OK;
+		}
+
+		// The key was found. It means the node had at least a key, which means old_min_key should not be NULL.
+		tx_debug_assert( old_min_key != NULL );
 
 		if ( compare_keys( old_min_key, key) == 0 ) // Was the deleted key the minimum key?
 		{
@@ -539,7 +680,9 @@ protected:
 				}
 				else
 				{
+					// TODO : what to do if the internal node does not have any keys any more?
 					const void * new_min_key = node->min_key();
+					tx_debug_assert(new_min_key);
 
 					node_t * deleted_node = NULL;
 
@@ -565,7 +708,7 @@ protected:
 
 		return NLDB_OK;
 	}
-
+*/
 
 	nldb_rc_t del_from_leaf_node(leaf_node_t * node, const void * key, void ** deleted_value)
 	{
@@ -580,6 +723,17 @@ protected:
 		nldb_rc_t rc = node->del(key, deleted_value);
 		if (rc) return rc;
 
+		if ( *deleted_value == NULL)
+		{
+			return NLDB_OK;
+		}
+
+		// The key was found. It means the node had at least a key, which means old_min_key should not be NULL.
+		tx_debug_assert( old_min_key != NULL );
+
+		// 1. Keep the keys in parent unchanged.
+		// 2. Even though the leaf node becomes empty, don't update parents.
+/*
 		if ( compare_keys( old_min_key, key) == 0 ) // Was the deleted key the minimum key?
 		{
 			internal_node_t * parent = (internal_node_t*) node->parent();
@@ -590,8 +744,6 @@ protected:
 			}
 			else
 			{
-				const void * new_min_key = node->min_key();
-
 				node_t * deleted_node = NULL;
 
 				// TODO : find a way to update an existing key in the node.
@@ -602,15 +754,35 @@ protected:
 
 				tx_assert(deleted_node == node);
 
-				// put the new minimum key in the parent.
-				rc = put_to_internal_node(parent, new_min_key, node);
-				if (rc) return rc;
+				const void * new_min_key = node->min_key();
+
+				if ( new_min_key) {
+					// put the new minimum key in the parent.
+					rc = put_to_internal_node(parent, new_min_key, node);
+					if (rc) return rc;
+				}
+				else
+				{
+					// node->min_key() returned NULL. This means The leaf node is empty.
+					tx_debug_assert( node->is_empty() );
+
+					// Decision : Don't eliminate an empty leaf node for now.
+
+					// TODO : Eliminate empty leaf node.
+					// Remove minimum key of the leaf node from the parent node.
+					// Merge parent (internal) nodes if necessary.
+
+					// The leaf node is empty node.
+					// return the leaf node to the pool.
+					//(void) node->unlink();
+					//(void) node->set_parent(NULL);
+					//(void) node_factory::return_leaf_node(node);
+				}
 			}
 		}
-
+*/
 		return NLDB_OK;
 	}
-
 
 	bool initialized_;
 	int  key_length_;
@@ -618,13 +790,13 @@ protected:
 	internal_node_t * root_node_;
 
 public:
-	typedef struct iterator
+	typedef struct iterator_t
 	{
 		// The node that has the key to iterate.
 		leaf_node_t * current_node_;
 		// The iterator within the sorted key array in the current_node_.
-		typename nldb_sorted_array<key_space_size>::iterator key_iter_;
-	} iterator;
+		typename nldb_sorted_array<key_space_size>::iterator_t key_iter_;
+	} iterator_t;
 
 	int key_length() {
 		tx_debug_assert( key_length_ > 0 );
@@ -636,7 +808,7 @@ public:
 	}
 	virtual ~nldb_array_tree() {}
 
-	bool is_initialized() {
+	bool is_initialized() const {
 		return initialized_;
 	}
 
@@ -645,19 +817,25 @@ public:
 		// the array tree object should not be initialized twice.
 		tx_debug_assert( ! is_initialized() );
 
-		initialized_ = true;
 		key_length_ = key_length;
 
+		// 1. Create the root node.
 		root_node_ = node_factory::new_internal_node( key_length_ );
 
-		// Not implemented yet.
+		// 2. Create a leaf node to add it as the left child of the root node.
+		leaf_node_t * leaf = node_factory::new_leaf_node( key_length_ );
+
+		// Set the leaf node as the left child of the root node.
+		(void)root_node_->set_left_child(leaf);
+
+		initialized_ = true;
 		return NLDB_OK;
 	}
 
 	nldb_rc_t destroy()
 	{
 		initialized_ = false;
-		// Not implemented yet.
+
 		return NLDB_OK;
 	}
 
@@ -666,18 +844,6 @@ public:
 		tx_debug_assert( is_initialized() );
 		tx_debug_assert( key != NULL );
 		tx_debug_assert( value != NULL );
-
-		if (root_node_->is_empty()) // No key exists at all.
-		{
-			leaf_node_t * leaf = node_factory::new_leaf_node( key_length_ );
-
-			// Put the value on the leaf node.
-			nldb_rc_t rc = leaf->put(key, value);
-			if (rc) return rc;
-
-			// Set the leaf node as the left child of the root node.
-			(void)root_node_->set_left_child(leaf);
-		}
 
 		leaf_node_t * leaf = NULL;
 
@@ -728,7 +894,7 @@ public:
 		return NLDB_OK;
 	}
 
-	nldb_rc_t seek_forward(const void * key, iterator * iter) const
+	nldb_rc_t seek_forward(const void * key, iterator_t * iter) const
 	{
 		tx_debug_assert( is_initialized() );
 		tx_debug_assert( key != NULL );
@@ -753,7 +919,7 @@ public:
 		return NLDB_OK;
 	}
 
-	nldb_rc_t seek_backward(const void * key, iterator * iter) const
+	nldb_rc_t seek_backward(const void * key, iterator_t * iter) const
 	{
 		tx_debug_assert( is_initialized() );
 		tx_debug_assert( key != NULL );
@@ -778,7 +944,7 @@ public:
 		return NLDB_OK;
 	}
 
-	nldb_rc_t move_forward(iterator & iter, void ** key, void ** value, bool * end_of_iter) const
+	nldb_rc_t move_forward(iterator_t & iter, void ** key, void ** value, bool * end_of_iter) const
 	{
 		tx_debug_assert( is_initialized() );
 		tx_debug_assert( key != NULL );
@@ -802,14 +968,29 @@ public:
 
 			if ( iter.current_node_ )
 			{
-				iter.current_node_->keys_with_values().iter_forward(&iter.key_iter_);
+				rc = iter.current_node_->keys_with_values().iter_forward(&iter.key_iter_);
+				if (rc) return rc;
+
+				rc = iter.current_node_->keys_with_values().iter_next(iter.key_iter_, key, value);
+				if (rc) return rc;
+
+				if (*key == NULL) {
+					tx_debug_assert( *value == NULL );
+					// No more nodes to iterate.
+					return NLDB_ERROR_END_OF_ITERATION;
+				}
+			}
+			else
+			{
+				// No more nodes to iterate.
+				return NLDB_ERROR_END_OF_ITERATION;
 			}
 		}
 
 		return NLDB_OK;
 	}
 
-	nldb_rc_t move_backward(iterator & iter, void ** key, void ** value, bool * end_of_iter) const
+	nldb_rc_t move_backward(iterator_t & iter, void ** key, void ** value, bool * end_of_iter) const
 	{
 		tx_debug_assert( is_initialized() );
 		tx_debug_assert( key != NULL );
@@ -833,7 +1014,22 @@ public:
 
 			if ( iter.current_node_ )
 			{
-				iter.current_node_->keys_with_values().iter_backward(&iter.key_iter_);
+				rc = iter.current_node_->keys_with_values().iter_backward(&iter.key_iter_);
+				if (rc) return rc;
+
+				rc = iter.current_node_->keys_with_values().iter_prev(iter.key_iter_, key, value);
+				if (rc) return rc;
+
+				if (*key == NULL) {
+					tx_debug_assert( *value == NULL );
+					// No more nodes to iterate.
+					return NLDB_ERROR_END_OF_ITERATION;
+				}
+			}
+			else
+			{
+				// No more nodes to iterate.
+				return NLDB_ERROR_END_OF_ITERATION;
 			}
 		}
 

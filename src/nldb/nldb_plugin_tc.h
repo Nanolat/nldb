@@ -45,7 +45,7 @@ public:
 	// Free allocated memory for the value if any.
 	virtual nldb_rc_t value_free(nldb_value_t & value);
 
-	// Free allocated memory for the value if any.
+	// Free allocated memory for the key if any.
 	virtual nldb_rc_t key_free(nldb_key_t & key);
 
 	virtual nldb_rc_t cursor_open(nldb_table_context_t table_ctx, nldb_cursor_context_t * cursor_ctx);

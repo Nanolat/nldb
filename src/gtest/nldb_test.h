@@ -27,6 +27,7 @@
 #include <nldb/nldb_common.h>
 #include <nldb/nldb.h>
 
+#include <stdint.h>
 using namespace std;
 
 const int TEST_DB_ID = 1;
@@ -37,8 +38,8 @@ const int PERSISTENT_TABLE_ID = 2;
 #define VALUE_SIZE = 256;
 
 typedef struct tbl_key {
-	long key1;
-	long key2;
+	uint32_t key1;
+	uint32_t key2;
 } tbl_key ;
 typedef struct tbl_value{
 	long value;
@@ -96,7 +97,8 @@ extern tbl_value    var##_value; \
 extern nldb_key_t   var##_nldb_key; \
 extern nldb_value_t var##_nldb_value;
 
-
+// About using htonl : Keys are stored in big endian encoding in NLDB.
+// This is to quickly compare keys by calling memcmp on keys whenever NLDB searches a key.
 #define DECLARE_KEY_VALUE(var, k1, k2, v) \
 tbl_key      var##_key = {htonl(k1), htonl(k2)}; \
 tbl_value    var##_value = {v}; \

@@ -45,7 +45,7 @@ public :
 	} table_t ;
 	
 	TxTransactionLogRedoer(nldb_db_t & db, const nldb_replication_trigger_hanlder_t & trigger_handler) : db_(db) {
-		for (int i=0; i < sizeof(tables_)/sizeof(tables_[0]); i++ ) {
+		for (unsigned int i=0; i < sizeof(tables_)/sizeof(tables_[0]); i++ ) {
 			tables_[i].is_open_ = false;
 		}
 
@@ -76,7 +76,7 @@ public :
 
 	nldb_rc_t redoLog(const nldb_table_id_t & tableId, const log_type_t & logType, void * keyData, key_length_t keyLength, void * valueData, value_length_t valueLength)
 	{
-		nldb_table_t * table;
+		nldb_table_t * table = NULL;
 		nldb_rc_t rc = getOpenTable( tableId, & table );
 
 		nldb_key_t nldb_key = { keyData, keyLength };

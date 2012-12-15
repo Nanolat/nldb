@@ -1,0 +1,9 @@
+src/.metadata
+gtest/Debug
+gtest/Release
+nldb/Debug
+nldb/Release
+tests/Debug
+tests/Release
+tests/DebugMaster
+tests/ReleaseMaster

@@ -1,2 +1,2 @@
 cp ../Debug/* .
-./tests lldb-master
+./tests nldb-master

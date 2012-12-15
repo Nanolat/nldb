@@ -11,18 +11,18 @@ int main(int argc, char* argv[])
 {
 	if ( argc != 2) 
 	{
-		printf("Usage : llcep_server <option>\n");
-		printf("        option => lldb-master : run lldb master\n");
-		printf("        option => lldb-slave  : run lldb slave\n");
+		printf("Usage : tests <option>\n");
+		printf("        option => nldb-master : run nldb master\n");
+		printf("        option => nldb-slave  : run nldb slave\n");
 		return -1;
 	}
 
 	char * mode = argv[1];
-	if (strcmp( mode, "lldb-master") == 0 ) {
+	if (strcmp( mode, "nldb-master") == 0 ) {
 		return llcep_nldb_master(argc, argv);
 	}
 
-	if (strcmp( mode, "lldb-slave") == 0 ) {
+	if (strcmp( mode, "nldb-slave") == 0 ) {
 		return llcep_nldb_slave(argc, argv);
 	}
 

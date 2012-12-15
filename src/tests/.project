@@ -3,7 +3,7 @@
 	<name>tests</name>
 	<comment></comment>
 	<projects>
-		<project>lldb</project>
+		<project>nldb</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

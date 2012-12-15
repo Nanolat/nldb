@@ -3,6 +3,7 @@
 	<name>gtest</name>
 	<comment></comment>
 	<projects>
+		<project>nldb</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

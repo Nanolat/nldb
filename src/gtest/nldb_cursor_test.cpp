@@ -30,8 +30,8 @@ const long exepceted_value6 = 10006;
 const long exepceted_value7 = 10007;
 const long exepceted_value8 = 10007;
 
-DECLARE_KEY_VALUE(r_bmin,    -1,   -1, -1); // for searching purpose
-DECLARE_KEY_VALUE(r1,         0,    0, exepceted_value1);
+DECLARE_KEY_VALUE(r_bmin,    10,    0, -1); // for searching purpose
+DECLARE_KEY_VALUE(r1,        50,    0, exepceted_value1);
 DECLARE_KEY_VALUE(r2,       100, 1000, exepceted_value2);
 DECLARE_KEY_VALUE(r3,       200,  200, exepceted_value3);
 DECLARE_KEY_VALUE(r_3_4,    200,  250, -1); // for searching purpose
@@ -52,13 +52,13 @@ TEST_F(NLDBCursorTest, find_existing_move_forward) {
 	nldb_value_t value;
 
 	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r6, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r6, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r7, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r7, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r8, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r8, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == NLDB_ERROR_END_OF_ITERATION );
 
@@ -73,13 +73,13 @@ TEST_F(NLDBCursorTest, find_existing_move_backward) {
 	nldb_value_t value;
 
 	ASSERT_TRUE( nldb_cursor_move_backward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r3, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r3, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_backward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r2, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r2, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_backward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r1, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r1, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_backward( cursor,  &key,  &value ) == NLDB_ERROR_END_OF_ITERATION );
 }
@@ -93,13 +93,13 @@ TEST_F(NLDBCursorTest, find_not_existing_move_forward) {
 	nldb_value_t value;
 
 	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r6, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r6, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r7, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r7, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r8, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r8, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == NLDB_ERROR_END_OF_ITERATION );
 
@@ -113,13 +113,13 @@ TEST_F(NLDBCursorTest, find_not_existing_move_backward) {
 	nldb_value_t value;
 
 	ASSERT_TRUE( nldb_cursor_move_backward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r3, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r3, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_backward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r2, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r2, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_backward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r1, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r1, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_backward( cursor,  &key,  &value ) == NLDB_ERROR_END_OF_ITERATION );
 }
@@ -133,28 +133,28 @@ TEST_F(NLDBCursorTest, find_min_move_forward) {
 	nldb_value_t value;
 
 	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r1, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r1, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r2, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r2, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r3, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r3, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r4, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r4, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r5, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r5, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r6, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r6, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r7, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r7, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r8, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r8, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == NLDB_ERROR_END_OF_ITERATION );
 
@@ -168,7 +168,7 @@ TEST_F(NLDBCursorTest, find_min_move_backward) {
 	nldb_value_t value;
 
 	ASSERT_TRUE( nldb_cursor_move_backward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r1, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r1, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_backward( cursor,  &key,  &value ) == NLDB_ERROR_END_OF_ITERATION );
 }
@@ -181,7 +181,7 @@ TEST_F(NLDBCursorTest, find_max_move_forward) {
 	nldb_value_t value;
 
 	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r8, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r8, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == NLDB_ERROR_END_OF_ITERATION );
 
@@ -194,30 +194,30 @@ TEST_F(NLDBCursorTest, find_max_move_backward) {
 	nldb_value_t value;
 
 	ASSERT_TRUE( nldb_cursor_move_backward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r8, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r8, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_backward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r7, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r7, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_backward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r6, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r6, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_backward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r5, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r5, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_backward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r4, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r4, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_backward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r3, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r3, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_backward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r2, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r2, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_backward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r1, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r1, key ) );
 
-	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == NLDB_ERROR_END_OF_ITERATION );
+	ASSERT_TRUE( nldb_cursor_move_backward( cursor,  &key,  &value ) == NLDB_ERROR_END_OF_ITERATION );
 }
 
 TEST_F(NLDBCursorTest, find_before_min_move_forward) {
@@ -228,28 +228,28 @@ TEST_F(NLDBCursorTest, find_before_min_move_forward) {
 	nldb_value_t value;
 
 	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r1, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r1, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r2, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r2, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r3, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r3, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r4, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r4, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r5, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r5, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r6, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r6, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r7, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r7, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r8, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r8, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == NLDB_ERROR_END_OF_ITERATION );
 
@@ -262,9 +262,6 @@ TEST_F(NLDBCursorTest, find_before_min_move_backward) {
 	nldb_key_t key;
 	nldb_value_t value;
 
-	ASSERT_TRUE( nldb_cursor_move_backward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r1, key );
-
 	ASSERT_TRUE( nldb_cursor_move_backward( cursor,  &key,  &value ) == NLDB_ERROR_END_OF_ITERATION );
 }
 
@@ -275,11 +272,7 @@ TEST_F(NLDBCursorTest, find_after_max_move_forward) {
 	nldb_key_t key;
 	nldb_value_t value;
 
-	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r8, key );
-
 	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == NLDB_ERROR_END_OF_ITERATION );
-
 }
 
 TEST_F(NLDBCursorTest, find_after_max_move_backward) {
@@ -289,29 +282,29 @@ TEST_F(NLDBCursorTest, find_after_max_move_backward) {
 	nldb_value_t value;
 
 	ASSERT_TRUE( nldb_cursor_move_backward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r8, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r8, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_backward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r7, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r7, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_backward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r6, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r6, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_backward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r5, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r5, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_backward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r4, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r4, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_backward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r3, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r3, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_backward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r2, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r2, key ) );
 
 	ASSERT_TRUE( nldb_cursor_move_backward( cursor,  &key,  &value ) == 0 );
-	IS_KEY_EQUAL( r1, key );
+	EXPECT_TRUE( IS_KEY_EQUAL( r1, key ) );
 
-	ASSERT_TRUE( nldb_cursor_move_forward( cursor,  &key,  &value ) == NLDB_ERROR_END_OF_ITERATION );
+	ASSERT_TRUE( nldb_cursor_move_backward( cursor,  &key,  &value ) == NLDB_ERROR_END_OF_ITERATION );
 }
 

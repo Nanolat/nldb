@@ -26,8 +26,11 @@
 								<option id="gnu.cpp.compiler.exe.debug.option.optimization.level.599288708" name="Optimization Level" superClass="gnu.cpp.compiler.exe.debug.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.exe.debug.option.debugging.level.1944501494" name="Debug Level" superClass="gnu.cpp.compiler.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.1518940917" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/boost&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/gtest/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/txbase&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/nldb&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.other.other.2014678013" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -std=c++0x -std=gnu++0x " valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.352662461" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -42,10 +45,14 @@
 								<option id="gnu.cpp.link.option.paths.1565267504" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/gtest&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/nldb/Debug&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/tokyocabinet&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/libxs/src/.libs&quot;"/>
 								</option>
 								<option id="gnu.cpp.link.option.libs.632920322" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="gtest"/>
 									<listOptionValue builtIn="false" value=":libnldb.so"/>
+									<listOptionValue builtIn="false" value="tokyocabinet"/>
+									<listOptionValue builtIn="false" value="xs"/>
 									<listOptionValue builtIn="false" value="pthread"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1805842089" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
@@ -85,8 +92,11 @@
 								<option id="gnu.cpp.compiler.exe.release.option.optimization.level.266429682" name="Optimization Level" superClass="gnu.cpp.compiler.exe.release.option.optimization.level" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.exe.release.option.debugging.level.1921946227" name="Debug Level" superClass="gnu.cpp.compiler.exe.release.option.debugging.level" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.522346223" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/boost&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/gtest/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/txbase&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/nldb&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1509830929" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -100,11 +110,15 @@
 								<option id="gnu.cpp.link.option.libs.880846626" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="gtest"/>
 									<listOptionValue builtIn="false" value=":libnldb.so"/>
+									<listOptionValue builtIn="false" value="tokyocabinet"/>
+									<listOptionValue builtIn="false" value="xs"/>
 									<listOptionValue builtIn="false" value="pthread"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.1304257883" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/gtest&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/nldb/Release&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/tokyocabinet&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/libxs/src/.libs&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1521875192" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>

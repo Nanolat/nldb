@@ -38,6 +38,8 @@
 
 #include "nldb_transaction_log_buffer.h"
 
+#include "nldb_internal.h"
+
 class LongEvent {
  public:
     LongEvent(const int64_t& value = 0) : value_(value) {}
@@ -119,6 +121,7 @@ class TxTransactionLogPublisher : public disruptor::EventHandlerInterface<TxTran
 		rc = xs_setsockopt(publisher_, XS_IDENTITY, &dbid, sizeof(dbid));
 		tx_assert( rc == 0 );
 */
+		// TODO : Return an error code instead of assertion.
 		rc = xs_bind (publisher_, bind_addr);
 		tx_assert (rc != -1);
 
@@ -132,7 +135,7 @@ class TxTransactionLogPublisher : public disruptor::EventHandlerInterface<TxTran
 */
 		// Sleep for 5 seconds to connect to subscribers. Otherwise we can lose some messages at the starting point, because it takes time for the ZMQ publisher and subscribers to connect to each other.
 		// BUGBUG : Find out how we can explic= ity check if the publisher and subscriber are connected together.
-		boost::this_thread::sleep(boost::posix_time::milliseconds(10000)); 
+		boost::this_thread::sleep(boost::posix_time::milliseconds( XS_HANDSHAKE_SLEEP_SECONDS * 10 ));
 	}
 	
 	virtual ~TxTransactionLogPublisher() {
@@ -187,7 +190,7 @@ class TxTransactionLogPublisher : public disruptor::EventHandlerInterface<TxTran
 
 		if ((sequence & 0xFFFFF) == 0 )
 		{
-			printf("Log publisher (sequence = %lld): published replication messages to slaves.\n", sequence);
+			printf("Log publisher (sequence = %ld): published replication messages to slaves.\n", sequence);
 		}
 
 		event->getLogBuffer().destroyReplicationMessage(&replicationMessage);

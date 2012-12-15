@@ -1,2 +1,2 @@
 cp ../Release/* .
-./tests lldb-master
+./tests nldb-master

@@ -12,17 +12,18 @@
 #include <iostream>
 #include <stdio.h>
 
+// memcpy
 #include <string.h>
 
-//#define TEST_ITERATIONS (1000L * 1000L * 300)
-// Iterations per transaction
-#define TEST_ITERATIONS (1L)
-// Total transactions 
-//#define TEST_TRANSACTIONS (3L)
-//#define TEST_TRANSACTIONS (100000000L)
-#define TEST_TRANSACTIONS   (10000000L)
+// htonl
+#include <arpa/inet.h>
 
-#define KEY_SIZE   (32)
+#define RECORDS_PER_TX (1L)
+//#define TEST_TRANSACTIONS   (10000000L)
+#define TEST_TRANSACTIONS   (3000000L)
+#define TEST_DATA_COUNT (RECORDS_PER_TX + TEST_TRANSACTIONS)
+
+#define KEY_SIZE   (8)
 #define VALUE_SIZE (256)
 
 typedef struct tbl_key {
@@ -32,7 +33,10 @@ typedef struct tbl_value{
 	char data[ VALUE_SIZE ];
 } tbl1_value ;
 
-nldb_uint64_t * rndNumsA;
+typedef unsigned char rnd_number_t;
+//typedef nldb_uint64_t rnd_number_t;
+
+rnd_number_t * rndNumsA;
 tbl_key * rndKeysA;
 tbl_value * rndValuesA;
 
@@ -41,14 +45,14 @@ tbl_value * rndValuesA;
 
 // set all duplicate values to 0 in the random value array.
 // return the number of eleminated duplicate values.
-size_t removeDuplicateNumbers(  size_t rnd_count, nldb_uint64_t * rnd_valus )
+size_t removeDuplicateNumbers(  size_t rnd_count, rnd_number_t * rnd_valus )
 {
 	size_t dup_count = 0;
 
 	// remove duplicates
-	for (size_t i = 0; i< TEST_ITERATIONS - 1; i++ )
+	for (size_t i = 0; i< TEST_DATA_COUNT +  - 1; i++ )
 	{
-		for (size_t j = i+1; j< TEST_ITERATIONS; j++ )
+		for (size_t j = i+1; j< TEST_DATA_COUNT; j++ )
 		{
 			if (rnd_valus[j] == rnd_valus[i])
 			{
@@ -61,23 +65,33 @@ size_t removeDuplicateNumbers(  size_t rnd_count, nldb_uint64_t * rnd_valus )
 }
 
 // Fill data into char array with the given random value
-void fillData(char * data, size_t size, nldb_uint64_t rndNum )
+void fillData(unsigned int dataNum, char * data, size_t size, rnd_number_t rndNum )
 {
-	// The size should be multiple of 8
-	tx_assert(size % sizeof(nldb_uint64_t) == 0);
+	// The size should be multiple of sizeof(rnd_number_t)
+	tx_assert(size % sizeof(rnd_number_t) == 0);
+
+	size_t original_size = size;
 
 	while (size > 0)
 	{
-		memcpy(data, &rndNum, sizeof(nldb_uint64_t));
-		data += sizeof(nldb_uint64_t);
-		size -= sizeof(nldb_uint64_t);
+		memcpy(data, &rndNum, sizeof(rnd_number_t));
+		data += sizeof(rnd_number_t);
+		size -= sizeof(rnd_number_t);
+	}
+
+	unsigned int keyPostfix = htonl(dataNum);
+
+	if (original_size >= sizeof(keyPostfix))
+	{
+		// To make the key unique, copy the dataNum to the end of the key.
+		memcpy(data - sizeof(keyPostfix), &keyPostfix, sizeof(keyPostfix));
 	}
 }
 void generateRandomNumbers()
 {
-	rndNumsA = new nldb_uint64_t [TEST_ITERATIONS];
-	rndKeysA = new tbl_key [TEST_ITERATIONS];
-	rndValuesA = new tbl_value [TEST_ITERATIONS];
+	rndNumsA = new rnd_number_t [TEST_DATA_COUNT];
+	rndKeysA = new tbl_key [TEST_DATA_COUNT];
+	rndValuesA = new tbl_value [TEST_DATA_COUNT];
 
 	boost::random::mt19937 rng;         // produces randomness out of thin air
 										// see pseudo-random number generators
@@ -85,18 +99,19 @@ void generateRandomNumbers()
 										// distribution that maps to 1..6
 										// see random number distributions
 
-	for (size_t i = 0; i< TEST_ITERATIONS; i++ )
+	for (unsigned int i = 0; i< TEST_DATA_COUNT; i++ )
 	{
-		nldb_uint64_t rndValue = rnd64(rng);
+		rnd_number_t rndValue = (rnd_number_t) rnd64(rng);
   	    rndNumsA[i] = rndValue;                   // simulate rolling a die
-  	    fillData( rndKeysA[i].data, sizeof(rndKeysA[i].data), rndValue);
-  	    fillData( rndValuesA[i].data, sizeof(rndValuesA[i].data), rndValue);
+  	    fillData( i, rndKeysA[i].data, sizeof(rndKeysA[i].data), rndValue);
+  	    fillData( i, rndValuesA[i].data, sizeof(rndValuesA[i].data), rndValue);
 	}
 
+/*
 	size_t dup_count;
-	dup_count = removeDuplicateNumbers( TEST_ITERATIONS, rndNumsA);
+	dup_count = removeDuplicateNumbers( TEST_DATA_COUNT, rndNumsA);
 	printf("The number of duplicates removed for random value set A : %lu\n", dup_count );
-
+*/
 }
 
 const int TEST_DB_ID = 1;
@@ -111,10 +126,12 @@ static void fatal_exit(const char* error, nldb_rc_t rc) {
 }
 static void unexpected_result(const char* error, nldb_rc_t actual_rc, nldb_rc_t expected_rc) {
 	fprintf(stderr, "%s [expected=%d, actual=%d]\n",error, expected_rc, actual_rc);
+	tx_assert(0);
 }
 
-static void unexpected_value(const char* error, tbl_key key) {
-	fprintf(stderr, "%s [key=%s]\n",error, key.data);
+
+static void unexpected_value(const char* error) {
+	fprintf(stderr, "error = %s\n",error);
 }
 
 
@@ -124,8 +141,8 @@ static void create_tables(nldb_db_t & db)
 	rc = nldb_table_create(db, VOLATILE_TABLE_ID, NLDB_TABLE_VOLATILE);
 	if (rc) fatal_exit("Failed to create a table with VOLATILE_TABLE_ID", rc);
 
-	rc = nldb_table_create(db, PERSISTENT_TABLE_ID, NLDB_TABLE_PERSISTENT);
-//	rc = nldb_table_create(db, PERSISTENT_TABLE_ID, NLDB_TABLE_VOLATILE);
+//	rc = nldb_table_create(db, PERSISTENT_TABLE_ID, NLDB_TABLE_PERSISTENT);
+	rc = nldb_table_create(db, PERSISTENT_TABLE_ID, NLDB_TABLE_VOLATILE);
 	if (rc) fatal_exit("Failed to create a table with NLDB_TABLE_PERSISTENT", rc);
 }
 
@@ -139,12 +156,12 @@ static void drop_tables(nldb_db_t & db)
 	if (rc) fatal_exit("Failed to drop a table with NLDB_TABLE_PERSISTENT", rc);
 }
 
-static void put_random_records( nldb_tx_t & tx, nldb_table_t & table, size_t rnd_count, nldb_uint64_t * rnd_values, const char * data_message, nldb_rc_t expected_rc )
+static void put_random_records( nldb_tx_t & tx, nldb_table_t & table, int data_index, size_t rnd_count, const char * data_message, nldb_rc_t expected_rc )
 {
 	nldb_rc_t rc;
 
 	// put a random record
-	for (size_t i=0; i<rnd_count; i++) {
+	for (size_t i=data_index; i<data_index+rnd_count; i++) {
 		tbl_key & key = rndKeysA[i];
 
 		tbl_value & value = rndValuesA[i];
@@ -160,16 +177,18 @@ static void put_random_records( nldb_tx_t & tx, nldb_table_t & table, size_t rnd
 	}
 }
 
-/*
-static void get_random_records( nldb_tx_t & tx, nldb_table_t & table, size_t rnd_count, nldb_uint64_t * exected_rnd_values, const char * data_message, nldb_rc_t expected_rc )
+
+static void get_random_records( nldb_tx_t & tx, nldb_table_t & table, int data_index, size_t rnd_count, const char * data_message, nldb_rc_t expected_rc )
 {
 	nldb_rc_t rc;
 
 	// put a random record
-	for (size_t i=0; i<rnd_count; i++) {
-		nldb_uint64_t rnd = exected_rnd_values[i];
+	for (size_t i=data_index; i< data_index + rnd_count; i++) {
+		tbl_key & key = rndKeysA[i];
+		tbl_value & expected_value = rndValuesA[i];
 
-		nldb_key_t nldb_key = { &rnd, sizeof(rnd) };
+		nldb_key_t nldb_key = { &key, sizeof(key) };
+
 		nldb_value_t actual_value;
 
 		rc = nldb_table_get( tx, table, nldb_key, & actual_value);
@@ -180,28 +199,25 @@ static void get_random_records( nldb_tx_t & tx, nldb_table_t & table, size_t rnd
 
 		if ( rc == 0 )
 		{
-			tbl_value expected_value;
-			make_record_value( rnd, data_message, & expected_value );
-
-			assert( sizeof( expected_value ) == actual_value.length );
+			tx_assert( sizeof( expected_value ) == actual_value.length );
 
 			if ( memcmp( &expected_value, actual_value.data, actual_value.length ) != 0 )
 			{
-				unexpected_value("get : got an unexpected value for key : %lld", rnd);
+				unexpected_value("get : got an unexpected value!");
 			}
 		}
 	}
 }
 
-static void del_random_records( nldb_tx_t & tx, nldb_table_t & table, size_t rnd_count, nldb_uint64_t * rnd_values, nldb_rc_t expected_rc )
+static void del_random_records( nldb_tx_t & tx, nldb_table_t & table, int data_index, size_t rnd_count, nldb_rc_t expected_rc )
 {
 	nldb_rc_t rc;
 
 	// put a random record
-	for (size_t i=0; i<rnd_count; i++) {
-		nldb_uint64_t rnd = rnd_values[i];
+	for (size_t i=data_index; i<data_index+rnd_count; i++) {
 
-		nldb_key_t nldb_key = { &rnd, sizeof(rnd) };
+		tbl_key & key = rndKeysA[i];
+		nldb_key_t nldb_key = { &key, sizeof(key) };
 
 		rc = nldb_table_del( tx, table, nldb_key);
 		if (rc != expected_rc)
@@ -210,17 +226,94 @@ static void del_random_records( nldb_tx_t & tx, nldb_table_t & table, size_t rnd
 		}
 	}
 }
-*/
+
+typedef void (*test_func_t)(nldb_db_t & db, nldb_table_t & table);
+
+void measure_performance(nldb_db_t & db, nldb_table_t & table, const char * test_name, test_func_t test_func )
+{
+    struct timeval start_time, end_time;
+	gettimeofday(&start_time, NULL);
+
+	// run test function
+	{
+		test_func(db, table);
+	}
+
+	nldb_rc_t rc = nldb_db_wait_for_replication_publishers( db );
+	if (rc) fatal_exit("Failed to wait for replication publishers", rc);
+
+	gettimeofday(&end_time, NULL);
+
+    double start, end;
+    start = start_time.tv_sec + ((double) start_time.tv_usec / 1000000);
+    end = end_time.tv_sec + ((double) end_time.tv_usec / 1000000);
+
+    std::cout.precision(15);
+    std::cout << test_name << " performance: ";
+    std::cout << (TEST_TRANSACTIONS * 1.0) / (end - start)
+              << " transactions/secs" << std::endl;
+}
+
+typedef struct test_case_t {
+	const char * test_name;
+	test_func_t test_func;
+} perf_case_t;
+
+void put_test(nldb_db_t & db, nldb_table_t & table) {
+	nldb_tx_t tx;
+	nldb_rc_t rc = nldb_tx_init( db, &tx );
+	if (rc) fatal_exit("Failed to initialize a transaction", rc);
+
+	for (int loop = 0 ; loop < TEST_TRANSACTIONS; loop ++ )
+	{
+		rc = nldb_tx_begin(tx);
+		if (rc) fatal_exit("Failed to begin a transaction", rc);
+
+		put_random_records( tx, table, loop, RECORDS_PER_TX, "ThankyouSoft", NLDB_OK);
+
+		rc = nldb_tx_commit(tx);
+		if (rc) fatal_exit("Failed to commit a transaction", rc);
+	}
+
+	rc = nldb_tx_destroy( tx );
+	if (rc) fatal_exit("Failed to destroy a transaction", rc);
+}
+
+void del_test(nldb_db_t & db, nldb_table_t & table) {
+	nldb_tx_t tx;
+	nldb_rc_t rc = nldb_tx_init( db, &tx );
+	if (rc) fatal_exit("Failed to initialize a transaction", rc);
+
+	for (int loop = 0 ; loop < TEST_TRANSACTIONS; loop ++ )
+	{
+		rc = nldb_tx_begin(tx);
+		if (rc) fatal_exit("Failed to begin a transaction", rc);
+
+		del_random_records( tx, table, loop, RECORDS_PER_TX, NLDB_OK);
+
+		rc = nldb_tx_commit(tx);
+		if (rc) fatal_exit("Failed to commit a transaction", rc);
+	}
+
+	rc = nldb_tx_destroy( tx );
+	if (rc) fatal_exit("Failed to destroy a transaction", rc);
+}
+
+test_case_t tests[] = {
+		{"put", put_test},
+		{"del", del_test},
+		{NULL, NULL}
+};
 
 int llcep_nldb_master(int arc, char** argv) {
-	
+
 	generateRandomNumbers();
 
 	nldb_rc_t rc;
 	rc = nldb_init();
 	if (rc) fatal_exit("Failed to initialize LLDB system", rc);
 
-	// BUGBUG : The master hangs if it runs in the same db path with a slave which is running. 
+	// BUGBUG : The master hangs if it runs in the same db path with a slave which is running.
 	// Fix : Need to show an error message "An instance is already up and running on this db path"
 	rc = nldb_db_create( TEST_DB_ID );
 	if (rc) fatal_exit("Failed to create LLDB", rc);
@@ -233,69 +326,21 @@ int llcep_nldb_master(int arc, char** argv) {
 
 	create_tables( db );
 
-	nldb_table_t vol_table;
-	rc = nldb_table_open(db, VOLATILE_TABLE_ID, &vol_table);
-	if (rc) fatal_exit("Failed to open table, VOLATILE_TABLE_ID", rc);
-
-	nldb_table_t pers_table;
-//	rc = nldb_table_open(db, VOLATILE_TABLE_ID, &pers_table);
-	rc = nldb_table_open(db, PERSISTENT_TABLE_ID, &pers_table);
-	if (rc) fatal_exit("Failed to open table, PERSISTENT_TABLE_ID", rc);
-
-	nldb_tx_t tx;
-	rc = nldb_tx_init( db, &tx );
-	if (rc) fatal_exit("Failed to initialize a transaction", rc);
-
-    struct timeval start_time, end_time;
-	gettimeofday(&start_time, NULL);
-
-	for (int loop = 0 ; loop < TEST_TRANSACTIONS; loop ++ )
 	{
-		rc = nldb_tx_begin(tx);
-		if (rc) fatal_exit("Failed to begin a transaction", rc);
+		nldb_table_t vol_table;
+		nldb_rc_t rc = nldb_table_open(db, VOLATILE_TABLE_ID, &vol_table);
+		if (rc) fatal_exit("Failed to open table, VOLATILE_TABLE_ID", rc);
 
-//		for (int i=0; i<2; i++)
-		int i=0;
-		{
-			nldb_table_t table = (i==0)? vol_table : pers_table;
-
-//			del_random_records( tx, table, TEST_ITERATIONS, rnd_values, NLDB_ERROR_KEY_NOT_FOUND);
-//			get_random_records( tx, table, TEST_ITERATIONS, rnd_values, "ThankyouSoft", NLDB_ERROR_KEY_NOT_FOUND);
-			put_random_records( tx, table, TEST_ITERATIONS, rndNumsA, "ThankyouSoft", NLDB_OK);
-////			put_random_records( tx, table, TEST_ITERATIONS, rnd_values, "ThankyouSoft", NLDB_ERROR_KEY_ALREADY_EXISTS);
-//			get_random_records( tx, table, TEST_ITERATIONS, rnd_values, "ThankyouSoft", NLDB_OK);
-//			del_random_records( tx, table, TEST_ITERATIONS, rnd_values, NLDB_OK);
+		for (int i=0; tests[i].test_name != NULL; i++) {
+			measure_performance(db, vol_table, tests[i].test_name, tests[i].test_func);
 		}
 
-		rc = nldb_tx_commit(tx);
-		if (rc) fatal_exit("Failed to commit a transaction", rc);
+		rc = nldb_table_close(vol_table);
+		if (rc) fatal_exit("Failed to close table, VOLATILE_TABLE_ID", rc);
 	}
-
-	rc = nldb_db_wait_for_replication_publishers( db );
-	if (rc) fatal_exit("Failed to wait for replication publishers", rc);
-
-	gettimeofday(&end_time, NULL);
-
-    double start, end;
-    start = start_time.tv_sec + ((double) start_time.tv_usec / 1000000);
-    end = end_time.tv_sec + ((double) end_time.tv_usec / 1000000);
-
-    std::cout.precision(15);
-    std::cout << "LLDB performance: ";
-    std::cout << (TEST_TRANSACTIONS * 1.0) / (end - start)
-              << " transactions/secs" << std::endl;
-
-	rc = nldb_tx_destroy( tx );
-	if (rc) fatal_exit("Failed to destroy a transaction", rc);
 
 	printf("Press Enter to start closing/dropping tables, closing DB, dropping DB\n");
 	(void)getchar();
-
-	rc = nldb_table_close(vol_table);
-	if (rc) fatal_exit("Failed to close table, VOLATILE_TABLE_ID", rc);
-
-	rc = nldb_table_close(pers_table);
-	if (rc) fatal_exit("Failed to close table, VOLATILE_TABLE_ID", rc);
 
 	drop_tables( db );
 
@@ -313,7 +358,7 @@ int llcep_nldb_master(int arc, char** argv) {
 
 nldb_rc_t replication_trigger_handler(const nldb_trigger_type_t trigger_type, const nldb_table_id_t & table_id, const nldb_key_t & key, const nldb_value_t & value)
 {
-	printf("Type:%s, Table Id:%d, Key length:%ld, Value length:%ld\n", (trigger_type==TT_PUT)?"PUT":(trigger_type==TT_DEL)?"DEL":"UNKNOWN", table_id, key.length, value.length);
+	printf("Type:%s, Table Id:%d, Key length:%d, Value length:%d\n", (trigger_type==TT_PUT)?"PUT":(trigger_type==TT_DEL)?"DEL":"UNKNOWN", table_id, key.length, value.length);
 	return NLDB_OK;
 }
 

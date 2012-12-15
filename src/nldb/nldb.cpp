@@ -38,6 +38,7 @@ typedef boost::thread thread_t;
 #include "nldb_txevent.h"
 #include "nldb_plugin_leveldb.h"
 #include "nldb_plugin_tc.h"
+#include "nldb_plugin_array_tree.h"
 #include "nldb_repl_slave_thread.h"
 
 using namespace disruptor;
@@ -88,6 +89,9 @@ nldb_plugin_id_t NLDB_TABLE_PERSISTENT;
 
 // The default table plugin for volatile tables ; uses TokyoCabinet
 nldb_plugin_tc_t      plugin_tc;
+
+nldb_plugin_array_tree_t      plugin_array_tree;
+
 // The default table plugin for persistent tables ; uses LevelDB
 nldb_plugin_leveldb_t plugin_leveldb;
 
@@ -95,7 +99,8 @@ nldb_plugin_leveldb_t plugin_leveldb;
 nldb_rc_t nldb_init()
 {
 	nldb_rc_t  rc;
-	rc = nldb_plugin_add( plugin_tc, & NLDB_TABLE_VOLATILE );
+//	rc = nldb_plugin_add( plugin_tc, & NLDB_TABLE_VOLATILE );
+	rc = nldb_plugin_add( plugin_array_tree, & NLDB_TABLE_VOLATILE );
 	if ( rc ) return rc;
 
 	rc = nldb_plugin_add( plugin_leveldb, & NLDB_TABLE_PERSISTENT );

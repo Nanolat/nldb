@@ -139,7 +139,7 @@ void replication_slave_thread_func(nldb_db_t & db, const std::string & master_ip
 
 		if ((receivedMessageCount & 0xFFFFF) == 0 )
 		{
-			printf("Log replayer (message count = %d): received a replication message from the master.\n", receivedMessageCount);
+			printf("Log replayer (message count = %lu): received a replication message from the master.\n", receivedMessageCount);
 		}
 
 		rc = TxTransactionLogBuffer::applyReplicationMessage(& replicationMessage, *logRedoer);
