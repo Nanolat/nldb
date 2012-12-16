@@ -218,24 +218,7 @@ protected:
 
 			return NLDB_OK;
 		}
-/*
- 	 	// Unused function.
-		// Remove the leaf node from the leaf-level linked list
-		void unlink()
-		{
-			if (this->prev_)
-			{
-				this->prev_->next_ = this->next_;
-			}
 
-			if (this->next_)
-			{
-				this->next_->prev_ = this->prev_;
-			}
-			this->next_ = NULL;
-			this->prev_ = NULL;
-		}
-*/
 	};
 
 	class internal_node_t : public node_t
@@ -645,71 +628,6 @@ protected:
 		return NLDB_OK;
 	}
 
-	/*
-	nldb_rc_t del_from_internal_node(internal_node_t * node, const void * key, node_t ** out_deleted_node)
-	{
-		tx_debug_assert( is_initialized() );
-
-		tx_debug_assert( node != NULL );
-		tx_debug_assert( key != NULL );
-		tx_debug_assert( deleted_node != NULL );
-
-		const void * old_min_key = node->min_key();
-		tx_debug_assert(old_min_key);
-
-		nldb_rc_t rc = node->del(key, out_deleted_node);
-		if (rc) return rc;
-
-		if ( *out_deleted_node == NULL)
-		{
-			return NLDB_OK;
-		}
-
-		// The key was found. It means the node had at least a key, which means old_min_key should not be NULL.
-		tx_debug_assert( old_min_key != NULL );
-
-		if ( compare_keys( old_min_key, key) == 0 ) // Was the deleted key the minimum key?
-		{
-			internal_node_t * parent = (internal_node_t*) node->parent();
-
-			if ( parent )
-			{
-				if ( node == parent->left_child() )
-				{
-					// Do nothing. We have nothing to change in the parent.
-				}
-				else
-				{
-					// TODO : what to do if the internal node does not have any keys any more?
-					const void * new_min_key = node->min_key();
-					tx_debug_assert(new_min_key);
-
-					node_t * deleted_node = NULL;
-
-					// TODO : find a way to update an existing key in the node.
-
-					// delete the old minimum key in the parent.
-					rc = del_from_internal_node(parent, old_min_key, & deleted_node);
-					if (rc) return rc;
-
-					tx_assert(deleted_node == node);
-
-					// put the new minimum key in the parent.
-					rc = put_to_internal_node(parent, new_min_key, node);
-					if (rc) return rc;
-				}
-			}
-			else
-			{
-				// parent == NULL
-				// The node is root node, we have no parent node to update.
-			}
-		}
-
-		return NLDB_OK;
-	}
-*/
-
 	nldb_rc_t del_from_leaf_node(leaf_node_t * node, const void * key, void ** deleted_value)
 	{
 		tx_debug_assert( is_initialized() );
@@ -717,8 +635,6 @@ protected:
 		tx_debug_assert( node != NULL );
 		tx_debug_assert( key != NULL );
 		tx_debug_assert( deleted_value != NULL );
-
-		const void * old_min_key = node->min_key();
 
 		nldb_rc_t rc = node->del(key, deleted_value);
 		if (rc) return rc;
@@ -728,59 +644,6 @@ protected:
 			return NLDB_OK;
 		}
 
-		// The key was found. It means the node had at least a key, which means old_min_key should not be NULL.
-		tx_debug_assert( old_min_key != NULL );
-
-		// 1. Keep the keys in parent unchanged.
-		// 2. Even though the leaf node becomes empty, don't update parents.
-/*
-		if ( compare_keys( old_min_key, key) == 0 ) // Was the deleted key the minimum key?
-		{
-			internal_node_t * parent = (internal_node_t*) node->parent();
-
-			if ( node == parent->left_child() )
-			{
-				// Do nothing. We have nothing to change in the parent.
-			}
-			else
-			{
-				node_t * deleted_node = NULL;
-
-				// TODO : find a way to update an existing key in the node.
-
-				// delete the old minimum key in the parent.
-				rc = del_from_internal_node(parent, old_min_key, & deleted_node);
-				if (rc) return rc;
-
-				tx_assert(deleted_node == node);
-
-				const void * new_min_key = node->min_key();
-
-				if ( new_min_key) {
-					// put the new minimum key in the parent.
-					rc = put_to_internal_node(parent, new_min_key, node);
-					if (rc) return rc;
-				}
-				else
-				{
-					// node->min_key() returned NULL. This means The leaf node is empty.
-					tx_debug_assert( node->is_empty() );
-
-					// Decision : Don't eliminate an empty leaf node for now.
-
-					// TODO : Eliminate empty leaf node.
-					// Remove minimum key of the leaf node from the parent node.
-					// Merge parent (internal) nodes if necessary.
-
-					// The leaf node is empty node.
-					// return the leaf node to the pool.
-					//(void) node->unlink();
-					//(void) node->set_parent(NULL);
-					//(void) node_factory::return_leaf_node(node);
-				}
-			}
-		}
-*/
 		return NLDB_OK;
 	}
 

@@ -229,7 +229,7 @@ public :
 		return NULL;
 	};
 
-	inline const void commitCurrentTransactionEvent() {
+	inline void commitCurrentTransactionEvent() {
 		tx_assert(currentSequence >= 0);
         txRingBuffer->Publish(currentSequence);
 		currentSequence = -1;

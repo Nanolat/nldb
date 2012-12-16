@@ -23,8 +23,8 @@
 #define TEST_TRANSACTIONS   (3000000L)
 #define TEST_DATA_COUNT (RECORDS_PER_TX + TEST_TRANSACTIONS)
 
-#define KEY_SIZE   (8)
-#define VALUE_SIZE (256)
+#define KEY_SIZE   (16)
+#define VALUE_SIZE (128)
 
 typedef struct tbl_key {
 	char data[ KEY_SIZE ];
