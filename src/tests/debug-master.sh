@@ -1,2 +1,2 @@
-cp ../Debug/* .
+cp ../IntelDebug/* .
 ./tests nldb-master

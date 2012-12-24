@@ -45,8 +45,10 @@ typedef struct nldb_cursor_holder_t * nldb_cursor_t;
 
 typedef nldb_uint32_t nldb_plugin_id_t;
 
-extern nldb_plugin_id_t NLDB_TABLE_VOLATILE;
 extern nldb_plugin_id_t NLDB_TABLE_PERSISTENT;
+extern nldb_plugin_id_t NLDB_TABLE_VOLATILE;
+extern nldb_plugin_id_t NLDB_TABLE_TC;
+
 
 // return the maximum number of plugins
 extern nldb_uint32_t nldb_plugin_max_count();
@@ -177,5 +179,13 @@ extern nldb_rc_t nldb_cursor_move_backward(const nldb_cursor_t & cursor, nldb_ke
 
 // errors : NLDB_CURSOR_NOT_OPEN
 extern nldb_rc_t nldb_cursor_close(const nldb_cursor_t & cursor);
+
+/*********************/
+/* memory management */
+/*********************/
+extern nldb_rc_t nldb_value_free(const nldb_table_t & table, nldb_value_t & value);
+
+extern nldb_rc_t nldb_key_free(const nldb_table_t & table, nldb_key_t & key);
+
 
 #endif

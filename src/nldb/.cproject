@@ -223,7 +223,7 @@
 								<option id="intel.compilestep.preprocessor.defsym.463417795" name="Preprocessor Definitions (-D)" superClass="intel.compilestep.preprocessor.defsym" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="DEBUG"/>
 								</option>
-								<option id="intel.compilestep.coptions.843364331" name="Additional Options" superClass="intel.compilestep.coptions" value="-std=c++0x" valueType="string"/>
+								<option id="intel.compilestep.coptions.843364331" name="Additional Options" superClass="intel.compilestep.coptions" value="-std=c++0x -prof-gen=srcpos" valueType="string"/>
 								<inputType id="intel.cpp.compilestep.input.325061443" superClass="intel.cpp.compilestep.input"/>
 							</tool>
 							<tool id="intel.c.compilestep.linux.x86_64.so.dbg.490677195_13.0.0" name="Intel Intel(R) 64 C Compiler" superClass="intel.c.compilestep.linux.x86_64.so.dbg_13.0.0">
@@ -292,7 +292,7 @@
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/libxs/include&quot;"/>
 								</option>
 								<option id="intel.compilestep.coptions.2022652277" name="Additional Options" superClass="intel.compilestep.coptions" value="-std=c++0x" valueType="string"/>
-								<option id="intel.compilestep.general.debug.cpp.x86_64.so.dbg.1254568462_13.0.0" name="Include Debug Information (-g)" superClass="intel.compilestep.general.debug.cpp.x86_64.so.dbg_13.0.0" value="false" valueType="boolean"/>
+								<option id="intel.compilestep.general.debug.cpp.x86_64.so.dbg.1254568462_13.0.0" name="Include Debug Information (-g)" superClass="intel.compilestep.general.debug.cpp.x86_64.so.dbg_13.0.0" value="true" valueType="boolean"/>
 								<option id="intel.compilestep.general.optimization2.32062969" name="Optimization Level" superClass="intel.compilestep.general.optimization2" value="general.opt.speedHLO" valueType="enumerated"/>
 								<inputType id="intel.cpp.compilestep.input.626819321" superClass="intel.cpp.compilestep.input"/>
 							</tool>

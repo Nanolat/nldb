@@ -32,6 +32,9 @@
 								</option>
 								<option id="gnu.cpp.compiler.option.other.pic.1976570898" name="Position Independent Code (-fPIC)" superClass="gnu.cpp.compiler.option.other.pic" value="true" valueType="boolean"/>
 								<option id="gnu.cpp.compiler.option.other.other.550505807" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -std=c++0x" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.798966440" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="DEBUG"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.6173806" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.372801279" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug">
@@ -151,6 +154,10 @@
 									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/txbase"/>
 									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/kat"/>
 								</option>
+								<option id="intel.compilestep.coptions.1811034415" name="Additional Options" superClass="intel.compilestep.coptions" value="-prof-gen=srcpos" valueType="string"/>
+								<option id="intel.compilestep.preprocessor.defsym.1143564196" superClass="intel.compilestep.preprocessor.defsym" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="DEBUG"/>
+								</option>
 								<inputType id="intel.cpp.compilestep.input.2072806260" superClass="intel.cpp.compilestep.input"/>
 							</tool>
 							<tool id="intel.c.compilestep.linux.x86_64.exe.dbg.754274759_13.0.0" name="Intel Intel(R) 64 C Compiler" superClass="intel.c.compilestep.linux.x86_64.exe.dbg_13.0.0">
@@ -202,7 +209,7 @@
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/txbase&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/kat&quot;"/>
 								</option>
-								<option id="intel.compilestep.general.debug.cpp.x86_64.exe.dbg.872211002_13.0.0" name="Include Debug Information (-g)" superClass="intel.compilestep.general.debug.cpp.x86_64.exe.dbg_13.0.0" value="false" valueType="boolean"/>
+								<option id="intel.compilestep.general.debug.cpp.x86_64.exe.dbg.872211002_13.0.0" name="Include Debug Information (-g)" superClass="intel.compilestep.general.debug.cpp.x86_64.exe.dbg_13.0.0" value="true" valueType="boolean"/>
 								<option id="intel.compilestep.general.optimization2.1323786728" name="Optimization Level" superClass="intel.compilestep.general.optimization2" value="general.opt.speedHLO" valueType="enumerated"/>
 								<inputType id="intel.cpp.compilestep.input.798964744" superClass="intel.cpp.compilestep.input"/>
 							</tool>

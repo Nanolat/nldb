@@ -33,6 +33,9 @@
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/nldb&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.other.other.2014678013" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -std=c++0x" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.832739711" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="DEBUG"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.352662461" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.171978052" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug">
@@ -158,7 +161,10 @@
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/txbase&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/nldb&quot;"/>
 								</option>
-								<option id="intel.compilestep.coptions.2127004730" name="Additional Options" superClass="intel.compilestep.coptions" value="-std=c++0x" valueType="string"/>
+								<option id="intel.compilestep.coptions.2127004730" name="Additional Options" superClass="intel.compilestep.coptions" value="-std=c++0x -prof-gen=srcpos" valueType="string"/>
+								<option id="intel.compilestep.preprocessor.defsym.1072309808" superClass="intel.compilestep.preprocessor.defsym" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="DEBUG"/>
+								</option>
 								<inputType id="intel.cpp.compilestep.input.223038148" superClass="intel.cpp.compilestep.input"/>
 							</tool>
 							<tool id="intel.c.compilestep.linux.x86_64.exe.dbg.706671282_13.0.0" name="Intel Intel(R) 64 C Compiler" superClass="intel.c.compilestep.linux.x86_64.exe.dbg_13.0.0">
@@ -169,6 +175,7 @@
 								<option id="intel.linkstep.libname.368563156" name="Additional Libraries (-l)" superClass="intel.linkstep.libname" valueType="libs">
 									<listOptionValue builtIn="false" value="gtest"/>
 									<listOptionValue builtIn="false" value="nldb-intel-debug"/>
+									<listOptionValue builtIn="false" value="leveldb"/>
 									<listOptionValue builtIn="false" value="tokyocabinet"/>
 									<listOptionValue builtIn="false" value="xs"/>
 									<listOptionValue builtIn="false" value="pthread"/>
@@ -176,6 +183,7 @@
 								<option id="intel.linkstep.libpath.844868087" name="Search Directory for Libraries (-L)" superClass="intel.linkstep.libpath" valueType="stringList">
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/gtest&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/nldb/IntelDebug&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/leveldb&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/tokyocabinet&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/libxs/src/.libs&quot;"/>
 								</option>
@@ -228,6 +236,7 @@
 								<option id="intel.linkstep.libname.2117315148" name="Additional Libraries (-l)" superClass="intel.linkstep.libname" valueType="libs">
 									<listOptionValue builtIn="false" value="gtest"/>
 									<listOptionValue builtIn="false" value="nldb-intel-release"/>
+									<listOptionValue builtIn="false" value="leveldb"/>
 									<listOptionValue builtIn="false" value="tokyocabinet"/>
 									<listOptionValue builtIn="false" value="xs"/>
 									<listOptionValue builtIn="false" value="pthread"/>
@@ -235,6 +244,7 @@
 								<option id="intel.linkstep.libpath.1196164745" name="Search Directory for Libraries (-L)" superClass="intel.linkstep.libpath" valueType="stringList">
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/gtest&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/nldb/IntelRelease&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/leveldb&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/tokyocabinet&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/libxs/src/.libs&quot;"/>
 								</option>

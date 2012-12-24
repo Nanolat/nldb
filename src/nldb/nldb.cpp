@@ -84,8 +84,9 @@ static inline nldb_plugin_t * nldb_plugin( const nldb_plugin_id_t & id) {
 
 
 // Default table plugins
-nldb_plugin_id_t NLDB_TABLE_VOLATILE;
 nldb_plugin_id_t NLDB_TABLE_PERSISTENT;
+nldb_plugin_id_t NLDB_TABLE_VOLATILE;
+nldb_plugin_id_t NLDB_TABLE_TC;
 
 // The default table plugin for volatile tables ; uses TokyoCabinet
 nldb_plugin_tc_t      plugin_tc;
@@ -99,12 +100,16 @@ nldb_plugin_leveldb_t plugin_leveldb;
 nldb_rc_t nldb_init()
 {
 	nldb_rc_t  rc;
-//	rc = nldb_plugin_add( plugin_tc, & NLDB_TABLE_VOLATILE );
+	rc = nldb_plugin_add( plugin_leveldb, & NLDB_TABLE_PERSISTENT );
+	if ( rc ) return rc;
+
 	rc = nldb_plugin_add( plugin_array_tree, & NLDB_TABLE_VOLATILE );
 	if ( rc ) return rc;
 
-	rc = nldb_plugin_add( plugin_leveldb, & NLDB_TABLE_PERSISTENT );
-	return rc;
+	rc = nldb_plugin_add( plugin_tc, & NLDB_TABLE_TC );
+	if ( rc ) return rc;
+
+	return NLDB_OK;
 }
 
 // Destroy LLDB system.
@@ -1021,6 +1026,41 @@ const nldb_plugin_id_t & nldb_table_plugin_id(const nldb_table_t & table)
 	nldb_table_impl_t * tablei = (nldb_table_impl_t*) table;
 
 	return tablei->plugin_id();
+}
+
+
+
+/*********************/
+/* cursor management */
+/*********************/
+nldb_rc_t nldb_value_free(const nldb_table_t & table, nldb_value_t & value)
+{
+	nldb_table_impl_t * tablei = (nldb_table_impl_t*) table;
+
+	nldb_plugin_t * table_plugin = tablei->table_plugin();
+
+	nldb_rc_t rc = table_plugin->value_free(value);
+	if (rc) return rc;
+
+	value.data = NULL;
+	value.length = NULL;
+
+	return NLDB_OK;
+}
+
+nldb_rc_t nldb_key_free(const nldb_table_t & table, nldb_key_t & key)
+{
+	nldb_table_impl_t * tablei = (nldb_table_impl_t*) table;
+
+	nldb_plugin_t * table_plugin = tablei->table_plugin();
+
+	nldb_rc_t rc = table_plugin->key_free(key);
+	if (rc) return rc;
+
+	key.data = NULL;
+	key.length = NULL;
+
+	return NLDB_OK;
 }
 
 

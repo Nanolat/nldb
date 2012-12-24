@@ -128,9 +128,56 @@ nldb_rc_t nldb_plugin_array_tree_t::table_open(nldb_plugin_table_desc_t & table_
 	return NLDB_OK;
 }
 
+
+#if defined(DEBUG)
+bool __print_nodes_on_table_close = false;
+bool __check_consistency_on_table_close = false;
+// Print all keys in all nodes in ascending order.
+static nldb_rc_t debug_print_nodes(nldb_table_context_t table_ctx)
+{
+	table_context_t * ctx = (table_context_t*) table_ctx;
+
+	table_context_t::tree_t & tree = ctx->tree();
+
+	int print_iteration = tree.get_print_iteration();
+
+	(void)tree.print_tree(print_iteration);
+
+	return NLDB_OK;
+}
+
+static nldb_rc_t debug_check_consistency(nldb_table_context_t table_ctx)
+{
+	table_context_t * ctx = (table_context_t*) table_ctx;
+
+	table_context_t::tree_t & tree = ctx->tree();
+
+	int print_iteration = tree.get_print_iteration();
+
+	(void) tree.check_consistency(print_iteration);
+
+	return NLDB_OK;
+}
+#endif // DEBUG
+
 nldb_rc_t nldb_plugin_array_tree_t::table_close(nldb_table_context_t table_ctx)
 {
 	table_context_t * ctx = (table_context_t*) table_ctx;
+
+#if defined(DEBUG)
+	if (__print_nodes_on_table_close)
+	{
+		tx_assert( debug_print_nodes(ctx) == NLDB_OK );
+		__print_nodes_on_table_close = false;
+	}
+
+	if (__check_consistency_on_table_close)
+	{
+		tx_assert( debug_check_consistency(ctx) == NLDB_OK );
+		__check_consistency_on_table_close = false;
+	}
+#endif // DEBUG
+
 	if (ctx->isInitialized())
 	{
 		ctx->destroy();

@@ -1,2 +1,2 @@
-cp ../Release/* .
+cp ../IntelRelease/* .
 ./tests nldb-master

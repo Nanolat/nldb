@@ -61,4 +61,9 @@ public:
 	virtual nldb_rc_t cursor_close(nldb_table_context_t table_ctx, nldb_cursor_context_t cursor_ctx);
 };
 
+#if defined(DEBUG)
+extern nldb_rc_t debug_print_nodes(nldb_table_context_t table_ctx);
+extern nldb_rc_t debug_check_consistency(nldb_table_context_t table_ctx);
+#endif // DEBUG
+
 #endif // _NLDB_PLUGIN_ARRAY_TREE_H_

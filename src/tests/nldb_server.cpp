@@ -20,10 +20,10 @@
 
 #define RECORDS_PER_TX (1L)
 //#define TEST_TRANSACTIONS   (10000000L)
-#define TEST_TRANSACTIONS   (3000000L)
+#define TEST_TRANSACTIONS   (1000000L)
 #define TEST_DATA_COUNT (RECORDS_PER_TX + TEST_TRANSACTIONS)
 
-#define KEY_SIZE   (16)
+#define KEY_SIZE   (8)
 #define VALUE_SIZE (128)
 
 typedef struct tbl_key {
@@ -43,26 +43,6 @@ tbl_value * rndValuesA;
 #include <boost/random/uniform_int_distribution.hpp>
 #include <boost/random/mersenne_twister.hpp>
 
-// set all duplicate values to 0 in the random value array.
-// return the number of eleminated duplicate values.
-size_t removeDuplicateNumbers(  size_t rnd_count, rnd_number_t * rnd_valus )
-{
-	size_t dup_count = 0;
-
-	// remove duplicates
-	for (size_t i = 0; i< TEST_DATA_COUNT +  - 1; i++ )
-	{
-		for (size_t j = i+1; j< TEST_DATA_COUNT; j++ )
-		{
-			if (rnd_valus[j] == rnd_valus[i])
-			{
-				rnd_valus[j] = 0;
-				dup_count++;
-			}
-		}
-	}
-	return dup_count;
-}
 
 // Fill data into char array with the given random value
 void fillData(unsigned int dataNum, char * data, size_t size, rnd_number_t rndNum )
@@ -107,16 +87,12 @@ void generateRandomNumbers()
   	    fillData( i, rndValuesA[i].data, sizeof(rndValuesA[i].data), rndValue);
 	}
 
-/*
-	size_t dup_count;
-	dup_count = removeDuplicateNumbers( TEST_DATA_COUNT, rndNumsA);
-	printf("The number of duplicates removed for random value set A : %lu\n", dup_count );
-*/
 }
 
 const int TEST_DB_ID = 1;
-const int VOLATILE_TABLE_ID = 1;
-const int PERSISTENT_TABLE_ID = 2;
+const int TC_TABLE_ID = 1;
+const int VOLATILE_TABLE_ID = 2;
+const int PERSISTENT_TABLE_ID = 3;
 const int REPLICATION_PORT = 9090;
 
 static void fatal_exit(const char* error, nldb_rc_t rc) {
@@ -138,17 +114,24 @@ static void unexpected_value(const char* error) {
 static void create_tables(nldb_db_t & db)
 {
 	nldb_rc_t rc;
+
+	rc = nldb_table_create(db, TC_TABLE_ID, NLDB_TABLE_TC);
+	if (rc) fatal_exit("Failed to create a table with TC_TABLE_ID", rc);
+
 	rc = nldb_table_create(db, VOLATILE_TABLE_ID, NLDB_TABLE_VOLATILE);
 	if (rc) fatal_exit("Failed to create a table with VOLATILE_TABLE_ID", rc);
 
-//	rc = nldb_table_create(db, PERSISTENT_TABLE_ID, NLDB_TABLE_PERSISTENT);
-	rc = nldb_table_create(db, PERSISTENT_TABLE_ID, NLDB_TABLE_VOLATILE);
+	rc = nldb_table_create(db, PERSISTENT_TABLE_ID, NLDB_TABLE_PERSISTENT);
 	if (rc) fatal_exit("Failed to create a table with NLDB_TABLE_PERSISTENT", rc);
 }
 
 static void drop_tables(nldb_db_t & db)
 {
 	nldb_rc_t rc;
+
+	rc = nldb_table_drop(db, TC_TABLE_ID);
+	if (rc) fatal_exit("Failed to drop a table with TC_TABLE_ID", rc);
+
 	rc = nldb_table_drop(db, VOLATILE_TABLE_ID);
 	if (rc) fatal_exit("Failed to drop a table with VOLATILE_TABLE_ID", rc);
 
@@ -269,7 +252,7 @@ void put_test(nldb_db_t & db, nldb_table_t & table) {
 		rc = nldb_tx_begin(tx);
 		if (rc) fatal_exit("Failed to begin a transaction", rc);
 
-		put_random_records( tx, table, loop, RECORDS_PER_TX, "ThankyouSoft", NLDB_OK);
+		(void)put_random_records( tx, table, loop, RECORDS_PER_TX, "ThankyouSoft", NLDB_OK);
 
 		rc = nldb_tx_commit(tx);
 		if (rc) fatal_exit("Failed to commit a transaction", rc);
@@ -278,6 +261,156 @@ void put_test(nldb_db_t & db, nldb_table_t & table) {
 	rc = nldb_tx_destroy( tx );
 	if (rc) fatal_exit("Failed to destroy a transaction", rc);
 }
+
+void get_test(nldb_db_t & db, nldb_table_t & table) {
+	nldb_tx_t tx;
+	nldb_rc_t rc = nldb_tx_init( db, &tx );
+	if (rc) fatal_exit("Failed to initialize a transaction", rc);
+
+	for (int loop = 0 ; loop < TEST_TRANSACTIONS; loop ++ )
+	{
+		rc = nldb_tx_begin(tx);
+		if (rc) fatal_exit("Failed to begin a transaction", rc);
+
+		(void)get_random_records( tx, table, loop, RECORDS_PER_TX, "ThankyouSoft", NLDB_OK);
+
+		rc = nldb_tx_commit(tx);
+		if (rc) fatal_exit("Failed to commit a transaction", rc);
+	}
+
+	rc = nldb_tx_destroy( tx );
+	if (rc) fatal_exit("Failed to destroy a transaction", rc);
+}
+
+
+void forward_cursor_test(nldb_db_t & db, nldb_table_t & table) {
+	nldb_tx_t tx;
+	nldb_rc_t rc = nldb_tx_init( db, &tx );
+	if (rc) fatal_exit("Failed to initialize a transaction", rc);
+
+	rc = nldb_tx_begin(tx);
+	if (rc) fatal_exit("Failed to begin a transaction", rc);
+
+	nldb_cursor_t cursor;
+
+	rc = nldb_cursor_open(tx, table, &cursor);
+	if (rc == NLDB_ERROR_UNSUPPORTED_FEATURE ) {
+		printf("cursor feature is not supported for this table type.\n");
+		goto on_error;
+	}
+	if (rc) fatal_exit("Failed to open a cursor", rc);
+
+	{
+		tbl_key min_key;
+		fillData(0, min_key.data, sizeof(min_key), 0);
+
+		nldb_key_t nldb_min_key = {min_key.data, sizeof(min_key)};
+
+		rc = nldb_cursor_seek_forward( cursor, nldb_min_key );
+		tx_assert( rc == NLDB_OK );
+
+		nldb_key_t key;
+		nldb_value_t value;
+
+		tbl_key prev_key;
+		memset( &prev_key, 0, sizeof(prev_key));
+
+		nldb_rc_t rc;
+		while( ( rc = nldb_cursor_move_forward( cursor,  &key,  &value ) ) == 0 )
+		{
+			tx_assert( key.length == sizeof(prev_key));
+			tx_assert( memcmp( &prev_key, key.data, key.length) <= 0 );
+
+			memcpy( &prev_key, key.data, key.length );
+
+			rc = nldb_key_free( table, key );
+			tx_assert( rc == NLDB_OK );
+
+			rc = nldb_value_free( table, value );
+			tx_assert( rc == NLDB_OK );
+		}
+
+		if ( rc != NLDB_ERROR_END_OF_ITERATION ) {
+			printf("Invalid return code for nldb_cursor_move_forward => %d\n", rc);
+			tx_assert( 0 );
+		}
+	}
+
+	rc = nldb_cursor_close( cursor );
+	if (rc) fatal_exit("Failed to close a cursor", rc);
+
+on_error:
+	rc = nldb_tx_commit(tx);
+	if (rc) fatal_exit("Failed to commit a transaction", rc);
+
+	rc = nldb_tx_destroy( tx );
+	if (rc) fatal_exit("Failed to destroy a transaction", rc);
+}
+
+void backward_cursor_test(nldb_db_t & db, nldb_table_t & table) {
+	nldb_tx_t tx;
+	nldb_rc_t rc = nldb_tx_init( db, &tx );
+	if (rc) fatal_exit("Failed to initialize a transaction", rc);
+
+	rc = nldb_tx_begin(tx);
+	if (rc) fatal_exit("Failed to begin a transaction", rc);
+
+	nldb_cursor_t cursor;
+
+	rc = nldb_cursor_open(tx, table, &cursor);
+	if (rc == NLDB_ERROR_UNSUPPORTED_FEATURE ) {
+		printf("cursor feature is not supported for this table type.\n");
+		goto on_error;
+	}
+	if (rc) fatal_exit("Failed to open a cursor", rc);
+
+	{
+		tbl_key max_key;
+		fillData(0xFFFFFFFFU, max_key.data, sizeof(max_key), 0xFFU);
+
+		nldb_key_t nldb_max_key = {max_key.data, sizeof(max_key)};
+
+		rc = nldb_cursor_seek_backward( cursor, nldb_max_key );
+		tx_assert( rc == NLDB_OK );
+
+		nldb_key_t key;
+		nldb_value_t value;
+
+		tbl_key prev_key;
+		memset( &prev_key, 0xFFU, sizeof(prev_key));
+
+		nldb_rc_t rc;
+		while( ( rc = nldb_cursor_move_backward( cursor,  &key,  &value ) ) == 0 )
+		{
+			tx_assert( key.length == sizeof(prev_key));
+			tx_assert( memcmp( &prev_key, key.data, key.length) >= 0 );
+
+			memcpy( &prev_key, key.data, key.length );
+
+			rc = nldb_key_free( table, key );
+			tx_assert( rc == NLDB_OK );
+
+			rc = nldb_value_free( table, value );
+			tx_assert( rc == NLDB_OK );
+		}
+
+		if ( rc != NLDB_ERROR_END_OF_ITERATION ) {
+			printf("Invalid return code for nldb_cursor_move_forward => %d\n", rc);
+			tx_assert( 0 );
+		}
+	}
+
+	rc = nldb_cursor_close( cursor );
+	if (rc) fatal_exit("Failed to close a cursor", rc);
+
+on_error:
+	rc = nldb_tx_commit(tx);
+	if (rc) fatal_exit("Failed to commit a transaction", rc);
+
+	rc = nldb_tx_destroy( tx );
+	if (rc) fatal_exit("Failed to destroy a transaction", rc);
+}
+
 
 void del_test(nldb_db_t & db, nldb_table_t & table) {
 	nldb_tx_t tx;
@@ -289,7 +422,7 @@ void del_test(nldb_db_t & db, nldb_table_t & table) {
 		rc = nldb_tx_begin(tx);
 		if (rc) fatal_exit("Failed to begin a transaction", rc);
 
-		del_random_records( tx, table, loop, RECORDS_PER_TX, NLDB_OK);
+		(void)del_random_records( tx, table, loop, RECORDS_PER_TX, NLDB_OK);
 
 		rc = nldb_tx_commit(tx);
 		if (rc) fatal_exit("Failed to commit a transaction", rc);
@@ -299,10 +432,64 @@ void del_test(nldb_db_t & db, nldb_table_t & table) {
 	if (rc) fatal_exit("Failed to destroy a transaction", rc);
 }
 
+
+extern bool __print_nodes_on_table_close;
+extern bool __check_consistency_on_table_close;
+
+void print_node_test(nldb_db_t & db, nldb_table_t & table) {
+	__print_nodes_on_table_close = true;
+	__check_consistency_on_table_close = true;
+
+	nldb_tx_t tx;
+	nldb_rc_t rc = nldb_tx_init( db, &tx );
+	if (rc) fatal_exit("Failed to initialize a transaction", rc);
+
+	// Insert 100 records
+	for (int loop = 0 ; loop < 100; loop ++ )
+	{
+		rc = nldb_tx_begin(tx);
+		if (rc) fatal_exit("Failed to begin a transaction", rc);
+
+		(void)put_random_records( tx, table, loop, RECORDS_PER_TX, "ThankyouSoft", NLDB_OK);
+
+		rc = nldb_tx_commit(tx);
+		if (rc) fatal_exit("Failed to commit a transaction", rc);
+	}
+
+	rc = nldb_tx_destroy( tx );
+	if (rc) fatal_exit("Failed to destroy a transaction", rc);
+
+}
+
+
+
+
+
+
+// List of test cases
 test_case_t tests[] = {
-		{"put", put_test},
-		{"del", del_test},
-		{NULL, NULL}
+	{"put", put_test},
+	{"get", get_test},
+	{"forward_cursor", forward_cursor_test},
+	{"backward_cursor", backward_cursor_test},
+	{"del", del_test},
+#if defined(DEBUG)
+	{"print_nodes", print_node_test},
+#endif
+	{NULL, NULL}
+};
+
+// List of tables to test for each test case
+typedef struct table_desc_t {
+	char * table_desc;
+	int    table_id;
+}table_desc_t;
+
+table_desc_t tables[] = {
+	{"Array Tree", VOLATILE_TABLE_ID },
+	{"Tokyo Cabinet", TC_TABLE_ID },
+	{"LevelDB", PERSISTENT_TABLE_ID },
+	{NULL, -1 },
 };
 
 int llcep_nldb_master(int arc, char** argv) {
@@ -326,21 +513,23 @@ int llcep_nldb_master(int arc, char** argv) {
 
 	create_tables( db );
 
+	for (int i=0; tables[i].table_desc != NULL; i++)
 	{
-		nldb_table_t vol_table;
-		nldb_rc_t rc = nldb_table_open(db, VOLATILE_TABLE_ID, &vol_table);
-		if (rc) fatal_exit("Failed to open table, VOLATILE_TABLE_ID", rc);
+		printf("\nRunning tests with table type : %s\n", tables[i].table_desc );
 
-		for (int i=0; tests[i].test_name != NULL; i++) {
-			measure_performance(db, vol_table, tests[i].test_name, tests[i].test_func);
+		nldb_table_t table;
+		nldb_rc_t rc = nldb_table_open(db, tables[i].table_id, &table);
+		if (rc) fatal_exit("Failed to open table", rc);
+
+		for (int j=0; tests[j].test_name != NULL; j++) {
+			measure_performance(db, table, tests[j].test_name, tests[j].test_func);
 		}
 
-		rc = nldb_table_close(vol_table);
-		if (rc) fatal_exit("Failed to close table, VOLATILE_TABLE_ID", rc);
+		rc = nldb_table_close(table);
+		if (rc) fatal_exit("Failed to open table", rc);
 	}
 
-	printf("Press Enter to start closing/dropping tables, closing DB, dropping DB\n");
-	(void)getchar();
+	printf("Test Finished.\n");
 
 	drop_tables( db );
 
