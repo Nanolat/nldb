@@ -200,21 +200,21 @@ void close_db()
 void open_tables()
 {
     /*
-    EXEC SQL OPEN TABLE :dept;
+    EXEC SQL OPEN TABLE dept;
     */
 	SQLCA.SQLCODE = nldb_table_open(db, ESQL_table_id_dept, &esql_table_dept);
 
 	CHECK_ERROR(SQLCA.SQLCODE);
 
     /*
-    EXEC SQL OPEN TABLE :emp;
+    EXEC SQL OPEN TABLE emp;
     */
 	SQLCA.SQLCODE = nldb_table_open(db, ESQL_table_id_emp, &esql_table_emp);
 
 	CHECK_ERROR(SQLCA.SQLCODE);
 
     /*
-    EXEC SQL OPEN TABLE :dept_emp;
+    EXEC SQL OPEN TABLE dept_emp;
     */
 	SQLCA.SQLCODE = nldb_table_open(db, ESQL_table_id_dept_emp, &esql_table_dept_emp);
 
@@ -224,21 +224,21 @@ void open_tables()
 void close_tables()
 {
     /*
-    EXEC SQL CLOSE TABLE :dept;
+    EXEC SQL CLOSE TABLE dept;
     */
 	SQLCA.SQLCODE = nldb_table_close( esql_table_dept );
 
 	CHECK_ERROR(SQLCA.SQLCODE);
 
 	/*
-    EXEC SQL CLOSE TABLE :emp;
+    EXEC SQL CLOSE TABLE emp;
     */
 	SQLCA.SQLCODE = nldb_table_close( esql_table_emp );
 
 	CHECK_ERROR(SQLCA.SQLCODE);
 
 	/*
-    EXEC SQL CLOSE TABLE :dept_emp;
+    EXEC SQL CLOSE TABLE dept_emp;
     */
 	SQLCA.SQLCODE = nldb_table_close( esql_table_dept_emp );
 
@@ -248,21 +248,21 @@ void close_tables()
 void create_tables()
 {
 	/*
-    EXEC SQL CREATE TABLE :dept { PLUGIN = NLDB_TABLE_PERSISTENT };
+    EXEC SQL CREATE TABLE dept { PLUGIN = NLDB_TABLE_PERSISTENT };
     */
 	SQLCA.SQLCODE = nldb_table_create( db, ESQL_table_id_dept, NLDB_TABLE_PERSISTENT);
 
 	CHECK_ERROR(SQLCA.SQLCODE);
 
 	/*
-    EXEC SQL CREATE TABLE :emp { PLUGIN = NLDB_TABLE_PERSISTENT };
+    EXEC SQL CREATE TABLE emp { PLUGIN = NLDB_TABLE_PERSISTENT };
     */
 	SQLCA.SQLCODE = nldb_table_create( db, ESQL_table_id_emp, NLDB_TABLE_PERSISTENT);
 
 	CHECK_ERROR(SQLCA.SQLCODE);
 
 	/*
-    EXEC SQL CREATE TABLE :dept_emp { PLUGIN = NLDB_TABLE_VOLATILE };
+    EXEC SQL CREATE TABLE dept_emp { PLUGIN = NLDB_TABLE_VOLATILE };
     */
 	SQLCA.SQLCODE = nldb_table_create( db, ESQL_table_id_dept_emp, NLDB_TABLE_PERSISTENT);
 
@@ -272,21 +272,21 @@ void create_tables()
 void drop_tables()
 {
 	/*
-    EXEC SQL DROP TABLE :dept;
+    EXEC SQL DROP TABLE dept;
     */
 	SQLCA.SQLCODE = nldb_table_drop( db, ESQL_table_id_dept);
 
     CHECK_ERROR(SQLCA.SQLCODE);
 
     /*
-    EXEC SQL DROP TABLE :emp;
+    EXEC SQL DROP TABLE emp;
     */
 	SQLCA.SQLCODE = nldb_table_drop( db, ESQL_table_id_emp);
 
     CHECK_ERROR(SQLCA.SQLCODE);
 
     /*
-    EXEC SQL DROP TABLE :dept_emp;
+    EXEC SQL DROP TABLE dept_emp;
     */
 	SQLCA.SQLCODE = nldb_table_drop( db, ESQL_table_id_dept_emp);
 
