@@ -52,6 +52,7 @@ typedef int nldb_rc_t;
 typedef int nldb_db_id_t;
 typedef int nldb_table_id_t;
 typedef long long nldb_tx_id_t;
+typedef nldb_uint32_t nldb_plugin_id_t;
 
 typedef unsigned short key_length_t;
 typedef unsigned short value_length_t;

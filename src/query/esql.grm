@@ -1,0 +1,28 @@
+%%
+%term
+    EOF
+  | ID of string
+  | INT of int 
+  | STRING of string
+  | COMMA | COLON | SEMICOLON | LPAREN | RPAREN | LBRACE | RBRACE | DOT
+  | PLUS | MINUS | TIMES | DIVIDE | EQ | NEQ | LT | LE | GT | GE
+  | CREATE | DROP | TABLE |  
+  | SELECT | FROM | WHERE | GROUP | BY | ORDER
+  | INNER | LEFT | RIGHT | FULL | OUTER | JOIN | ON
+  | UPDATE | SET 
+  | DELETE 
+  | INSERT | INTO | VALUES
+
+%nonterm 
+    stmt 
+  | create_table_stmt
+  | drop_table_stmt
+  | select_stmt
+  | update_stmt
+  | delete_stmt
+  | insert_stmt
+
+%start stmt
+
+$eop EOF
+ 

@@ -19,6 +19,7 @@
 #include <txbase/tx_assert.h>
 
 #include <nldb/nldb.h>
+#include <nldb/nldb_plugin.h>
 #include "nldb_internal.h"
 
 #if defined(_MSC_VER)

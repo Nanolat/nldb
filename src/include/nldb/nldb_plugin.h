@@ -76,5 +76,8 @@ public:
 
 };
 
+// errors : NLDB_ERROR_PLUGIN_NO_MORE_SLOT
+extern nldb_rc_t nldb_plugin_add( nldb_plugin_t & plugin, nldb_plugin_id_t * plugin_id );
+
 #endif // _NLDB_PLUGIN_H_
 

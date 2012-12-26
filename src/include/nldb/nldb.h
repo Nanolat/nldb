@@ -20,8 +20,6 @@
 #define _NLDB_H_ (1)
 
 #include <nldb/nldb_common.h>
-#include <string>
-#include <vector>
 
 
 // When you create a table, you don't specify a string for a table name, but you specify an integer, table id. 
@@ -41,10 +39,6 @@ typedef struct nldb_cursor_holder_t * nldb_cursor_t;
 /*********************/
 /* plugin management */
 /*********************/
-#include <nldb/nldb_plugin.h>
-
-typedef nldb_uint32_t nldb_plugin_id_t;
-
 extern nldb_plugin_id_t NLDB_TABLE_PERSISTENT;
 extern nldb_plugin_id_t NLDB_TABLE_VOLATILE;
 extern nldb_plugin_id_t NLDB_TABLE_TC;
@@ -53,8 +47,9 @@ extern nldb_plugin_id_t NLDB_TABLE_TC;
 // return the maximum number of plugins
 extern nldb_uint32_t nldb_plugin_max_count();
 
-// errors : NLDB_ERROR_PLUGIN_NO_MORE_SLOT
-extern nldb_rc_t nldb_plugin_add( nldb_plugin_t & plugin, nldb_plugin_id_t * plugin_id );
+/**************************/
+/* nldb system management */
+/**************************/
 
 extern nldb_rc_t nldb_init();
 
@@ -73,7 +68,7 @@ extern nldb_rc_t nldb_db_drop( const nldb_db_id_t & db_id );
 typedef struct nldb_replication_master_op_t {
 	// BUGBUG : Make sure that we can replace * to ip address in zmq::socket.bind("tcp://*:5556");
 	// The ip of the master.
-	std::string ip;
+	char             ip[64];
     // The port that the Master uses to publish transactional logs on the localhost.
 	nldb_uint16_t    port;
 }nldb_replication_master_op_t;
@@ -81,10 +76,10 @@ typedef struct nldb_replication_master_op_t {
 // The address of replication master. Slaves uses this address to subscribe Master's log publication.
 typedef struct nldb_replication_master_desc_t {
 	// The ip of the master.
-	std::string ip;
+	char             ip[64];
 	// The port of the master.
 	nldb_uint16_t    port;
-} nldb_replication_slave_addr_t;
+} nldb_replication_master_desc_t;
 
 typedef enum nldb_trigger_type_t
 {
