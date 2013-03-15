@@ -16,7 +16,7 @@ Why use it?
 
 How it works?
 -------------
-- Uses 40G Infiniband and 10G Ethernet instead of TCP/IP to replicate data from a server to another server.
+- Uses 40G Infiniband and 10G Ethernet instead of TCP/IP to replicate data from a server to another server within 2.5 us.
 - Instead of flushing transactional log on local disk, transfer it to slave machine.
 
 Target systems
