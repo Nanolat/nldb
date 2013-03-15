@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2012 ThankyouSoft (http://ThankyouSoft.com/) and others.
+ * (C) Copyright 2012 ThankyouSoft (http://ThankyouSoft.com/) and Nanolat(http://Nanolat.com).
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -13,7 +13,6 @@
  *
  * Contributors:
  *     Kangmo Kim
- *     Saryong Kang
  */
 
 #ifndef NLDBSEARCH_H_
