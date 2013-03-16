@@ -27,7 +27,7 @@ How it works?
 Nanolat Open Source License v1.0 ( Simple but ambiguous )
 --------------------------------------------
 - If you are in USA, Canada, or Germany, it is *likely* that you get free LGPL v2.1.  
-- In other countries, you are *likely* under GPL v3, but you can by LGPL v2.1 from Nanolat Co., Ltd. 
+- In other countries, you are *likely* under GPL v3, but you can buy LGPL v2.1 from Nanolat Co., Ltd. 
 - For free software, you *definitely* get free LGPL v2.1 whereever you are.
 
 Nanolat Open Source License v1.0 ( Detailed and explicit )
