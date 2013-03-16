@@ -24,9 +24,11 @@ How it works?
 - Uses 40G Infiniband and 10G Ethernet instead of TCP/IP to replicate data from a server to another server within 2.5 us.
 - Instead of flushing transactional log on local disk, transfer it to slave machine.
 
-Nanolat License v1.0
---------------------
-- In the hope of seeing increasing contributions in countries that does not have enough open source contributors,
-  Nanolat License provides free LGPL v2.1 only to companies in countries in top 10 open source contributing countries.
-- For companies in other countries, you are under GPL v3.0, but you still can buy LGPL v2.1 from Nanolat Co., Ltd.
+Nanolat Open Source License v1.0
+--------------------------------
+- In the hope of seeing increasing open source contributions in countries that does not have enough open source contributors, Nanolat Open Source License provides free LGPL v2.1 only to companies and people of countries that have at least three KudoRank 10 contributors in http://www.ohloh.net/people. The list of countries are updated at the beginning of a year. In 2013, these countries are USA, Canada, and Germany.
+- For companies and people of other countries, you are under GPL v3.0, but you can buy LGPL v2.1 license for a product from Nanolat Co., Ltd.
 - However, for non-commercial usage, you get free LGPL v2.1 whereever you are.
+- A company is of a country if the head of office is in the country.
+- A person is of a country if the nationality of the person is the country.
+- A country has a KudoRank 10 contributor if the contributor's location is the country in http://www.ohloh.net/.
