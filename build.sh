@@ -7,28 +7,31 @@ echo "Step 1. Installing prerequisites..."
 #    sudo apt-get install libz-dev libbz2-dev unzip
 #########################################################################
 
-if [ `lsb_release -a | grep CentOS | wc -l` = "1" ]
+if [ `lsb_release -a | grep CentOS | wc -l` -gt 0 ]
 then
+   echo "haha"
    USE_YUM=1 
 fi
 
-if [ `lsb_release -a | grep "Red Hat Enterprise Linux" | wc -l` = "1" ]
+if [ `lsb_release -a | grep "Red Hat Enterprise Linux" | wc -l` -gt 0 ]
 then
    USE_YUM=1
 fi
 
-if [ `lsb_release -a | grep "Ubuntu" | wc -l` = "1" ]
+if [ `lsb_release -a | grep "Ubuntu" | wc -l` -gt 0 ]
 then 
    USE_APT=1
 fi
 
-if [ $USE_YUM -eq 1 ]
+if [ "$USE_YUM" = "1" ]
 then
+   echo "Using yum to install prerequisites."
    sudo yum install zlib-devel bzip2-devel unzip
 fi
 
-if [ $USE_APT -eq 1 ]
+if [ "$USE_APT" = "1" ]
 then
+   echo "Using aptitude to install prerequisites."
    sudo apt-get install libz-dev libbz2-dev unzip
 fi
 
@@ -50,8 +53,10 @@ echo "Step 2. Check gcc version ... (needs 4.6.x) ..."
 #    source ./use-gcc46.sh
 #########################################################################
 
-if [ `gcc --version | grep 4.6 | wc -l` = "0" ]
+if [ `gcc --version | grep 4.6 | wc -l` = "1" ]
 then
+   echo "gcc version is 4.6.x. Will use the installed gcc."
+else
    echo "gcc version is not 4.6.x. Will download and install gcc 4.6.3."
    git clone https://github.com/ThankyouSoft/gcc46.git
    cd gcc46

@@ -45,8 +45,8 @@
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.1993036145" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.954784547" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
 								<option id="gnu.cpp.link.option.paths.1565267504" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/../external-libs/lib&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/nldb&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../../../external-libs/lib&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../../nldb&quot;"/>
 								</option>
 								<option id="gnu.cpp.link.option.libs.632920322" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="gtest"/>
@@ -118,8 +118,8 @@
 									<listOptionValue builtIn="false" value="pthread"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.1304257883" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/../external-libs/lib&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/nldb&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../../../external-libs/lib&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../../nldb&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1521875192" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
