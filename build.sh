@@ -52,7 +52,7 @@ echo "Step 2. Check gcc version ... (needs 4.6.x) ..."
 #    source ./use-gcc46.sh
 #########################################################################
 
-if [ `gcc --version | grep 4.6 | wc -l` = "1" ]
+if [ `gcc --version | grep "4\.6\." | wc -l` = "1" ]
 then
    echo "gcc version is 4.6.x. Will use the installed gcc."
 else
