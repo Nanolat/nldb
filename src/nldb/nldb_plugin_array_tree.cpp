@@ -43,7 +43,7 @@
 #include "nldb_array_tree.h"
 #include "nldb_debuggable_array_tree.h"
 
-#include <boost/pool/pool.hpp>
+#include "nldb_object_pool.h"
 #include <txbase/tx_assert.h>
 
 nldb_rc_t nldb_plugin_array_tree_t::table_create(const nldb_table_id_t & db_id, const nldb_table_id_t & table_id, nldb_plugin_table_desc_t * table_desc)
@@ -72,7 +72,7 @@ public :
 private :
 
 	tree_t tree_;
-	boost::pool<> * value_pool_;
+	nldb_object_pool * value_pool_;
 	bool initialized_;
 
 	// Why don't use key length in tree_ and value length in value_pool_?
@@ -95,7 +95,7 @@ public :
 		return tree_;
 	}
 
-	inline boost::pool<> & value_pool() {
+	inline nldb_object_pool & value_pool() {
 		tx_assert(value_pool_!= NULL);
 		return *value_pool_;
 	}
@@ -124,7 +124,7 @@ public :
 		if (rc)
 			return rc;
 
-		value_pool_ = new boost::pool<>(value_length_);
+		value_pool_ = new nldb_object_pool(value_length_);
 
 		initialized_ = true;
 
@@ -155,7 +155,7 @@ nldb_rc_t nldb_plugin_array_tree_t::table_open(nldb_plugin_table_desc_t & table_
 bool __print_nodes_on_table_close = false;
 bool __check_consistency_on_table_close = false;
 // Print all keys in all nodes in ascending order.
-static nldb_rc_t debug_print_nodes(nldb_table_context_t table_ctx)
+nldb_rc_t debug_print_nodes(nldb_table_context_t table_ctx)
 {
 	table_context_t * ctx = (table_context_t*) table_ctx;
 
@@ -168,7 +168,7 @@ static nldb_rc_t debug_print_nodes(nldb_table_context_t table_ctx)
 	return NLDB_OK;
 }
 
-static nldb_rc_t debug_check_consistency(nldb_table_context_t table_ctx)
+nldb_rc_t debug_check_consistency(nldb_table_context_t table_ctx)
 {
 	table_context_t * ctx = (table_context_t*) table_ctx;
 

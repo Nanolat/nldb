@@ -157,7 +157,7 @@ class TxTransactionLogPublisher : public disruptor::EventHandlerInterface<TxTran
 */
 		// Sleep for 5 seconds to connect to subscribers. Otherwise we can lose some messages at the starting point, because it takes time for the ZMQ publisher and subscribers to connect to each other.
 		// BUGBUG : Find out how we can explic= ity check if the publisher and subscriber are connected together.
-		boost::this_thread::sleep(boost::posix_time::milliseconds( XS_HANDSHAKE_SLEEP_SECONDS * 10 ));
+    std::this_thread::sleep_for(std::chrono::milliseconds(XS_HANDSHAKE_SLEEP_SECONDS * 10));
 	}
 	
 	virtual ~TxTransactionLogPublisher() {

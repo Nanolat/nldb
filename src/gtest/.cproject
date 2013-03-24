@@ -26,14 +26,13 @@
 								<option id="gnu.cpp.compiler.exe.debug.option.optimization.level.599288708" name="Optimization Level" superClass="gnu.cpp.compiler.exe.debug.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.exe.debug.option.debugging.level.1944501494" name="Debug Level" superClass="gnu.cpp.compiler.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.1518940917" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/boost&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/gtest/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/../external-libs/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/txbase&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/nldb&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.other.other.2014678013" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -std=c++0x" valueType="string"/>
-								<option id="gnu.cpp.compiler.option.preprocessor.def.832739711" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+								<option id="gnu.cpp.compiler.option.preprocessor.def.832739711" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="DEBUG"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.352662461" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -46,14 +45,13 @@
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.exe.debug.1993036145" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.exe.debug"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.954784547" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
 								<option id="gnu.cpp.link.option.paths.1565267504" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/gtest&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/nldb/GccDebug&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/tokyocabinet&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/libxs/src/.libs&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/../external-libs/lib&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/nldb&quot;"/>
 								</option>
 								<option id="gnu.cpp.link.option.libs.632920322" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="gtest"/>
-									<listOptionValue builtIn="false" value="nldb-gcc-debug"/>
+									<listOptionValue builtIn="false" value="nldb"/>
+									<listOptionValue builtIn="false" value="leveldb"/>
 									<listOptionValue builtIn="false" value="tokyocabinet"/>
 									<listOptionValue builtIn="false" value="xs"/>
 									<listOptionValue builtIn="false" value="pthread"/>
@@ -62,6 +60,7 @@
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
 								</inputType>
+								<outputType id="cdt.managedbuild.tool.gnu.cpp.linker.output.1404157073" outputPrefix="../" superClass="cdt.managedbuild.tool.gnu.cpp.linker.output"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.assembler.exe.debug.546169832" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.debug">
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1238976379" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
@@ -95,8 +94,7 @@
 								<option id="gnu.cpp.compiler.exe.release.option.optimization.level.266429682" name="Optimization Level" superClass="gnu.cpp.compiler.exe.release.option.optimization.level" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.exe.release.option.debugging.level.1921946227" name="Debug Level" superClass="gnu.cpp.compiler.exe.release.option.debugging.level" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.522346223" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/boost&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/gtest/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/../external-libs/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/txbase&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/nldb&quot;"/>
@@ -113,21 +111,21 @@
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.1578977448" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.release">
 								<option id="gnu.cpp.link.option.libs.880846626" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="gtest"/>
-									<listOptionValue builtIn="false" value="nldb-gcc-release"/>
+									<listOptionValue builtIn="false" value="nldb"/>
+									<listOptionValue builtIn="false" value="leveldb"/>
 									<listOptionValue builtIn="false" value="tokyocabinet"/>
 									<listOptionValue builtIn="false" value="xs"/>
 									<listOptionValue builtIn="false" value="pthread"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.1304257883" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/gtest&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/nldb/GccRelease&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/tokyocabinet&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/libxs/src/.libs&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/../external-libs/lib&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/nldb&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1521875192" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
 								</inputType>
+								<outputType id="cdt.managedbuild.tool.gnu.cpp.linker.output.1409528201" outputPrefix="../" superClass="cdt.managedbuild.tool.gnu.cpp.linker.output"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.assembler.exe.release.1027922452" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.exe.release">
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1243359171" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
@@ -144,54 +142,21 @@
 				<extensions>
 					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.ICCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.VCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.autotools.core.ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.exe.debug.1136252895.715903454" name="IntelDebug" parent="cdt.managedbuild.config.gnu.exe.debug">
 					<folderInfo id="cdt.managedbuild.config.gnu.exe.debug.1136252895.715903454." name="/" resourcePath="">
-						<toolChain id="intel.toolchain.linux.x86_64.exe.dbg_13.0.0.67342042" name="Intel Toolchain for Executable on Intel(R) 64" superClass="intel.toolchain.linux.x86_64.exe.dbg_13.0.0">
-							<targetPlatform archList="x86_64" binaryParser="org.eclipse.cdt.core.ELF" id="intel.platform.linux.x86_64.exe.dbg.896729593_13.0.0" name="Platform.Executable.Debug" osList="linux" superClass="intel.platform.linux.x86_64.exe.dbg_13.0.0"/>
-							<builder buildPath="${workspace_loc:/gtest/IntelDebug}" id="intel.builder.linux.x86_64.exe.dbg.137131340_13.0.0" keepEnvironmentInBuildfile="false" name="Intel Builder" superClass="intel.builder.linux.x86_64.exe.dbg_13.0.0"/>
-							<tool id="intel.cpp.compilestep.linux.x86_64.exe.dbg.1762448940_13.0.0" name="Intel Intel(R) 64 C++ Compiler " superClass="intel.cpp.compilestep.linux.x86_64.exe.dbg_13.0.0">
-								<option id="intel.compilestep.preprocessor.includedirectories.1826151096" name="Additional Include Directories (-I)" superClass="intel.compilestep.preprocessor.includedirectories" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/boost&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/gtest/include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/txbase&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/nldb&quot;"/>
-								</option>
-								<option id="intel.compilestep.coptions.2127004730" name="Additional Options" superClass="intel.compilestep.coptions" value="-std=c++0x -prof-gen=srcpos" valueType="string"/>
-								<option id="intel.compilestep.preprocessor.defsym.1072309808" superClass="intel.compilestep.preprocessor.defsym" valueType="definedSymbols">
-									<listOptionValue builtIn="false" value="DEBUG"/>
-								</option>
-								<inputType id="intel.cpp.compilestep.input.223038148" superClass="intel.cpp.compilestep.input"/>
-							</tool>
-							<tool id="intel.c.compilestep.linux.x86_64.exe.dbg.706671282_13.0.0" name="Intel Intel(R) 64 C Compiler" superClass="intel.c.compilestep.linux.x86_64.exe.dbg_13.0.0">
-								<inputType id="intel.c.compilestep.input.1183925522" superClass="intel.c.compilestep.input"/>
-							</tool>
-							<tool id="intel.c.linkstep.linux.x86_64.exe.dbg.175138077_13.0.0" name="Intel Intel(R) 64 C Linker" superClass="intel.c.linkstep.linux.x86_64.exe.dbg_13.0.0"/>
-							<tool id="intel.cpp.linkstep.linux.x86_64.exe.dbg.1691073193_13.0.0" name="Intel Intel(R) 64 C++ Linker" superClass="intel.cpp.linkstep.linux.x86_64.exe.dbg_13.0.0">
-								<option id="intel.linkstep.libname.368563156" name="Additional Libraries (-l)" superClass="intel.linkstep.libname" valueType="libs">
-									<listOptionValue builtIn="false" value="gtest"/>
-									<listOptionValue builtIn="false" value="nldb-intel-debug"/>
-									<listOptionValue builtIn="false" value="leveldb"/>
-									<listOptionValue builtIn="false" value="tokyocabinet"/>
-									<listOptionValue builtIn="false" value="xs"/>
-									<listOptionValue builtIn="false" value="pthread"/>
-								</option>
-								<option id="intel.linkstep.libpath.844868087" name="Search Directory for Libraries (-L)" superClass="intel.linkstep.libpath" valueType="stringList">
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/gtest&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/nldb/IntelDebug&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/leveldb&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/tokyocabinet&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/libxs/src/.libs&quot;"/>
-								</option>
-								<inputType id="intel.linkstep.input.613475412" superClass="intel.linkstep.input">
-									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
-									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
-								</inputType>
-							</tool>
+						<toolChain id="intel.toolchain.linux.x86_64.exe.dbg_13.0.0.67342042" name="Intel Toolchain for Executable on Intel(R) 64">
+							<targetPlatform archList="x86_64" binaryParser="org.eclipse.cdt.core.ELF" id="intel.platform.linux.x86_64.exe.dbg.896729593_13.0.0" name="Platform.Executable.Debug" osList="linux"/>
+							<builder buildPath="${workspace_loc:/gtest/IntelDebug}" id="intel.builder.linux.x86_64.exe.dbg.137131340_13.0.0" keepEnvironmentInBuildfile="false" name="Intel Builder"/>
 						</toolChain>
 					</folderInfo>
 				</configuration>
@@ -204,56 +169,21 @@
 				<extensions>
 					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.ICCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.VCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.autotools.core.ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.exe.release.1468674454.1805271993" name="IntelRelease" parent="cdt.managedbuild.config.gnu.exe.release">
 					<folderInfo id="cdt.managedbuild.config.gnu.exe.release.1468674454.1805271993." name="/" resourcePath="">
-						<toolChain id="intel.toolchain.linux.x86_64.exe.dbg_13.0.0.240422702" name="Intel Toolchain for Executable on Intel(R) 64" superClass="intel.toolchain.linux.x86_64.exe.dbg_13.0.0">
-							<targetPlatform archList="x86_64" binaryParser="org.eclipse.cdt.core.ELF" id="intel.platform.linux.x86_64.exe.dbg.2010483558_13.0.0" name="Platform.Executable.Debug" osList="linux" superClass="intel.platform.linux.x86_64.exe.dbg_13.0.0"/>
-							<builder buildPath="${workspace_loc:/gtest/IntelRelease}" id="intel.builder.linux.x86_64.exe.dbg.1559987345_13.0.0" keepEnvironmentInBuildfile="false" name="Intel Builder" superClass="intel.builder.linux.x86_64.exe.dbg_13.0.0"/>
-							<tool id="intel.cpp.compilestep.linux.x86_64.exe.dbg.1260335797_13.0.0" name="Intel Intel(R) 64 C++ Compiler " superClass="intel.cpp.compilestep.linux.x86_64.exe.dbg_13.0.0">
-								<option id="intel.compilestep.preprocessor.includedirectories.891118067" name="Additional Include Directories (-I)" superClass="intel.compilestep.preprocessor.includedirectories" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/boost&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/gtest/include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/txbase&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/nldb&quot;"/>
-								</option>
-								<option id="intel.compilestep.coptions.1661858090" name="Additional Options" superClass="intel.compilestep.coptions" value="-std=c++0x" valueType="string"/>
-								<option id="intel.compilestep.general.debug.cpp.x86_64.exe.dbg.1747973493_13.0.0" name="Include Debug Information (-g)" superClass="intel.compilestep.general.debug.cpp.x86_64.exe.dbg_13.0.0" value="false" valueType="boolean"/>
-								<option id="intel.compilestep.general.optimization2.735229476" name="Optimization Level" superClass="intel.compilestep.general.optimization2" value="general.opt.speedHLO" valueType="enumerated"/>
-								<inputType id="intel.cpp.compilestep.input.2076370176" superClass="intel.cpp.compilestep.input"/>
-							</tool>
-							<tool id="intel.c.compilestep.linux.x86_64.exe.dbg.368943591_13.0.0" name="Intel Intel(R) 64 C Compiler" superClass="intel.c.compilestep.linux.x86_64.exe.dbg_13.0.0">
-								<option id="intel.compilestep.general.debug.c.x86_64.exe.dbg.754555286_13.0.0" name="Include Debug Information (-g)" superClass="intel.compilestep.general.debug.c.x86_64.exe.dbg_13.0.0" value="false" valueType="boolean"/>
-								<option id="intel.compilestep.general.optimization2.200975066" name="Optimization Level" superClass="intel.compilestep.general.optimization2" value="general.opt.speedHLO" valueType="enumerated"/>
-								<inputType id="intel.c.compilestep.input.1233283131" superClass="intel.c.compilestep.input"/>
-							</tool>
-							<tool id="intel.c.linkstep.linux.x86_64.exe.dbg.1213478641_13.0.0" name="Intel Intel(R) 64 C Linker" superClass="intel.c.linkstep.linux.x86_64.exe.dbg_13.0.0"/>
-							<tool id="intel.cpp.linkstep.linux.x86_64.exe.dbg.1960726563_13.0.0" name="Intel Intel(R) 64 C++ Linker" superClass="intel.cpp.linkstep.linux.x86_64.exe.dbg_13.0.0">
-								<option id="intel.linkstep.libname.2117315148" name="Additional Libraries (-l)" superClass="intel.linkstep.libname" valueType="libs">
-									<listOptionValue builtIn="false" value="gtest"/>
-									<listOptionValue builtIn="false" value="nldb-intel-release"/>
-									<listOptionValue builtIn="false" value="leveldb"/>
-									<listOptionValue builtIn="false" value="tokyocabinet"/>
-									<listOptionValue builtIn="false" value="xs"/>
-									<listOptionValue builtIn="false" value="pthread"/>
-								</option>
-								<option id="intel.linkstep.libpath.1196164745" name="Search Directory for Libraries (-L)" superClass="intel.linkstep.libpath" valueType="stringList">
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/gtest&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/nldb/IntelRelease&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/leveldb&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/tokyocabinet&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/libxs/src/.libs&quot;"/>
-								</option>
-								<option id="intel.linkstep.general.optimization2.258618863" name="Optimization Level" superClass="intel.linkstep.general.optimization2" value="general.opt.speedHLO" valueType="enumerated"/>
-								<inputType id="intel.linkstep.input.2064420777" superClass="intel.linkstep.input">
-									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
-									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
-								</inputType>
-							</tool>
+						<toolChain id="intel.toolchain.linux.x86_64.exe.dbg_13.0.0.240422702" name="Intel Toolchain for Executable on Intel(R) 64">
+							<targetPlatform archList="x86_64" binaryParser="org.eclipse.cdt.core.ELF" id="intel.platform.linux.x86_64.exe.dbg.2010483558_13.0.0" name="Platform.Executable.Debug" osList="linux"/>
+							<builder buildPath="${workspace_loc:/gtest/IntelRelease}" id="intel.builder.linux.x86_64.exe.dbg.1559987345_13.0.0" keepEnvironmentInBuildfile="false" name="Intel Builder"/>
 						</toolChain>
 					</folderInfo>
 				</configuration>

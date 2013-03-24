@@ -80,8 +80,7 @@ rnd_number_t * rndNumsA;
 tbl_key * rndKeysA;
 tbl_value * rndValuesA;
 
-#include <boost/random/uniform_int_distribution.hpp>
-#include <boost/random/mersenne_twister.hpp>
+#include <random>
 
 
 // Fill data into char array with the given random value
@@ -113,15 +112,12 @@ void generateRandomNumbers()
 	rndKeysA = new tbl_key [TEST_DATA_COUNT];
 	rndValuesA = new tbl_value [TEST_DATA_COUNT];
 
-	boost::random::mt19937 rng;         // produces randomness out of thin air
-										// see pseudo-random number generators
-	boost::random::uniform_int_distribution<nldb_uint64_t> rnd64(1,((nldb_uint64_t)1LL)<<63);
-										// distribution that maps to 1..6
-										// see random number distributions
+	std::default_random_engine generator;
+	std::uniform_int_distribution<nldb_uint64_t> distribution(1,((nldb_uint64_t)1LL)<<63);
 
 	for (unsigned int i = 0; i< TEST_DATA_COUNT; i++ )
 	{
-		rnd_number_t rndValue = (rnd_number_t) rnd64(rng);
+		rnd_number_t rndValue = (rnd_number_t) distribution(generator);
   	    rndNumsA[i] = rndValue;                   // simulate rolling a die
   	    fillData( i, rndKeysA[i].data, sizeof(rndKeysA[i].data), rndValue);
   	    fillData( i, rndValuesA[i].data, sizeof(rndValuesA[i].data), rndValue);
@@ -472,6 +468,7 @@ void del_test(nldb_db_t & db, nldb_table_t & table) {
 	if (rc) fatal_exit("Failed to destroy a transaction", rc);
 }
 
+#if defined(DEBUG)
 
 extern bool __print_nodes_on_table_close;
 extern bool __check_consistency_on_table_close;
@@ -501,7 +498,7 @@ void print_node_test(nldb_db_t & db, nldb_table_t & table) {
 
 }
 
-
+#endif /* DEBUG */
 
 
 
@@ -521,7 +518,7 @@ test_case_t tests[] = {
 
 // List of tables to test for each test case
 typedef struct table_desc_t {
-	char * table_desc;
+	const char * table_desc;
 	int    table_id;
 }table_desc_t;
 

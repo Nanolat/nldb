@@ -235,7 +235,7 @@ public :
 		tx_debug_assert( key != NULL );
 		tx_debug_assert( value != NULL );
 
-		int i = get_print_iteration();
+		//int i = get_print_iteration();
 
 		nldb_rc_t rc = nldb_array_tree<key_space_size>::put(key, value);
 		if (rc) return rc;

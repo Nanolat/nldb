@@ -15,8 +15,8 @@
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/nldb"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/lldb/Debug"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/nldb/GccDebug"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="lldb"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="nldb-gcc-debug"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="lldb" srcPrefixMapping="" srcRootPath=""/>
+						<entry flags="RESOLVED" kind="libraryFile" name="nldb" srcPrefixMapping="" srcRootPath=""/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>
@@ -29,7 +29,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="so" artifactName="${ProjName}-gcc-debug" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.so.debug.1115280678" name="GccDebug" parent="cdt.managedbuild.config.gnu.so.debug">
+				<configuration artifactExtension="so" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.so.debug.1115280678" name="GccDebug" parent="cdt.managedbuild.config.gnu.so.debug">
 					<folderInfo id="cdt.managedbuild.config.gnu.so.debug.1115280678." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.so.debug.61313901" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.so.debug">
 							<targetPlatform id="cdt.managedbuild.target.gnu.platform.so.debug.2067482058" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.so.debug"/>
@@ -39,13 +39,10 @@
 								<option id="gnu.cpp.compiler.so.debug.option.optimization.level.1621539369" name="Optimization Level" superClass="gnu.cpp.compiler.so.debug.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.so.debug.option.debugging.level.1749486877" name="Debug Level" superClass="gnu.cpp.compiler.so.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.1431909974" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/externals/boost"/>
 									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/include"/>
 									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/txbase"/>
 									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/disruptor--"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/externals/tokyocabinet"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/externals/leveldb/include"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/externals/libxs/include"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../external-libs/include"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.other.other.266127707" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -std=c++0x  -static-libgcc -static-libstdc++ -nodefaultlibs -shared -fPIC" valueType="string"/>
 								<option id="gnu.cpp.compiler.option.other.pic.1461461932" name="Position Independent Code (-fPIC)" superClass="gnu.cpp.compiler.option.other.pic" value="true" valueType="boolean"/>
@@ -65,17 +62,13 @@
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.so.debug.571836812" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.so.debug">
 								<option defaultValue="true" id="gnu.cpp.link.so.debug.option.shared.595983514" name="Shared (-shared)" superClass="gnu.cpp.link.so.debug.option.shared" valueType="boolean"/>
 								<option id="gnu.cpp.link.option.paths.636542458" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/externals/tokyocabinet"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/externals/leveldb"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/externals/libxs/src/.libs"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/externals/boost/stage/lib"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../external-libs/lib"/>
 								</option>
 								<option id="gnu.cpp.link.option.libs.53474828" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" value=":libleveldb.a"/>
+									<listOptionValue builtIn="false" value=":libleveldb.so"/>
 									<listOptionValue builtIn="false" value="xs"/>
 									<listOptionValue builtIn="false" value="tokyocabinet"/>
 									<listOptionValue builtIn="false" value=":libbz2.so"/>
-									<listOptionValue builtIn="false" value=":libboost_thread.so"/>
 									<listOptionValue builtIn="false" value=":libz.so"/>
 									<listOptionValue builtIn="false" value=":libpthread.so"/>
 									<listOptionValue builtIn="false" value=":libdl.so"/>
@@ -86,6 +79,7 @@
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
 								</inputType>
+								<outputType id="cdt.managedbuild.tool.gnu.cpp.linker.so.debug.output.813444028" outputPrefix="../lib" superClass="cdt.managedbuild.tool.gnu.cpp.linker.so.debug.output"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.assembler.so.debug.1656256725" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.so.debug">
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1034846567" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
@@ -108,8 +102,8 @@
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/nldb"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/lldb/Release"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/nldb/GccRelease"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="lldb"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="nldb-gcc-release"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="lldb" srcPrefixMapping="" srcRootPath=""/>
+						<entry flags="RESOLVED" kind="libraryFile" name="nldb" srcPrefixMapping="" srcRootPath=""/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>
@@ -122,7 +116,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="so" artifactName="${ProjName}-gcc-release" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.so.release.1473162692" name="GccRelease" parent="cdt.managedbuild.config.gnu.so.release">
+				<configuration artifactExtension="so" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.so.release.1473162692" name="GccRelease" parent="cdt.managedbuild.config.gnu.so.release">
 					<folderInfo id="cdt.managedbuild.config.gnu.so.release.1473162692." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.so.release.1421018045" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.so.release">
 							<targetPlatform id="cdt.managedbuild.target.gnu.platform.so.release.1437378922" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.so.release"/>
@@ -132,13 +126,10 @@
 								<option id="gnu.cpp.compiler.so.release.option.optimization.level.1610126568" name="Optimization Level" superClass="gnu.cpp.compiler.so.release.option.optimization.level" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.so.release.option.debugging.level.339315886" name="Debug Level" superClass="gnu.cpp.compiler.so.release.option.debugging.level" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.931695851" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/boost&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/txbase&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/disruptor--&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/tokyocabinet&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/leveldb/include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/libxs/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/../external-libs/include&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.other.pic.768314462" name="Position Independent Code (-fPIC)" superClass="gnu.cpp.compiler.option.other.pic" value="true" valueType="boolean"/>
 								<option id="gnu.cpp.compiler.option.other.other.827625695" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -std=c++0x  -static-libgcc -static-libstdc++ -nodefaultlibs -shared -fPIC" valueType="string"/>
@@ -155,26 +146,23 @@
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.so.release.661830958" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.so.release">
 								<option defaultValue="true" id="gnu.cpp.link.so.release.option.shared.1514486102" name="Shared (-shared)" superClass="gnu.cpp.link.so.release.option.shared" valueType="boolean"/>
 								<option id="gnu.cpp.link.option.libs.1287554380" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
-									<listOptionValue builtIn="false" value=":libleveldb.a"/>
-									<listOptionValue builtIn="false" value=":libxs.a"/>
-									<listOptionValue builtIn="false" value=":libtokyocabinet.a"/>
+									<listOptionValue builtIn="false" value=":libleveldb.so"/>
+									<listOptionValue builtIn="false" value="xs"/>
+									<listOptionValue builtIn="false" value="tokyocabinet"/>
 									<listOptionValue builtIn="false" value=":libbz2.so"/>
-									<listOptionValue builtIn="false" value=":libboost_thread.so"/>
 									<listOptionValue builtIn="false" value=":libz.so"/>
 									<listOptionValue builtIn="false" value=":libpthread.so"/>
 									<listOptionValue builtIn="false" value=":libdl.so"/>
 									<listOptionValue builtIn="false" value=":librt.so"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.1745971853" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/tokyocabinet&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/leveldb&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/libxs/src/.libs&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/boost/stage/lib&quot;"/>
+									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../external-libs/lib"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.729798431" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
 								</inputType>
+								<outputType id="cdt.managedbuild.tool.gnu.cpp.linker.so.release.output.1541924850" outputPrefix="../lib" superClass="cdt.managedbuild.tool.gnu.cpp.linker.so.release.output"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.assembler.so.release.1557699599" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.so.release">
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.194080431" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
@@ -195,65 +183,27 @@
 					<externalSetting>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/nldb"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/nldb/IntelDebug"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="nldb-intel-debug"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="nldb-intel-debug" srcPrefixMapping="" srcRootPath=""/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>
 					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.ICCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.VCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.autotools.core.ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 				<configuration artifactExtension="so" artifactName="${ProjName}-intel-debug" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.so.debug.1115280678.1503528262" name="IntelDebug" parent="cdt.managedbuild.config.gnu.so.debug">
 					<folderInfo id="cdt.managedbuild.config.gnu.so.debug.1115280678.1503528262." name="/" resourcePath="">
-						<toolChain id="intel.toolchain.linux.x86_64.so.dbg_13.0.0.128877251" name="Intel Toolchain for Shared Library on Intel(R) 64" superClass="intel.toolchain.linux.x86_64.so.dbg_13.0.0">
-							<targetPlatform archList="x86_64" binaryParser="org.eclipse.cdt.core.ELF" id="intel.platform.linux.x86_64.so.dbg.1839136575_13.0.0" name="Platform.So.Debug" osList="linux" superClass="intel.platform.linux.x86_64.so.dbg_13.0.0"/>
-							<builder buildPath="${workspace_loc:/nldb/IntelDebug}" id="intel.builder.linux.x86_64.so.dbg.678140449_13.0.0" keepEnvironmentInBuildfile="false" name="Intel Builder" superClass="intel.builder.linux.x86_64.so.dbg_13.0.0"/>
-							<tool id="intel.cpp.compilestep.linux.x86_64.so.dbg.1923831404_13.0.0" name="Intel Intel(R) 64 C++ Compiler " superClass="intel.cpp.compilestep.linux.x86_64.so.dbg_13.0.0">
-								<option id="intel.compilestep.preprocessor.includedirectories.680247293" name="Additional Include Directories (-I)" superClass="intel.compilestep.preprocessor.includedirectories" valueType="includePath">
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/externals/boost"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/include"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/txbase"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/disruptor--"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/externals/tokyocabinet"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/externals/leveldb/include"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/externals/libxs/include"/>
-								</option>
-								<option id="intel.compilestep.preprocessor.defsym.463417795" name="Preprocessor Definitions (-D)" superClass="intel.compilestep.preprocessor.defsym" valueType="definedSymbols">
-									<listOptionValue builtIn="false" value="DEBUG"/>
-								</option>
-								<option id="intel.compilestep.coptions.843364331" name="Additional Options" superClass="intel.compilestep.coptions" value="-std=c++0x -prof-gen=srcpos" valueType="string"/>
-								<inputType id="intel.cpp.compilestep.input.325061443" superClass="intel.cpp.compilestep.input"/>
-							</tool>
-							<tool id="intel.c.compilestep.linux.x86_64.so.dbg.490677195_13.0.0" name="Intel Intel(R) 64 C Compiler" superClass="intel.c.compilestep.linux.x86_64.so.dbg_13.0.0">
-								<inputType id="intel.c.compilestep.input.1924023016" superClass="intel.c.compilestep.input"/>
-							</tool>
-							<tool id="intel.c.linkstep.so.linux.x86_64.dbg.625374757_13.0.0" name="Intel Intel(R) 64 C Linker" superClass="intel.c.linkstep.so.linux.x86_64.dbg_13.0.0"/>
-							<tool id="intel.cpp.linkstep.so.linux.x86_64.dbg.1895866498_13.0.0" name="Intel Intel(R) 64 C++ Linker" superClass="intel.cpp.linkstep.so.linux.x86_64.dbg_13.0.0">
-								<option id="intel.linkstep.libname.1320624766" name="Additional Libraries (-l)" superClass="intel.linkstep.libname" valueType="libs">
-									<listOptionValue builtIn="false" value="leveldb"/>
-									<listOptionValue builtIn="false" value="xs"/>
-									<listOptionValue builtIn="false" value="tokyocabinet"/>
-									<listOptionValue builtIn="false" value="bz2"/>
-									<listOptionValue builtIn="false" value="boost_thread"/>
-									<listOptionValue builtIn="false" value="z"/>
-									<listOptionValue builtIn="false" value="pthread"/>
-									<listOptionValue builtIn="false" value="dl"/>
-									<listOptionValue builtIn="false" value="rt"/>
-								</option>
-								<option id="intel.linkstep.libpath.1602936246" name="Search Directory for Libraries (-L)" superClass="intel.linkstep.libpath" valueType="stringList">
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/tokyocabinet&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/leveldb&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/libxs/src/.libs&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/boost/stage/lib&quot;"/>
-								</option>
-								<option id="intel.linkstep.options.static.1283063878" name="Link with Static Libraries (-static)" superClass="intel.linkstep.options.static" value="false" valueType="boolean"/>
-								<inputType id="intel.linkstep.input.1567007175" superClass="intel.linkstep.input">
-									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
-									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
-								</inputType>
-							</tool>
+						<toolChain id="intel.toolchain.linux.x86_64.so.dbg_13.0.0.128877251" name="Intel Toolchain for Shared Library on Intel(R) 64">
+							<targetPlatform archList="x86_64" binaryParser="org.eclipse.cdt.core.ELF" id="intel.platform.linux.x86_64.so.dbg.1839136575_13.0.0" name="Platform.So.Debug" osList="linux"/>
+							<builder buildPath="${workspace_loc:/nldb/IntelDebug}" id="intel.builder.linux.x86_64.so.dbg.678140449_13.0.0" keepEnvironmentInBuildfile="false" name="Intel Builder"/>
 						</toolChain>
 					</folderInfo>
 				</configuration>
@@ -266,66 +216,27 @@
 					<externalSetting>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/nldb"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/nldb/IntelRelease"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="nldb-intel-release"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="nldb-intel-release" srcPrefixMapping="" srcRootPath=""/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>
 					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.core.ICCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.VCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.autotools.core.ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 				<configuration artifactExtension="so" artifactName="${ProjName}-intel-release" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.so.release.1473162692.874264215" name="IntelRelease" parent="cdt.managedbuild.config.gnu.so.release">
 					<folderInfo id="cdt.managedbuild.config.gnu.so.release.1473162692.874264215." name="/" resourcePath="">
-						<toolChain id="intel.toolchain.linux.x86_64.so.dbg_13.0.0.1594541445" name="Intel Toolchain for Shared Library on Intel(R) 64" superClass="intel.toolchain.linux.x86_64.so.dbg_13.0.0">
-							<targetPlatform archList="x86_64" binaryParser="org.eclipse.cdt.core.ELF" id="intel.platform.linux.x86_64.so.dbg.1551074047_13.0.0" name="Platform.So.Debug" osList="linux" superClass="intel.platform.linux.x86_64.so.dbg_13.0.0"/>
-							<builder buildPath="${workspace_loc:/nldb/IntelRelease}/.." id="intel.builder.linux.x86_64.so.dbg.1516084222_13.0.0" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Intel Builder" superClass="intel.builder.linux.x86_64.so.dbg_13.0.0"/>
-							<tool id="intel.cpp.compilestep.linux.x86_64.so.dbg.807271488_13.0.0" name="Intel Intel(R) 64 C++ Compiler " superClass="intel.cpp.compilestep.linux.x86_64.so.dbg_13.0.0">
-								<option id="intel.compilestep.preprocessor.includedirectories.652404503" name="Additional Include Directories (-I)" superClass="intel.compilestep.preprocessor.includedirectories" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/boost&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/txbase&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/disruptor--&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/tokyocabinet&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/leveldb/include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/libxs/include&quot;"/>
-								</option>
-								<option id="intel.compilestep.coptions.2022652277" name="Additional Options" superClass="intel.compilestep.coptions" value="-std=c++0x" valueType="string"/>
-								<option id="intel.compilestep.general.debug.cpp.x86_64.so.dbg.1254568462_13.0.0" name="Include Debug Information (-g)" superClass="intel.compilestep.general.debug.cpp.x86_64.so.dbg_13.0.0" value="true" valueType="boolean"/>
-								<option id="intel.compilestep.general.optimization2.32062969" name="Optimization Level" superClass="intel.compilestep.general.optimization2" value="general.opt.speedHLO" valueType="enumerated"/>
-								<inputType id="intel.cpp.compilestep.input.626819321" superClass="intel.cpp.compilestep.input"/>
-							</tool>
-							<tool id="intel.c.compilestep.linux.x86_64.so.dbg.706093647_13.0.0" name="Intel Intel(R) 64 C Compiler" superClass="intel.c.compilestep.linux.x86_64.so.dbg_13.0.0">
-								<option id="intel.compilestep.general.debug.c.x86_64.so.dbg.643159558_13.0.0" name="Include Debug Information (-g)" superClass="intel.compilestep.general.debug.c.x86_64.so.dbg_13.0.0" value="false" valueType="boolean"/>
-								<option id="intel.compilestep.general.optimization2.315351393" name="Optimization Level" superClass="intel.compilestep.general.optimization2" value="general.opt.speedHLO" valueType="enumerated"/>
-								<inputType id="intel.c.compilestep.input.1152136636" superClass="intel.c.compilestep.input"/>
-							</tool>
-							<tool id="intel.c.linkstep.so.linux.x86_64.dbg.1524601809_13.0.0" name="Intel Intel(R) 64 C Linker" superClass="intel.c.linkstep.so.linux.x86_64.dbg_13.0.0"/>
-							<tool id="intel.cpp.linkstep.so.linux.x86_64.dbg.1715968539_13.0.0" name="Intel Intel(R) 64 C++ Linker" superClass="intel.cpp.linkstep.so.linux.x86_64.dbg_13.0.0">
-								<option id="intel.linkstep.libname.2088727598" name="Additional Libraries (-l)" superClass="intel.linkstep.libname" valueType="libs">
-									<listOptionValue builtIn="false" value="leveldb"/>
-									<listOptionValue builtIn="false" value="xs"/>
-									<listOptionValue builtIn="false" value="tokyocabinet"/>
-									<listOptionValue builtIn="false" value="bz2"/>
-									<listOptionValue builtIn="false" value="boost_thread"/>
-									<listOptionValue builtIn="false" value="z"/>
-									<listOptionValue builtIn="false" value="pthread"/>
-									<listOptionValue builtIn="false" value="dl"/>
-									<listOptionValue builtIn="false" value="rt"/>
-								</option>
-								<option id="intel.linkstep.libpath.1194219006" name="Search Directory for Libraries (-L)" superClass="intel.linkstep.libpath" valueType="stringList">
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/tokyocabinet&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/leveldb&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/libxs/src/.libs&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/externals/boost/stage/lib&quot;"/>
-								</option>
-								<option id="intel.linkstep.general.optimization2.2115783836" name="Optimization Level" superClass="intel.linkstep.general.optimization2" value="general.opt.speedHLO" valueType="enumerated"/>
-								<inputType id="intel.linkstep.input.589490767" superClass="intel.linkstep.input">
-									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
-									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
-								</inputType>
-							</tool>
+						<toolChain id="intel.toolchain.linux.x86_64.so.dbg_13.0.0.1594541445" name="Intel Toolchain for Shared Library on Intel(R) 64">
+							<targetPlatform archList="x86_64" binaryParser="org.eclipse.cdt.core.ELF" id="intel.platform.linux.x86_64.so.dbg.1551074047_13.0.0" name="Platform.So.Debug" osList="linux"/>
+							<builder buildPath="${workspace_loc:/nldb/IntelRelease}/.." id="intel.builder.linux.x86_64.so.dbg.1516084222_13.0.0" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Intel Builder"/>
 						</toolChain>
 					</folderInfo>
 				</configuration>

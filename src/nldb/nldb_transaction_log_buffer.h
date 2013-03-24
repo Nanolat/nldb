@@ -40,6 +40,8 @@
 #ifndef _O_NLDB_TRANSACTION_LOG_BUFFER_H_
 #define _O_NLDB_TRANSACTION_LOG_BUFFER_H_
 
+#include <string.h> /* memcpy */
+
 #include <txbase/tx_assert.h>
 
 #include "nldb_internal.h"

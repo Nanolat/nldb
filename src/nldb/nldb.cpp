@@ -50,8 +50,8 @@
 #  include <atomic>
 #endif
 
-#include <boost/thread/thread.hpp>
-typedef boost::thread thread_t;
+#include <thread>
+typedef std::thread thread_t;
 
 #include <disruptor/ring_buffer.h>
 #include <disruptor/event_publisher.h>
@@ -267,7 +267,7 @@ public :
 	{
 	    long expected_sequence = txRingBuffer->GetCursor();
 
-		for(int i=0; i<replicators_.size(); i++) 
+		for(size_t i=0; i<replicators_.size(); i++)
 		{
 			BatchEventProcessor<TxTransactionEvent> & processor = replicators_[i]->processor();
 			while (processor.GetSequence()->sequence() < expected_sequence) {}
@@ -1066,7 +1066,7 @@ nldb_rc_t nldb_value_free(const nldb_table_t & table, nldb_value_t & value)
 	if (rc) return rc;
 
 	value.data = NULL;
-	value.length = NULL;
+	value.length = 0;
 
 	return NLDB_OK;
 }
@@ -1081,7 +1081,7 @@ nldb_rc_t nldb_key_free(const nldb_table_t & table, nldb_key_t & key)
 	if (rc) return rc;
 
 	key.data = NULL;
-	key.length = NULL;
+	key.length = 0;
 
 	return NLDB_OK;
 }

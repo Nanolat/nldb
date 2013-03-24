@@ -1,2 +1,2 @@
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/externals/tokyocabinet:`pwd`/externals/libxs/src/.libs:`pwd`/externals/leveldb:`pwd`/nldb/GccDebug:`pwd`/nldb/GccRelease:`pwd`/nldb/IntelDebug:`pwd`/nldb/IntelRelease
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`pwd`/../external-libs/lib:`pwd`/nldb
 echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH"
