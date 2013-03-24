@@ -26,46 +26,17 @@ How it works?
 
 How to build?
 -------------
-- Simply run build.sh which runs following steps. Currently following platforms are tested. 
-1. CentOS 6.3
+- Simply run build.sh which runs following steps. Currently the script was tested on CentOS 6.3. 
 
-- Step 1. Install prerequisites. 
-Install bzip2, zlib, and unzip. In CentOS, build.sh runs following commands.
-    sudo yum install zlib-devel bzip2-devel unzip
-In Ubuntu, build.sh runs following commands.
-    sudo apt-get install libz-dev libbz2-dev unzip
-
-- Step 2. Check gcc version and download and build gcc 4.6 if not exists.
-Nanolat Database requires gcc 4.6 to build it. 
-    gcc --version
-
-If the version of gcc is not 4.6.x, build gcc 4.6 by running following commands.
-    git clone https://github.com/ThankyouSoft/gcc46.git
-    cd gcc46
-    ./bld.sh
-
-To use the gcc 4.6 built in the previous step. This is required for each time you compile nldb project. 
-    cd gcc46
-    source ./use-gcc46.sh
-
-- Step 3. Build external libraries.
-Nanolat Database requires following libraries.
-1. Google test framework for unit tests.
-2. Crossroads library for sending and receiving transactional logs between the master and slaves.
-3. TokyoCabinet library for the TokyoCabinet in-memory table plugin.
-4. Google LevelDB library for the LevelDB on-disk table plugin.
-
-- Step 4. Set environment variables.
-Nanolat Database library file, libnldb.so will be located in src/nldb . 
-Before building Nanolat Database, setup LD_LIBRARY_PATH to include external libraries built in step 3 and src/nldb where libnldb.so is located.
-
-- Step 5. Build nldb, tests, and gtest 
-The last step builds following binary files.
+- After the script finishes, you have following binaries.
 1. src/nldb/libnldb.so : The shared library file of Nanolat Database
 2. src/tests/tests : The testing program to run master/slave process of Nanolat Database.
 3. src/gtest/gtest : The test program implements unit tests with Google Test Framework.
 
-- Optionally, you can use eclipse for your development environment. 
+- To compile your program, you need to add following path to your additional include path.
+    src/include
+
+- Optionally, you can use eclipse for your development environment, but you need to run build.sh at least once to prepare prerequisites and dependent libraries.
 1. run eclipse, switch your workspace to nldb/src .
 2. Import all projects under nldb/src .
 3. clean nldb, gtest, tests projects. 
