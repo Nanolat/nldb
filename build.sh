@@ -9,7 +9,6 @@ echo "Step 1. Installing prerequisites..."
 
 if [ `lsb_release -a | grep CentOS | wc -l` -gt 0 ]
 then
-   echo "haha"
    USE_YUM=1 
 fi
 
