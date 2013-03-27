@@ -48,10 +48,12 @@ How to run a test?
 ------------------
 - Before running a test, build it by running build.sh .
 - Before runnigg a test, set LD_LIBRARY_PATH by executing *env.sh* command after going to the src directory.
+
     cd src
     source env.sh
 
 - Create a directory for a slave database, and start a slave process of the *tests* program.
+
     cd src
     source env.sh
     mkdir slave
@@ -60,9 +62,10 @@ How to run a test?
     ./tests nldb-slave
 
 - Start a master process
+
     cd src
     source env.sh
-     ./tests nldb-master
+    ./tests nldb-master
     
 Nanolat Open Source License v1.0 ( Simple but ambiguous )
 ---------------------------------------------------------
