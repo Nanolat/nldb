@@ -510,9 +510,11 @@ test_case_t tests[] = {
 	{"forward_cursor", forward_cursor_test},
 	{"backward_cursor", backward_cursor_test},
 	{"del", del_test},
+	/*
 #if defined(DEBUG)
 	{"print_nodes", print_node_test},
 #endif
+   */
 	{NULL, NULL}
 };
 

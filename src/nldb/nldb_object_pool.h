@@ -41,6 +41,7 @@
 #define NLDB_OBJECT_POOL_H_ (1)
 
 #include <assert.h>
+#include <stdlib.h>
 
 class nldb_object_pool {
 public :
@@ -51,14 +52,15 @@ public :
 	}
 
 	void * malloc() {
-		void * p = malloc();
+		void * p = ::malloc(object_size_);
 		assert(p);
 		return p;
 	}
 	void free( void * p ) {
 		assert(p);
-		free(p);
+		::free(p);
 	}
+private :
 	size_t object_size_;
 };
 
