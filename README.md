@@ -49,10 +49,12 @@ How to run a test for the master-slave replication example?
 -----------------------------------------------------------
 Before running a test, build it by running build.sh .
 Before runnigg a test, set LD_LIBRARY_PATH by executing *env.sh* command after going to the src directory.
+
     cd src
     source env.sh
 
 Create a directory for a slave database, and start a slave process of the *tests* program.
+
     cd src
     source env.sh
     mkdir slave
@@ -61,6 +63,7 @@ Create a directory for a slave database, and start a slave process of the *tests
     ./tests nldb-slave
 
 Start a master process.
+
     cd src
     source env.sh
     ./tests nldb-master
@@ -68,25 +71,30 @@ Start a master process.
 How to compile and link my program?
 -----------------------------------
 Add following directories as additional include paths.
+
     src/include
     src/txbase
 
 Specify std=c++0x to compile your program using c++0x.
 
 For example, in case you use g++, use following command line to compile your program where ${NLDB_HOME} has this README.md file.
+
     g++ -I${NLDB_HOME}/src/include -I${NLDB_HOME}/src/txbase -c -std=c++0x -o "your_program.o" "your_program.cpp"
 
 Add following directories as additional library paths.
+
     external-libs/lib
     src/nldb
 
 To link your program, add following libraries.
+
     nldb
     leveldb
     tokyocabinet
     xs
 
 For example, in case you use g++, use following command line to link your program where ${NLDB_HOME} has this README.md file.
+
     g++ -L{NLDB_HOME}/external-libs/lib -L{NLDB_HOME}/nldb -o your_program_binary  your_program.o -lnldb -lleveldb -ltokyocabinet -lxs
 
 Nanolat Open Source License v1.0 ( Simple but ambiguous )
