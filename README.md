@@ -29,18 +29,21 @@ How to build?
 - Simply run build.sh which runs following steps. Currently the script was tested on CentOS 6.3. 
 
 - After the script finishes, you have following binaries.
-1. src/nldb/libnldb.so : The shared library file of Nanolat Database
-2. src/tests/tests : The testing program to run master/slave process of Nanolat Database.
-3. src/gtest/gtest : The test program implements unit tests with Google Test Framework.
 
+    - src/nldb/libnldb.so : The shared library file of Nanolat Database
+    - src/tests/tests : The testing program to run master/slave process of Nanolat Database.
+    - src/gtest/gtest : The test program implements unit tests with Google Test Framework.
+    
 - To compile your program, you need to add following path to your additional include path.
-    src/include
 
+    - src/include
+    
 - Optionally, you can use eclipse for your development environment, but you need to run build.sh at least once to prepare prerequisites and dependent libraries.
-1. run eclipse, switch your workspace to nldb/src .
-2. Import all projects under nldb/src .
-3. clean nldb, gtest, tests projects. 
-4. build nldb, gtest, tests projects. 
+    - run eclipse, switch your workspace to nldb/src .
+    - Import all projects under nldb/src .
+    - clean nldb, gtest, tests projects. 
+    - build nldb, gtest, tests projects. 
+
 
 Nanolat Open Source License v1.0 ( Simple but ambiguous )
 ---------------------------------------------------------
