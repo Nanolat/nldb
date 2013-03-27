@@ -36,7 +36,7 @@ How to build?
     
 - To compile your program, you need to add following path to your additional include path.
 
-    - src/include
+    src/include
     
 - Optionally, you can use eclipse for your development environment, but you need to run build.sh at least once to prepare prerequisites and dependent libraries.
     - run eclipse, switch your workspace to nldb/src .
@@ -48,19 +48,21 @@ How to run a test?
 ------------------
 - Before running a test, build it by running build.sh .
 - Before runnigg a test, set LD_LIBRARY_PATH by executing *env.sh* command after going to the src directory.
-    - cd src
-    - source env.sh
+    cd src
+    source env.sh
+
 - Create a directory for a slave database, and start a slave process of the *tests* program.
-    - cd src
-    - source env.sh
-    - mkdir slave
-    - cd slave
-    - cp ../tests .
-    - ./tests nldb-slave
+    cd src
+    source env.sh
+    mkdir slave
+    cd slave
+    cp ../tests .
+    ./tests nldb-slave
+
 - Start a master process
-    - cd src
-    - source env.sh
-    - ./tests nldb-master
+    cd src
+    source env.sh
+     ./tests nldb-master
     
 Nanolat Open Source License v1.0 ( Simple but ambiguous )
 ---------------------------------------------------------
