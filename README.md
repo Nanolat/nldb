@@ -44,7 +44,24 @@ How to build?
     - clean nldb, gtest, tests projects. 
     - build nldb, gtest, tests projects. 
 
-
+How to run a test?
+------------------
+- Before running a test, build it by running build.sh .
+- Before runnigg a test, set LD_LIBRARY_PATH by executing *env.sh* command after going to the src directory.
+    - cd src
+    - source env.sh
+- Create a directory for a slave database, and start a slave process of the *tests* program.
+    - cd src
+    - source env.sh
+    - mkdir slave
+    - cd slave
+    - cp ../tests .
+    - ./tests nldb-slave
+- Start a master process
+    - cd src
+    - source env.sh
+    - ./tests nldb-master
+    
 Nanolat Open Source License v1.0 ( Simple but ambiguous )
 ---------------------------------------------------------
 - If you are in USA, Canada, or Germany, it is *likely* that you get free LGPL v2.1.  
