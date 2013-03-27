@@ -79,7 +79,7 @@ Specify std=c++0x to compile your program using c++0x.
 
 For example, in case you use g++, use following command line to compile your program where ${NLDB_HOME} has this README.md file.
 
-    g++ -I${NLDB_HOME}/src/include -I${NLDB_HOME}/src/txbase -c -std=c++0x -o "your_program.o" "your_program.cpp"
+    g++ -I${NLDB_HOME}/src/include -I${NLDB_HOME}/src/txbase -c -std=c++0x -o your_program.o your_program.cpp
 
 Add following directories as additional library paths.
 
