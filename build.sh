@@ -80,26 +80,9 @@ cd ..
 
 
 #########################################################################
-echo "Step 4. Setting environment variables ..."
+echo "Step 4. Build all projects ..."
 #########################################################################
-# Nanolat Database library file, libnldb.so will be located in src/nldb .
-# Before building Nanolat Database, setup LD_LIBRARY_PATH to include external libraries built in step 3 and src/nldb where libnldb.so is located.
-#########################################################################
-
 cd src
-source env.sh
-
-#########################################################################
-echo "Step 5. Building nldb, tests, and gtest ..."
-#########################################################################
-
-for build_dir in nldb test gtest
-do
-    pushd .
-    cd $build_dir/build
-    make clean
-    make
-    popd 
-done
+source build.sh
 
 

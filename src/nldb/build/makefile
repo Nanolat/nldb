@@ -43,7 +43,7 @@ all: ../libnldb.so
 ../libnldb.so: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++ -L/home/ladmin/nldb_work/nldb/src/../external-libs/lib -shared -o "../libnldb.so" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -L../../../external-libs/lib -shared -o "../libnldb.so" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

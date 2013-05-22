@@ -47,7 +47,7 @@ CPP_DEPS += \
 %.o: ../%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	g++ -I"/home/ladmin/nldb_work/nldb/src/../external-libs/include" -I"/home/ladmin/nldb_work/nldb/src/include" -I"/home/ladmin/nldb_work/nldb/src/txbase" -I"/home/ladmin/nldb_work/nldb/src/nldb" -O3 -Wall -c -fmessage-length=0 -std=c++0x -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
+	g++ -I"../../../external-libs/include" -I"../../include" -I"../../txbase" -I"../../nldb" -O3 -Wall -c -fmessage-length=0 -std=c++0x -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

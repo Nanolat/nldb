@@ -15,8 +15,8 @@
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/nldb"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/lldb/Debug"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/nldb/GccDebug"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="lldb" srcPrefixMapping="" srcRootPath=""/>
-						<entry flags="RESOLVED" kind="libraryFile" name="nldb" srcPrefixMapping="" srcRootPath=""/>
+						<entry flags="RESOLVED" kind="libraryFile" name="lldb"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="nldb"/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>
@@ -39,10 +39,10 @@
 								<option id="gnu.cpp.compiler.so.debug.option.optimization.level.1621539369" name="Optimization Level" superClass="gnu.cpp.compiler.so.debug.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.so.debug.option.debugging.level.1749486877" name="Debug Level" superClass="gnu.cpp.compiler.so.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.1431909974" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/include"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/txbase"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/disruptor--"/>
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../external-libs/include"/>
+									<listOptionValue builtIn="false" value="../../include"/>
+									<listOptionValue builtIn="false" value="../../txbase"/>
+									<listOptionValue builtIn="false" value="../../disruptor--"/>
+									<listOptionValue builtIn="false" value="../../../external-libs/include"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.other.other.266127707" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -std=c++0x  -static-libgcc -static-libstdc++ -nodefaultlibs -shared -fPIC" valueType="string"/>
 								<option id="gnu.cpp.compiler.option.other.pic.1461461932" name="Position Independent Code (-fPIC)" superClass="gnu.cpp.compiler.option.other.pic" value="true" valueType="boolean"/>
@@ -102,8 +102,8 @@
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/nldb"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/lldb/Release"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/nldb/GccRelease"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="lldb" srcPrefixMapping="" srcRootPath=""/>
-						<entry flags="RESOLVED" kind="libraryFile" name="nldb" srcPrefixMapping="" srcRootPath=""/>
+						<entry flags="RESOLVED" kind="libraryFile" name="lldb"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="nldb"/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>
@@ -126,10 +126,10 @@
 								<option id="gnu.cpp.compiler.so.release.option.optimization.level.1610126568" name="Optimization Level" superClass="gnu.cpp.compiler.so.release.option.optimization.level" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.so.release.option.debugging.level.339315886" name="Debug Level" superClass="gnu.cpp.compiler.so.release.option.debugging.level" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.931695851" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/txbase&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/disruptor--&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${WorkspaceDirPath}/../external-libs/include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../../include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../../txbase&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../../disruptor--&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../../../external-libs/include&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.other.pic.768314462" name="Position Independent Code (-fPIC)" superClass="gnu.cpp.compiler.option.other.pic" value="true" valueType="boolean"/>
 								<option id="gnu.cpp.compiler.option.other.other.827625695" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -std=c++0x  -static-libgcc -static-libstdc++ -nodefaultlibs -shared -fPIC" valueType="string"/>
@@ -156,7 +156,7 @@
 									<listOptionValue builtIn="false" value=":librt.so"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.1745971853" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
-									<listOptionValue builtIn="false" value="${WorkspaceDirPath}/../external-libs/lib"/>
+									<listOptionValue builtIn="false" value="../../../external-libs/lib"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.729798431" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
@@ -183,19 +183,19 @@
 					<externalSetting>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/nldb"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/nldb/IntelDebug"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="nldb-intel-debug" srcPrefixMapping="" srcRootPath=""/>
+						<entry flags="RESOLVED" kind="libraryFile" name="nldb-intel-debug"/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>
 					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.VCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.autotools.core.ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.ICCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
@@ -216,19 +216,19 @@
 					<externalSetting>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/nldb"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/nldb/IntelRelease"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="nldb-intel-release" srcPrefixMapping="" srcRootPath=""/>
+						<entry flags="RESOLVED" kind="libraryFile" name="nldb-intel-release"/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>
 					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.VCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
-					<extension id="org.eclipse.cdt.autotools.core.ErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.ICCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
@@ -263,20 +263,20 @@
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.lib.debug.1952698848;cdt.managedbuild.config.gnu.lib.debug.1952698848.;cdt.managedbuild.tool.gnu.cpp.compiler.lib.debug.2013241188;cdt.managedbuild.tool.gnu.cpp.compiler.input.1501753540">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.so.debug.1115280678;cdt.managedbuild.config.gnu.so.debug.1115280678.;cdt.managedbuild.tool.gnu.cpp.compiler.so.debug.1197094565;cdt.managedbuild.tool.gnu.cpp.compiler.input.50106032">
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.lib.release.671929723;cdt.managedbuild.config.gnu.lib.release.671929723.;cdt.managedbuild.tool.gnu.cpp.compiler.lib.release.2008836327;cdt.managedbuild.tool.gnu.cpp.compiler.input.869314278">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.lib.release.671929723;cdt.managedbuild.config.gnu.lib.release.671929723.;cdt.managedbuild.tool.gnu.cpp.compiler.lib.release.2008836327;cdt.managedbuild.tool.gnu.cpp.compiler.input.869314278">
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.so.debug.1115280678;cdt.managedbuild.config.gnu.so.debug.1115280678.;cdt.managedbuild.tool.gnu.cpp.compiler.so.debug.1197094565;cdt.managedbuild.tool.gnu.cpp.compiler.input.50106032">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.lib.release.671929723;cdt.managedbuild.config.gnu.lib.release.671929723.;cdt.managedbuild.tool.gnu.c.compiler.lib.release.1958062266;cdt.managedbuild.tool.gnu.c.compiler.input.1846768876">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.so.release.1473162692.874264215;cdt.managedbuild.config.gnu.so.release.1473162692.874264215.;intel.cpp.compilestep.linux.x86_64.so.dbg.807271488_13.0.0;intel.cpp.compilestep.input.626819321">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.intel.compiler.cdt.managedbuilder.ui.ICCManagedMakePerProjectProfile"/>
-		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.lib.debug.1952698848;cdt.managedbuild.config.gnu.lib.debug.1952698848.;cdt.managedbuild.tool.gnu.c.compiler.lib.debug.1908588616;cdt.managedbuild.tool.gnu.c.compiler.input.617284023">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.so.release.1473162692.874264215;cdt.managedbuild.config.gnu.so.release.1473162692.874264215.;intel.cpp.compilestep.linux.x86_64.so.dbg.807271488_13.0.0;intel.cpp.compilestep.input.626819321">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.intel.compiler.cdt.managedbuilder.ui.ICCManagedMakePerProjectProfile"/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.so.release.1473162692;cdt.managedbuild.config.gnu.so.release.1473162692.;cdt.managedbuild.tool.gnu.cpp.compiler.so.release.138323108;cdt.managedbuild.tool.gnu.cpp.compiler.input.1893564837">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
