@@ -30,11 +30,11 @@ How to build?
     - Download MacPorts from http://www.macports.org/install.php
     - Install gcc 4.7 using MacPorts by running following command.
 
-    sudo port install gcc47 
+        sudo port install gcc47 
 
     - Or install gcc 4.6 using MacPorts by running following command.
 
-    sudo port install gcc46 
+        sudo port install gcc46 
 
 - Simply run build.sh which runs following steps. Currently the script was tested on CentOS 6.3, Ubuntu 12.10, and MacOS 10.7
     - Install required libraries.
