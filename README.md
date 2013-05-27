@@ -31,6 +31,7 @@ How to build?
     - Install gcc 4.7 using MacPorts by running following two commands.
 
         sudo port install gcc47
+        
         sudo port select --set gcc mp-gcc47
 
     - gcc 4.6 in MacOS is not supported yet.
