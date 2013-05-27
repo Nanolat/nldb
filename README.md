@@ -26,7 +26,13 @@ How it works?
 
 How to build?
 -------------
-- Simply run build.sh which runs following steps. Currently the script was tested on CentOS 6.3. 
+- In MacOS, you need to install gcc 4.6 using MacPorts
+    - Download MacPorts from http://www.macports.org/install.php
+    - Install gcc 4.6 using MacPorts by running following command.
+    
+    sudo port install gcc46 
+
+- Simply run build.sh which runs following steps. Currently the script was tested on CentOS 6.3 and Ubuntu 12.10
     - Install required libraries.
     - Check gcc version and install gcc 4.6.3 if gcc version is not 4.6.x.
     - Build external libraries in external-libs.

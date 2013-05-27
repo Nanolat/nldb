@@ -169,7 +169,7 @@ public :
 
 		printf("checking tree consistency[%d]\n",iteration);
 
-		nldb_rc_t rc = seek_forward(&min, &iter);
+		nldb_rc_t rc = this->seek_forward(&min, &iter);
 		tx_assert(rc==0);
 
 		void * prev_key = NULL;
@@ -178,7 +178,7 @@ public :
 			void * key = NULL;
 			void * value = NULL;
 			bool end_of_iter = false;
-			rc = move_forward(iter, &key, &value, &end_of_iter);
+			rc = this->move_forward(iter, &key, &value, &end_of_iter);
 			if ( rc == NLDB_ERROR_END_OF_ITERATION)
 				break;
 
@@ -211,16 +211,16 @@ public :
 		switch(this->key_length_)
 		{
 		case 1:
-			print_internal_node<unsigned char>( 0, this->root_node_ );
+			this->template print_internal_node<unsigned char>( 0, this->root_node_ );
 			break;
 		case 2:
-			print_internal_node<unsigned short>( 0, this->root_node_ );
+			this->template print_internal_node<unsigned short>( 0, this->root_node_ );
 			break;
 		case 4:
-			print_internal_node<unsigned int>( 0, this->root_node_ );
+			this->template print_internal_node<unsigned int>( 0, this->root_node_ );
 			break;
 		case 8:
-			print_internal_node<unsigned long long>( 0, this->root_node_ );
+			this->template print_internal_node<unsigned long long>( 0, this->root_node_ );
 			break;
 		default:
 			printf("print_tree supports key size with 1,2,4,8 only.\n");
