@@ -29,7 +29,7 @@ CPP_DEPS += \
 %.o: ../%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	g++ -D_GLIBCXX_USE_NANOSLEEP -I"../../include" -I"../../txbase" -I"../../disruptor--" -I"../../../external-libs/include" -O3 -Wall -c -fmessage-length=0 -std=c++11  -static-libgcc -static-libstdc++ -nodefaultlibs -shared -fPIC -fPIC -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
+	g++ -D_GLIBCXX_USE_NANOSLEEP -I"../../include" -I"../../txbase" -I"../../disruptor--" -I"../../../external-libs/include" -O3 -Wall -c -fmessage-length=0 -std=c++0x  -static-libgcc -static-libstdc++ -nodefaultlibs -shared -fPIC -fPIC -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

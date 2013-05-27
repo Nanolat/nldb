@@ -55,6 +55,9 @@ echo "Step 2. Check gcc version ... (needs 4.6.x) ..."
 if [ `gcc --version | grep "4\.6\." | wc -l` = "1" ]
 then
    echo "gcc version is 4.6.x. Will use the installed gcc."
+elif [ `gcc --version | grep "4\.7\." | wc -l` = "1" ]
+then
+   echo "gcc version is 4.7.x. Will use the installed gcc."
 else
    echo "gcc version is not 4.6.x. Will download and install gcc 4.6.3."
    git clone https://github.com/ThankyouSoft/gcc46.git

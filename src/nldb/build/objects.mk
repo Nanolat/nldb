@@ -4,5 +4,5 @@
 
 USER_OBJS :=
 
-LIBS := -l:libleveldb.so -lxs -ltokyocabinet -l:libbz2.so -l:libz.so -l:libpthread.so -l:libdl.so -l:librt.so
+LIBS := -lleveldb -lxs -ltokyocabinet -lbz2 -lz -lpthread -ldl
 

@@ -26,17 +26,21 @@ How it works?
 
 How to build?
 -------------
-- In MacOS, you need to install gcc 4.7 using MacPorts
+- In MacOS, you need to install gcc 4.7 or gcc 4.6 using MacPorts
     - Download MacPorts from http://www.macports.org/install.php
     - Install gcc 4.7 using MacPorts by running following command.
-    
+
     sudo port install gcc47 
 
-- Simply run build.sh which runs following steps. Currently the script was tested on CentOS 6.3 and Ubuntu 12.10
+    - Or install gcc 4.6 using MacPorts by running following command.
+
+    sudo port install gcc46 
+
+- Simply run build.sh which runs following steps. Currently the script was tested on CentOS 6.3, Ubuntu 12.10, and MacOS 10.7
     - Install required libraries.
-    - Check gcc version and install gcc 4.6.3 if gcc version is not 4.6.x.
+    - Check gcc version and install gcc 4.6.3 if gcc version is neither 4.6 nor 4.7.
     - Build external libraries in external-libs.
-    - Setup environment variable LD_LIBRARY_PATH.
+    - Setup environment variable LD_LIBRARY_PATH(Or DYLD_LIBRARY_PATH in OSX).
     - Build src/nldb/libnldb.so, src/tests/tests, src/gtest/gtest.
 
 - After the script finishes, you have following binaries.
