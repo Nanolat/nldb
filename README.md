@@ -5,6 +5,7 @@ What is it?
 -----------
 - An in-memory key/value store supporting put/get/del, and cursors for range search.
 - Supports transaction and master-slave replication.
+- Adds transactional log replication feature on top of LevelDB and TokyoCabinet.
 - Supports Table Plugins to implement your own data structure for efficient data processing for your specific domain.
 
 Target systems
@@ -16,7 +17,7 @@ Why use it?
 -----------
 - Low latency data processing, 1 transaction takes < 5 us.
 - Supports 1.5M transactions / second .
-- Supports built in Table Plug-ins using google LevelDB and TokyoCabinet providing replication feature on top of them. 
+- Supports built in Table Plug-ins using LevelDB and TokyoCabinet providing replication feature on top of them. 
 - (Under Development in another project) Supports basic SQL that is directly converted to Nanolat Database API at compile time to achieve low latency data processing.
 
 How it works?
