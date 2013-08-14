@@ -118,7 +118,7 @@ Nanolat provides its Nanolat Database server and Nanolat Client Libraries under 
 OEMs (Original Equipment Manufacturers), ISVs (Independent Software Vendors), VARs (Value Added Resellers) and other distributors that combine and distribute commercially licensed software with Nanolat Database software but do not wish to distribute the source code for the commercially licensed software under version 3 of the GNU Affero General Public License (the "AGPL") must enter into a commercial license agreement with Nanolat.
 SPs (Service Providers) also need to enter into a commercial license agreement with Nanolat otherwise they are under the AGPL v3.
 
-The commercial license is similar to Apache 2, which does not require to open source the project developed using Nanolat Database.
+The commercial license includes Apache v2 license, which does not require you to open source the project developed using Nanolat Database.
 
 For start-up companies, Nanolat provides commercial license and technical support at small percentage of equity share. 
 Focus on your client side development and grow your business quicker by using Nanolat Database. 
