@@ -42,19 +42,7 @@
 #define NLDB_CURSOR_TEST_H_
 
 #include "nldb_test.h"
-
-DEFINE_KEY_VALUE(r_bmin); // for searching purpose
-DEFINE_KEY_VALUE(r1);
-DEFINE_KEY_VALUE(r2);
-DEFINE_KEY_VALUE(r3);
-DEFINE_KEY_VALUE(r_3_4); // for searching purpose
-DEFINE_KEY_VALUE(r4);
-DEFINE_KEY_VALUE(r5);
-DEFINE_KEY_VALUE(r_5_6); // for searching purpose
-DEFINE_KEY_VALUE(r6);
-DEFINE_KEY_VALUE(r7);
-DEFINE_KEY_VALUE(r8);
-DEFINE_KEY_VALUE(r_amax); // for searching purpose
+#include "nldb_data.h"
 
 // Run cursor tests on persistent table, which uses LevelDB.
 // Volatile table uses TokyoCabinet, which does not support cursors.

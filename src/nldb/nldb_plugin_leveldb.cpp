@@ -212,7 +212,7 @@ nldb_rc_t nldb_plugin_leveldb_t::table_get(nldb_table_context_t table_ctx, const
 	if (order != NULL)
 		return NLDB_ERROR_UNSUPPORTED_FEATURE;
 
-	std::string gotValue;
+	std::string gotValue("");
 	leveldb::Status status = db->Get(leveldb::ReadOptions(), get_slice(key), &gotValue);
 
 	if (status.IsNotFound()) 

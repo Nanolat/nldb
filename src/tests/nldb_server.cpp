@@ -210,7 +210,7 @@ static void get_random_records( nldb_tx_t & tx, nldb_table_t & table, int data_i
 
 		nldb_value_t actual_value;
 
-		rc = nldb_table_get( tx, table, nldb_key, & actual_value);
+		rc = nldb_table_get( tx, table, nldb_key, & actual_value, NULL/* nldb_order_t */);
 		if (rc != expected_rc)
 		{
 			 unexpected_result("get : got an unexpected result", rc, expected_rc);
