@@ -82,9 +82,12 @@ nldb_rc_t nldb_plugin_tc_t::table_put(nldb_table_context_t table_ctx, const nldb
 
 
 // errors : NLDB_ERROR_KEY_NOT_FOUND
-nldb_rc_t nldb_plugin_tc_t::table_get(nldb_table_context_t table_ctx, const nldb_key_t & key, nldb_value_t * value)
+nldb_rc_t nldb_plugin_tc_t::table_get(nldb_table_context_t table_ctx, const nldb_key_t & key, nldb_value_t * value, nldb_order_t * order)
 {
 	TCNDB * ndb = (TCNDB*) table_ctx;
+
+	if (order != NULL)
+		return NLDB_ERROR_UNSUPPORTED_FEATURE;
 
 	int value_size;
 	void * value_ptr = tcndbget(ndb, key.data, key.length, &value_size);
@@ -95,6 +98,12 @@ nldb_rc_t nldb_plugin_tc_t::table_get(nldb_table_context_t table_ctx, const nldb
 	value->length = value_size;
 
 	return NLDB_OK;
+}
+
+// errors : NLDB_ERROR_ORDER_OUT_OF_RANGE
+nldb_rc_t nldb_plugin_tc_t::table_get(nldb_table_context_t table_ctx, const nldb_order_t & order, nldb_key_t * key, nldb_value_t * value)
+{
+	return NLDB_ERROR_UNSUPPORTED_FEATURE;
 }
 
 // errors : NLDB_ERROR_KEY_NOT_FOUND
@@ -109,6 +118,12 @@ nldb_rc_t nldb_plugin_tc_t::table_del(nldb_table_context_t table_ctx, const nldb
 
 	return NLDB_OK;
 }
+
+nldb_rc_t nldb_plugin_tc_t::table_stat(nldb_table_context_t table_ctx, nldb_table_stat_t * table_stat)
+{
+	return NLDB_ERROR_UNSUPPORTED_FEATURE;
+}
+
 
 nldb_rc_t nldb_plugin_tc_t::value_free(nldb_value_t & value) {
 	tcfree(value.data);

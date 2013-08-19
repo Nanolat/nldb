@@ -71,11 +71,16 @@ public:
 // errors : NLDB_ERROR_KEY_ALREADY_EXISTS
 	virtual nldb_rc_t table_put(nldb_table_context_t table_ctx, const nldb_key_t & key, const nldb_value_t & value) = 0;
 
+// errors : NLDB_ERROR_ORDER_OUT_OF_RANGE
+	virtual nldb_rc_t table_get(nldb_table_context_t table_ctx, const nldb_order_t & order, nldb_key_t * key, nldb_value_t * value ) = 0;
+
 // errors : NLDB_ERROR_KEY_NOT_FOUND
-	virtual nldb_rc_t table_get(nldb_table_context_t table_ctx, const nldb_key_t & key, nldb_value_t * value) = 0;
+	virtual nldb_rc_t table_get(nldb_table_context_t table_ctx, const nldb_key_t & key, nldb_value_t * value, nldb_order_t * order_stat) = 0;
 
 // errors : NLDB_ERROR_KEY_NOT_FOUND
 	virtual nldb_rc_t table_del(nldb_table_context_t table_ctx, const nldb_key_t & key) = 0;
+
+	virtual nldb_rc_t table_stat(nldb_table_context_t table_ctx, nldb_table_stat_t * table_stat) = 0;
 
 	// Free allocated memory for the value if any.
 	virtual nldb_rc_t value_free(nldb_value_t & value) = 0;

@@ -358,7 +358,7 @@ public :
 		nldb_key_t   key     = {(void*)&table_id, sizeof(table_id)};
 		nldb_value_t value;
 
-		nldb_rc_t rc = meta_table_plugin_.table_get( meta_table_context_, key, & value);
+		nldb_rc_t rc = meta_table_plugin_.table_get( meta_table_context_, key, & value, NULL /* nldb_order_t */);
 		if ( rc ) return rc;
 
 		nldb_meta_table_value_t * meta_table_value = (nldb_meta_table_value_t *) value.data ;
@@ -553,11 +553,20 @@ public :
 		return rc;
 	}
 
-	// errors : NLDB_ERROR_KEY_NOT_FOUND
-	inline nldb_rc_t get(const nldb_key_t & key, nldb_value_t * value)
+
+	// errors : NLDB_ERROR_ORDER_OUT_OF_RANGE
+	inline nldb_rc_t get(const nldb_order_t & order, nldb_key_t * key, nldb_value_t * value)
 	{
 		nldb_rc_t rc;
-		rc = table_plugin_->table_get(table_context_, key, value);
+		rc = table_plugin_->table_get(table_context_, order, key, value);
+		return rc;
+	}
+
+	// errors : NLDB_ERROR_KEY_NOT_FOUND
+	inline nldb_rc_t get(const nldb_key_t & key, nldb_value_t * value, nldb_order_t * order)
+	{
+		nldb_rc_t rc;
+		rc = table_plugin_->table_get(table_context_, key, value, order);
 		return rc;
 	}
 
@@ -567,6 +576,15 @@ public :
 		nldb_rc_t rc;
 
 		rc = table_plugin_->table_del(table_context_, key);
+
+		return rc;
+	}
+
+	inline nldb_rc_t stat(nldb_table_stat_t * stat)
+	{
+		nldb_rc_t rc;
+
+		rc = table_plugin_->table_stat(table_context_, stat);
 
 		return rc;
 	}
@@ -1006,15 +1024,27 @@ nldb_rc_t nldb_table_put(nldb_tx_t & tx, nldb_table_t & table, const nldb_key_t 
 	return rc;
 }
 
-// errors : NLDB_ERROR_KEY_NOT_FOUND
-nldb_rc_t nldb_table_get(nldb_tx_t & tx, nldb_table_t & table, const nldb_key_t & key, nldb_value_t * value)
+// errors : NLDB_ERROR_ORDER_OUT_OF_RANGE
+nldb_rc_t nldb_table_get(nldb_tx_t & tx, nldb_table_t & table, const nldb_order_t & order, nldb_key_t * key, nldb_value_t * value)
 {
 	nldb_rc_t rc;
 
 //	nldb_tx_impl_t * txi = (nldb_tx_impl_t*) tx;
 	nldb_table_impl_t * tablei = (nldb_table_impl_t*) table;
 
-	rc = tablei->get(key, value);
+	rc = tablei->get(order, key, value);
+	return rc;
+}
+
+// errors : NLDB_ERROR_KEY_NOT_FOUND
+nldb_rc_t nldb_table_get(nldb_tx_t & tx, nldb_table_t & table, const nldb_key_t & key, nldb_value_t * value, nldb_order_t * order)
+{
+	nldb_rc_t rc;
+
+//	nldb_tx_impl_t * txi = (nldb_tx_impl_t*) tx;
+	nldb_table_impl_t * tablei = (nldb_table_impl_t*) table;
+
+	rc = tablei->get(key, value, order);
 	return rc;
 }
 
@@ -1034,6 +1064,17 @@ nldb_rc_t nldb_table_del(nldb_tx_t & tx, nldb_table_t & table, const nldb_key_t 
 	// Assume : Same to nldb_table_put
 	rc = txi->append_log_del(tablei->id(), key);
 	return rc;
+}
+
+nldb_rc_t nldb_table_stat(nldb_tx_t & tx, nldb_table_t & table, nldb_table_stat_t * table_stat)
+{
+	nldb_rc_t rc;
+
+	//	nldb_tx_impl_t * txi = (nldb_tx_impl_t*) tx;
+	nldb_table_impl_t * tablei = (nldb_table_impl_t*) table;
+
+	rc = tablei->stat(table_stat);
+	if ( rc ) return rc;
 }
 
 // table accessors 

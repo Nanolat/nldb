@@ -60,6 +60,17 @@ TEST(sample_test_case, tbb)
 } 
 */
 
+/*
+ * List of tests to add.
+ * 1) Get by Order.
+ *    (LevelDB, TC should fail, ArrayTree should succeed)
+ * 2) Get by Order. Open Cursor with a Key, move forward until it reaches to the end.
+ *    (LevelDB, TC should fail, ArrayTree should succeed)
+ * 3) Get by Key with Order Statistics.
+ *    (LevelDB, TC should fail, ArrayTree should succeed)
+ * 4) Get table statistics
+ *    (LevelDB, TC should fail, ArrayTree should succeed)
+ */
 int main(int argc, char** argv)  
 {  
     testing::InitGoogleTest(&argc, argv);  

@@ -167,10 +167,16 @@ extern nldb_rc_t nldb_table_close(nldb_table_t & table);
 extern nldb_rc_t nldb_table_put(nldb_tx_t & tx, nldb_table_t & table, const nldb_key_t & key, const nldb_value_t & value);
 
 // errors : NLDB_ERROR_KEY_NOT_FOUND
-extern nldb_rc_t nldb_table_get(nldb_tx_t & tx, nldb_table_t & table, const nldb_key_t & key, nldb_value_t * value);
+extern nldb_rc_t nldb_table_get(nldb_tx_t & tx, nldb_table_t & table, const nldb_key_t & key, nldb_value_t * value, nldb_order_t * order);
+
+// errors : NLDB_ERROR_ORDER_OUT_OF_RANGE
+extern nldb_rc_t nldb_table_get(nldb_tx_t & tx, nldb_table_t & table, const nldb_order_t & order, nldb_key_t * key, nldb_value_t * value);
 
 // errors : NLDB_ERROR_KEY_NOT_FOUND
 extern nldb_rc_t nldb_table_del(nldb_tx_t & tx, nldb_table_t & table, const nldb_key_t & key);
+
+extern nldb_rc_t nldb_table_stat(nldb_tx_t & tx, nldb_table_t & table, nldb_table_stat_t * table_stat);
+
 
 // table accessors 
 extern const nldb_table_id_t & nldb_table_id(const nldb_table_t & table);

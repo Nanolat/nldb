@@ -63,6 +63,7 @@
 #define NLDB_ERROR_UNSUPPORTED_FEATURE  (-19)
 #define NLDB_ERROR_VARIABLE_KEY_SIZE_NOT_SUPPORTED  (-20)
 #define NLDB_ERROR_VARIABLE_VALUE_SIZE_NOT_SUPPORTED  (-21)
+#define NLDB_ERROR_ORDER_OUT_OF_RANGE (-22)
 
 typedef int nldb_int32_t;
 typedef unsigned int nldb_uint32_t;
@@ -76,6 +77,7 @@ typedef int nldb_table_id_t;
 typedef long long nldb_tx_id_t;
 typedef nldb_uint32_t nldb_plugin_id_t;
 
+typedef long long nldb_order_t;
 typedef unsigned short key_length_t;
 typedef unsigned short value_length_t;
 
@@ -89,5 +91,8 @@ typedef struct nldb_value_t {
 	value_length_t length;
 } nldb_value_t;
 
+typedef struct nldb_table_stat_t {
+	nldb_int64_t key_count;
+} nldb_table_stat_t ;
 
 #endif //_NLDB_COMMON_H_

@@ -55,7 +55,7 @@ TEST_F(NLDBTest, transaction_commit) {
 	// Check value before commit
 	{
 		nldb_value_t v;
-		ASSERT_TRUE( nldb_table_get( tx, vol_table, KEY(rec1), & v) == 0 );
+		ASSERT_TRUE( nldb_table_get( tx, vol_table, KEY(rec1), & v, NULL /*nldb_order_t*/ ) == 0 );
 		ASSERT_TRUE( IS_VALUE_EQUAL(v, exepceted_value));
 	}
 
@@ -64,7 +64,7 @@ TEST_F(NLDBTest, transaction_commit) {
 	// Check value after commit
 	{
 		nldb_value_t v;
-		ASSERT_TRUE( nldb_table_get( tx, vol_table, KEY(rec1), & v) == 0 );
+		ASSERT_TRUE( nldb_table_get( tx, vol_table, KEY(rec1), & v, NULL /*nldb_order_t*/) == 0 );
 		ASSERT_TRUE( IS_VALUE_EQUAL(v, exepceted_value));
 	}
 }
@@ -84,7 +84,7 @@ TEST_F(NLDBTest, get_before_put) {
 
 	ASSERT_TRUE( nldb_tx_begin(tx) == 0 );
 
-	ASSERT_TRUE( nldb_table_get( tx, vol_table, KEY(rec1), & v) == NLDB_ERROR_KEY_NOT_FOUND );
+	ASSERT_TRUE( nldb_table_get( tx, vol_table, KEY(rec1), & v, NULL /*nldb_order_t*/) == NLDB_ERROR_KEY_NOT_FOUND );
 
 	ASSERT_TRUE( nldb_tx_commit(tx) == 0 );
 }
@@ -95,13 +95,13 @@ TEST_F(NLDBTest, del) {
 
 	ASSERT_TRUE( nldb_tx_begin(tx) == 0 );
 
-	ASSERT_TRUE( nldb_table_get( tx, vol_table, KEY(rec1), & v) == NLDB_ERROR_KEY_NOT_FOUND );
+	ASSERT_TRUE( nldb_table_get( tx, vol_table, KEY(rec1), & v, NULL /*nldb_order_t*/) == NLDB_ERROR_KEY_NOT_FOUND );
 
 	ASSERT_TRUE( nldb_table_del( tx, vol_table, KEY(rec1)) == NLDB_ERROR_KEY_NOT_FOUND );
 
 	ASSERT_TRUE( nldb_table_put( tx, vol_table, KEY(rec1), VALUE(rec1) ) == 0 );
 
-	ASSERT_TRUE( nldb_table_get( tx, vol_table, KEY(rec1), & v) == 0 );
+	ASSERT_TRUE( nldb_table_get( tx, vol_table, KEY(rec1), & v, NULL /*nldb_order_t*/) == 0 );
 	ASSERT_TRUE( IS_VALUE_EQUAL(v, exepceted_value));
 
 	// Check value before commit
@@ -109,7 +109,7 @@ TEST_F(NLDBTest, del) {
 
 	ASSERT_TRUE( nldb_table_del( tx, vol_table, KEY(rec1)) == NLDB_ERROR_KEY_NOT_FOUND );
 
-	ASSERT_TRUE( nldb_table_get( tx, vol_table, KEY(rec1), & v) == NLDB_ERROR_KEY_NOT_FOUND );
+	ASSERT_TRUE( nldb_table_get( tx, vol_table, KEY(rec1), & v, NULL /*nldb_order_t*/) == NLDB_ERROR_KEY_NOT_FOUND );
 
 	ASSERT_TRUE( nldb_tx_commit(tx) == 0 );
 }
