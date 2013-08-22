@@ -1,3 +1,5 @@
+RemoteSystemsTempFiles/
+.metadata
 src/RemoteSystemsTempFiles/
 src/.metadata
 src/nldb/.settings/
@@ -12,6 +14,7 @@ src/gtest/GccRelease
 src/gtest/build/*.d
 src/gtest/build/*.o
 src/gtest/gtest
+src/gtest/1-2/
 src/tests/.settings/
 src/tests/GccDebug
 src/tests/GccRelease

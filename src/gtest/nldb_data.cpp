@@ -38,66 +38,38 @@
  */
 
  
-#ifndef NLDB_TEST_H_
-#define NLDB_TEST_H_
+#include <string.h>
 
-#include <gtest/gtest.h>
+#include "nldb_data.h"
 
-// for htonl
-#include <arpa/inet.h>
+const long exepceted_value1 = 10001;
+const long exepceted_value2 = 10002;
+const long exepceted_value3 = 10003;
+const long exepceted_value4 = 10004;
+const long exepceted_value5 = 10005;
+const long exepceted_value6 = 10006;
+const long exepceted_value7 = 10007;
+const long exepceted_value8 = 10007;
 
-#include <nldb/nldb_common.h>
-#include <nldb/nldb.h>
+const nldb_order_t exepcetedOrder_order1 = 1;
+const nldb_order_t exepcetedOrder_order2 = 2;
+const nldb_order_t exepcetedOrder_order3 = 3;
+const nldb_order_t exepcetedOrder_order4 = 4;
+const nldb_order_t exepcetedOrder_order5 = 5;
+const nldb_order_t exepcetedOrder_order6 = 6;
+const nldb_order_t exepcetedOrder_order7 = 7;
+const nldb_order_t exepcetedOrder_order8 = 8;
 
-#include <stdint.h>
-using namespace std;
 
-const int TEST_DB_ID = 1;
-const int VOLATILE_TABLE_ID = 1;
-const int PERSISTENT_TABLE_ID = 2;
-
-class NLDBTest : public testing::Test {
-  protected:
-    virtual void SetUp() {
-    	ASSERT_TRUE( nldb_init() == 0 );
-
-    	ASSERT_TRUE( nldb_db_create( TEST_DB_ID ) == 0 );
-
-    	ASSERT_TRUE( nldb_db_open( TEST_DB_ID, NULL/*master*/, NULL/*slave*/, &db ) == 0 );
-
-    	ASSERT_TRUE( nldb_table_create(db, VOLATILE_TABLE_ID, NLDB_TABLE_VOLATILE) == 0 );
-
-    	ASSERT_TRUE( nldb_table_create(db, PERSISTENT_TABLE_ID, NLDB_TABLE_PERSISTENT) == 0 );
-
-    	ASSERT_TRUE( nldb_table_open(db, VOLATILE_TABLE_ID, &vol_table) == 0 );
-
-    	ASSERT_TRUE( nldb_table_open(db, PERSISTENT_TABLE_ID, &pers_table) == 0 );
-
-    	ASSERT_TRUE( nldb_tx_init( db, &tx ) == 0 );
-    }
-
-    virtual void TearDown() {
-    	ASSERT_TRUE( nldb_tx_destroy( tx ) == 0 );
-
-    	ASSERT_TRUE( nldb_table_close(vol_table) == 0 );
-
-    	ASSERT_TRUE( nldb_table_close(pers_table) == 0 );
-
-    	ASSERT_TRUE( nldb_table_drop(db, VOLATILE_TABLE_ID) == 0 );
-
-    	ASSERT_TRUE( nldb_table_drop(db, PERSISTENT_TABLE_ID) == 0 );
-
-    	ASSERT_TRUE( nldb_db_close( db ) == 0 );
-
-    	ASSERT_TRUE( nldb_db_drop( TEST_DB_ID ) == 0 );
-
-    	ASSERT_TRUE( nldb_destroy() == 0 );
-    }
-
-	nldb_db_t db;
-	nldb_table_t vol_table;
-	nldb_table_t pers_table;
-	nldb_tx_t tx;
-};
-
-#endif /* NLDB_TEST_H_ */
+DECLARE_KEY_VALUE(r_bmin,    10,    0, -1, -1); // for searching purpose
+DECLARE_KEY_VALUE(r1,        50,    0, exepceted_value1, exepcetedOrder_order1);
+DECLARE_KEY_VALUE(r2,       100, 1000, exepceted_value2, exepcetedOrder_order2);
+DECLARE_KEY_VALUE(r3,       200,  200, exepceted_value3, exepcetedOrder_order3);
+DECLARE_KEY_VALUE(r_3_4,    200,  250, -1, -1); // for searching purpose
+DECLARE_KEY_VALUE(r4,       200,  300, exepceted_value4, exepcetedOrder_order4);
+DECLARE_KEY_VALUE(r5,      1000,  100, exepceted_value5, exepcetedOrder_order5);
+DECLARE_KEY_VALUE(r_5_6,   1000,  150, -1, -1); // for searching purpose
+DECLARE_KEY_VALUE(r6,      1000,  200, exepceted_value6, exepcetedOrder_order6);
+DECLARE_KEY_VALUE(r7,      2000,  100, exepceted_value7, exepcetedOrder_order7);
+DECLARE_KEY_VALUE(r8,      2000,  200, exepceted_value8, exepcetedOrder_order5);
+DECLARE_KEY_VALUE(r_amax, 10000,    0, -1, -1); // for searching purpose
