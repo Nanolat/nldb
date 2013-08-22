@@ -12,4 +12,18 @@ src/tests/tests
 external-libs/include
 external-libs/lib
 external-libs/build
-gcc46
+
+# Exlude all files in build folders
+*/*/GccDebug/*
+*/*/GccRelease/*
+*/*/IndelDebug/*
+*/*/IntelRelease/*
+
+# Except make files in all build folders
+!*/*/*/makefile
+!*/*/*/objects.mk
+!*/*/*/sources.mk
+!*/*/*/subdir.mk
+
+
+
