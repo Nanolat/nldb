@@ -1,0 +1,7 @@
+*
+
+!.gitignore
+!makefile
+!objects.mk
+!sources.mk
+!subdir.mk
