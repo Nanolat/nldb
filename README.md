@@ -37,11 +37,13 @@ How to build?
 
     - gcc 4.6 in MacOS is not supported yet.
 
-- Simply run build.sh which runs following steps. Currently the script was tested on CentOS 6.3, Ubuntu 12.10, and MacOS 10.7
+- Simply run 'make prepare-build' to prepare compiler and build required libraries. Currently the script was tested on CentOS 6.3, Ubuntu 12.10, and MacOS 10.7
     - Install required libraries.
     - Check gcc version and install gcc 4.6.3 if gcc version is neither 4.6 nor 4.7.
     - Build external libraries in external-libs.
     - Setup environment variable LD_LIBRARY_PATH(Or DYLD_LIBRARY_PATH in OSX).
+ 
+- And then, run 'make'. It will build following binaries.    
     - Build src/nldb/libnldb.so, src/tests/tests, src/gtest/gtest.
 
 - After the script finishes, you have following binaries.
