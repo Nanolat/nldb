@@ -364,15 +364,11 @@ nldb_rc_t nldb_plugin_array_tree_t::key_free(nldb_key_t & key) {
 class cursor_context_t
 {
 public :
-	typedef enum direction {
-		SEEK_FORWARD = 1,
-		SEEK_BACKWARD = 2
-	} direction;
 
 	table_context_t::tree_t::iterator_t iter_;
 	table_context_t * table_ctx_;
 
-	direction dir_;
+	nldb_cursor_direction_t dir_;
 
 	cursor_context_t(table_context_t * table_ctx)
 	{
@@ -394,8 +390,9 @@ nldb_rc_t nldb_plugin_array_tree_t::cursor_open(nldb_table_context_t table_ctx, 
 	return NLDB_OK;
 }
 
-nldb_rc_t nldb_plugin_array_tree_t::cursor_seek_forward (nldb_cursor_context_t cursor_ctx, const nldb_key_t & key)
-{
+
+
+nldb_rc_t nldb_plugin_array_tree_t::cursor_seek(nldb_cursor_context_t cursor_ctx, const nldb_cursor_direction_t & direction, const nldb_key_t & key) {
 	cursor_context_t* the_cursor_ctx = (cursor_context_t*) cursor_ctx;
 
 	table_context_t * the_table_ctx = the_cursor_ctx->table_ctx_;
@@ -405,13 +402,27 @@ nldb_rc_t nldb_plugin_array_tree_t::cursor_seek_forward (nldb_cursor_context_t c
 		nldb_rc_t rc = check_key_length(the_table_ctx, key.length);
 		if (rc) return rc;
 
-		rc = the_table_ctx->tree().seek_forward( key.data, & the_cursor_ctx->iter_);
-		if (rc) return rc;
-
-		the_cursor_ctx->dir_ = cursor_context_t::SEEK_FORWARD;
+		switch(direction) {
+		case NLDB_CURSOR_FORWARD:
+		{
+			rc = the_table_ctx->tree().seek_forward( key.data, & the_cursor_ctx->iter_);
+			if (rc) return rc;
+			break;
+		}
+		case NLDB_CURSOR_BACKWARD:
+		{
+			rc = the_table_ctx->tree().seek_backward( key.data, & the_cursor_ctx->iter_);
+			if (rc) return rc;
+			break;
+		}
+		default:
+			tx_assert(0);
+		}
+		the_cursor_ctx->dir_ = direction;
 	}
 	else
 	{
+		// TODO : Do we need to search again from the key if cursor_seek is called twice?
 		// No nothing, just return NLDB_OK.
 		// cursor_move_forward will return NLDB_ERROR_END_OF_ITERATION.
 	}
@@ -419,7 +430,15 @@ nldb_rc_t nldb_plugin_array_tree_t::cursor_seek_forward (nldb_cursor_context_t c
 	return NLDB_OK;
 }
 
-nldb_rc_t nldb_plugin_array_tree_t::cursor_move_forward (nldb_cursor_context_t cursor_ctx, nldb_key_t * key, nldb_value_t * value)
+
+// errors : NLDB_ERROR_CURSOR_NOT_OPEN
+nldb_rc_t nldb_plugin_array_tree_t::cursor_seek(nldb_cursor_context_t cursor_ctx, const nldb_cursor_direction_t & direction, const nldb_order_t & order) {
+	// TODO : Implment it.
+	return NLDB_ERROR_NOT_IMPLEMENTED_YET;
+}
+
+
+nldb_rc_t nldb_plugin_array_tree_t::cursor_fetch (nldb_cursor_context_t cursor_ctx, nldb_key_t * key, nldb_value_t * value, nldb_order_t * order)
 {
 	cursor_context_t * the_cursor_ctx = (cursor_context_t*) cursor_ctx;
 
@@ -429,17 +448,26 @@ nldb_rc_t nldb_plugin_array_tree_t::cursor_move_forward (nldb_cursor_context_t c
 
 	if ( the_table_ctx->isInitialized() )
 	{
-		// make sure that cursor_seek_forward was invoked.
-		if ( the_cursor_ctx->dir_ != cursor_context_t::SEEK_FORWARD )
-		{
-			return NLDB_ERROR_INVALID_ITERATION;
-		}
-
 		bool end_of_iteration = false;
 		void * key_data = NULL;
 		void * value_data = NULL;
-		nldb_rc_t rc = the_table_ctx->tree().move_forward( the_cursor_ctx->iter_, & key_data, & value_data, & end_of_iteration);
-		if (rc) return rc;
+
+		switch(the_cursor_ctx->dir_) {
+		case NLDB_CURSOR_FORWARD :
+		{
+			nldb_rc_t rc = the_table_ctx->tree().move_forward( the_cursor_ctx->iter_, & key_data, & value_data, & end_of_iteration);
+			if (rc) return rc;
+			break;
+		}
+		case NLDB_CURSOR_BACKWARD :
+		{
+			nldb_rc_t rc = the_table_ctx->tree().move_backward( the_cursor_ctx->iter_, & key_data, & value_data, & end_of_iteration);
+			if (rc) return rc;
+			break;
+		}
+		default:
+			tx_assert(0);
+		}
 
 		if (end_of_iteration)
 			return NLDB_ERROR_END_OF_ITERATION;
@@ -449,68 +477,8 @@ nldb_rc_t nldb_plugin_array_tree_t::cursor_move_forward (nldb_cursor_context_t c
 
 		value->length = the_table_ctx->value_length();
 		value->data = value_data;
-	}
-	else
-	{
-		return NLDB_ERROR_END_OF_ITERATION;
-	}
-	return NLDB_OK;
-}
 
-nldb_rc_t nldb_plugin_array_tree_t::cursor_seek_backward(nldb_cursor_context_t cursor_ctx, const nldb_key_t & key)
-{
-	cursor_context_t* the_cursor_ctx = (cursor_context_t*) cursor_ctx;
-
-	table_context_t * the_table_ctx = the_cursor_ctx->table_ctx_;
-
-	if ( the_table_ctx->isInitialized() )
-	{
-		nldb_rc_t rc = check_key_length(the_table_ctx, key.length);
-		if (rc) return rc;
-
-		rc = the_table_ctx->tree().seek_backward( key.data, & the_cursor_ctx->iter_);
-		if (rc) return rc;
-
-		the_cursor_ctx->dir_ = cursor_context_t::SEEK_BACKWARD;
-	}
-	else
-	{
-		// No nothing, just return NLDB_OK.
-		// cursor_move_forward will return NLDB_ERROR_END_OF_ITERATION.
-	}
-
-	return NLDB_OK;
-}
-
-nldb_rc_t nldb_plugin_array_tree_t::cursor_move_backward(nldb_cursor_context_t cursor_ctx, nldb_key_t * key, nldb_value_t * value)
-{
-	cursor_context_t * the_cursor_ctx = (cursor_context_t*) cursor_ctx;
-
-
-	table_context_t * the_table_ctx = the_cursor_ctx->table_ctx_;
-
-	if ( the_table_ctx->isInitialized() )
-	{
-		// make sure that cursor_seek_backward was invoked.
-		if ( the_cursor_ctx->dir_ != cursor_context_t::SEEK_BACKWARD )
-		{
-			return NLDB_ERROR_INVALID_ITERATION;
-		}
-
-		bool end_of_iteration = false;
-		void * key_data = NULL;
-		void * value_data = NULL;
-		nldb_rc_t rc = the_table_ctx->tree().move_backward( the_cursor_ctx->iter_, & key_data, & value_data, & end_of_iteration);
-		if (rc) return rc;
-
-		if (end_of_iteration)
-			return NLDB_ERROR_END_OF_ITERATION;
-
-		key->length = the_table_ctx->key_length();
-		key->data = key_data;
-
-		value->length = the_table_ctx->value_length();
-		value->data = value_data;
+		// TODO : set key order
 	}
 	else
 	{

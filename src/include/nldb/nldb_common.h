@@ -84,6 +84,11 @@ typedef long long nldb_order_t;
 typedef unsigned short key_length_t;
 typedef unsigned short value_length_t;
 
+typedef enum nldb_cursor_direction_t {
+	NLDB_CURSOR_FORWARD = 1,
+	NLDB_CURSOR_BACKWARD = 2
+} nldb_cursor_direction_t;
+
 typedef struct nldb_key_t {
 	void * data;
 	key_length_t length;

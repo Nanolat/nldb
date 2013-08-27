@@ -342,7 +342,7 @@ void forward_cursor_test(nldb_db_t & db, nldb_table_t & table) {
 
 		nldb_key_t nldb_min_key = {min_key.data, sizeof(min_key)};
 
-		rc = nldb_cursor_seek_forward( cursor, nldb_min_key );
+		rc = nldb_cursor_seek( cursor, NLDB_CURSOR_FORWARD, nldb_min_key );
 		tx_assert( rc == NLDB_OK );
 
 		nldb_key_t key;
@@ -352,7 +352,7 @@ void forward_cursor_test(nldb_db_t & db, nldb_table_t & table) {
 		memset( &prev_key, 0, sizeof(prev_key));
 
 		nldb_rc_t rc;
-		while( ( rc = nldb_cursor_move_forward( cursor,  &key,  &value ) ) == 0 )
+		while( ( rc = nldb_cursor_fetch( cursor,  &key,  &value ) ) == 0 )
 		{
 			tx_assert( key.length == sizeof(prev_key));
 			tx_assert( memcmp( &prev_key, key.data, key.length) <= 0 );
@@ -406,7 +406,7 @@ void backward_cursor_test(nldb_db_t & db, nldb_table_t & table) {
 
 		nldb_key_t nldb_max_key = {max_key.data, sizeof(max_key)};
 
-		rc = nldb_cursor_seek_backward( cursor, nldb_max_key );
+		rc = nldb_cursor_seek( cursor, NLDB_CURSOR_BACKWARD, nldb_max_key );
 		tx_assert( rc == NLDB_OK );
 
 		nldb_key_t key;
@@ -416,7 +416,7 @@ void backward_cursor_test(nldb_db_t & db, nldb_table_t & table) {
 		memset( &prev_key, 0xFFU, sizeof(prev_key));
 
 		nldb_rc_t rc;
-		while( ( rc = nldb_cursor_move_backward( cursor,  &key,  &value ) ) == 0 )
+		while( ( rc = nldb_cursor_fetch( cursor,  &key,  &value ) ) == 0 )
 		{
 			tx_assert( key.length == sizeof(prev_key));
 			tx_assert( memcmp( &prev_key, key.data, key.length) >= 0 );

@@ -743,22 +743,8 @@ nldb_rc_t nldb_cursor_close(const nldb_cursor_t & cursor)
 }
 
 
-nldb_rc_t nldb_cursor_seek_forward(const nldb_cursor_t & cursor, const nldb_key_t & key)
-{
-	nldb_cursor_impl_t * cursori = (nldb_cursor_impl_t*) cursor;
-
-	nldb_table_impl_t * tablei = cursori->table();
-
-	nldb_plugin_t * table_plugin = tablei->table_plugin();
-
-	nldb_rc_t rc = table_plugin->cursor_seek_forward(cursori->cursor_context(), key);
-	if(rc) return rc;
-
-	return NLDB_OK;
-}
-
 // errors : NLDB_ERROR_CURSOR_NOT_OPEN
-nldb_rc_t nldb_cursor_seek_backward(const nldb_cursor_t & cursor, const nldb_key_t & key)
+nldb_rc_t nldb_cursor_seek(const nldb_cursor_t & cursor, const nldb_cursor_direction_t & direction, const nldb_key_t & key)
 {
 	nldb_cursor_impl_t * cursori = (nldb_cursor_impl_t*) cursor;
 
@@ -766,14 +752,29 @@ nldb_rc_t nldb_cursor_seek_backward(const nldb_cursor_t & cursor, const nldb_key
 
 	nldb_plugin_t * table_plugin = tablei->table_plugin();
 
-	nldb_rc_t rc = table_plugin->cursor_seek_backward(cursori->cursor_context(), key);
+	nldb_rc_t rc = table_plugin->cursor_seek(cursori->cursor_context(), direction, key);
 	if(rc) return rc;
 
 	return NLDB_OK;
 }
+
+nldb_rc_t nldb_cursor_seek(const nldb_cursor_t & cursor, const nldb_cursor_direction_t & direction, const nldb_order_t & order)
+{
+	nldb_cursor_impl_t * cursori = (nldb_cursor_impl_t*) cursor;
+
+	nldb_table_impl_t * tablei = cursori->table();
+
+	nldb_plugin_t * table_plugin = tablei->table_plugin();
+
+	nldb_rc_t rc = table_plugin->cursor_seek(cursori->cursor_context(), direction, order);
+	if(rc) return rc;
+
+	return NLDB_OK;
+}
+
 
 // errors : NLDB_ERROR_CURSOR_NOT_OPEN, NLDB_ERROR_END_OF_ITERATION
-nldb_rc_t nldb_cursor_move_forward(const nldb_cursor_t & cursor, nldb_key_t * key, nldb_value_t * value)
+nldb_rc_t nldb_cursor_fetch(const nldb_cursor_t & cursor, nldb_key_t * key, nldb_value_t * value, nldb_order_t * order)
 {
 	nldb_cursor_impl_t * cursori = (nldb_cursor_impl_t*) cursor;
 
@@ -781,27 +782,11 @@ nldb_rc_t nldb_cursor_move_forward(const nldb_cursor_t & cursor, nldb_key_t * ke
 
 	nldb_plugin_t * table_plugin = tablei->table_plugin();
 
-	nldb_rc_t rc = table_plugin->cursor_move_forward(cursori->cursor_context(), key, value);
+	nldb_rc_t rc = table_plugin->cursor_fetch(cursori->cursor_context(), key, value, order);
 	if(rc) return rc;
 
 	return NLDB_OK;
 }
-
-// errors : NLDB_ERROR_CURSOR_NOT_OPEN, NLDB_ERROR_END_OF_ITERATION
-nldb_rc_t nldb_cursor_move_backward(const nldb_cursor_t & cursor, nldb_key_t * key, nldb_value_t * value)
-{
-	nldb_cursor_impl_t * cursori = (nldb_cursor_impl_t*) cursor;
-
-	nldb_table_impl_t * tablei = cursori->table();
-
-	nldb_plugin_t * table_plugin = tablei->table_plugin();
-
-	nldb_rc_t rc = table_plugin->cursor_move_backward(cursori->cursor_context(), key, value);
-	if(rc) return rc;
-
-	return NLDB_OK;
-}
-
 
 
 
@@ -881,7 +866,7 @@ nldb_rc_t nldb_db_close( nldb_db_t & db)
 
 
 // db accessors 
-const nldb_db_id_t & nldb_db_id(const nldb_db_t & db)
+nldb_db_id_t nldb_db_id(const nldb_db_t & db)
 {
 	nldb_db_impl_t * dbi = (nldb_db_impl_t*) db;
 

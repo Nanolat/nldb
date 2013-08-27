@@ -140,22 +140,20 @@ nldb_rc_t nldb_plugin_tc_t::cursor_open(nldb_table_context_t table_ctx, nldb_cur
 	return NLDB_ERROR_UNSUPPORTED_FEATURE;
 }
 
-nldb_rc_t nldb_plugin_tc_t::cursor_seek_forward (nldb_cursor_context_t cursor_ctx, const nldb_key_t & key)
+
+nldb_rc_t nldb_plugin_tc_t::cursor_seek(nldb_cursor_context_t cursor_ctx, const nldb_cursor_direction_t & direction, const nldb_key_t & key)
 {
 	return NLDB_ERROR_UNSUPPORTED_FEATURE;
 }
 
-nldb_rc_t nldb_plugin_tc_t::cursor_seek_backward(nldb_cursor_context_t cursor_ctx, const nldb_key_t & key)
+// errors : NLDB_ERROR_CURSOR_NOT_OPEN
+nldb_rc_t nldb_plugin_tc_t::cursor_seek(nldb_cursor_context_t cursor_ctx, const nldb_cursor_direction_t & direction, const nldb_order_t & order)
 {
 	return NLDB_ERROR_UNSUPPORTED_FEATURE;
 }
 
-nldb_rc_t nldb_plugin_tc_t::cursor_move_forward (nldb_cursor_context_t cursor_ctx, nldb_key_t * key, nldb_value_t * value)
-{
-	return NLDB_ERROR_UNSUPPORTED_FEATURE;
-}
-
-nldb_rc_t nldb_plugin_tc_t::cursor_move_backward(nldb_cursor_context_t cursor_ctx, nldb_key_t * key, nldb_value_t * value)
+// errors : NLDB_ERROR_CURSOR_NOT_OPEN, NLDB_ERROR_END_OF_ITERATION
+nldb_rc_t nldb_plugin_tc_t::cursor_fetch(nldb_cursor_context_t cursor_ctx, nldb_key_t * key, nldb_value_t * value, nldb_order_t * order)
 {
 	return NLDB_ERROR_UNSUPPORTED_FEATURE;
 }

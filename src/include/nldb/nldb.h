@@ -41,7 +41,7 @@
 #define _NLDB_H_ (1)
 
 #include <nldb/nldb_common.h>
-
+#include <stddef.h>
 
 // When you create a table, you don't specify a string for a table name, but you specify an integer, table id. 
 // Why? strings are not efficient data format, using an integer is enough to identify a table.
@@ -129,7 +129,7 @@ extern nldb_rc_t nldb_db_wait_for_replication_publishers(nldb_db_t & db);
 extern nldb_rc_t nldb_db_close( nldb_db_t & db);
 
 // db accessors 
-extern const nldb_db_id_t & nldb_db_id(const nldb_db_t & db);
+extern nldb_db_id_t nldb_db_id(const nldb_db_t & db);
 
 /**************************/
 /* transaction management */
@@ -167,7 +167,7 @@ extern nldb_rc_t nldb_table_close(nldb_table_t & table);
 extern nldb_rc_t nldb_table_put(nldb_tx_t & tx, nldb_table_t & table, const nldb_key_t & key, const nldb_value_t & value);
 
 // errors : NLDB_ERROR_KEY_NOT_FOUND
-extern nldb_rc_t nldb_table_get(nldb_tx_t & tx, nldb_table_t & table, const nldb_key_t & key, nldb_value_t * value, nldb_order_t * order);
+extern nldb_rc_t nldb_table_get(nldb_tx_t & tx, nldb_table_t & table, const nldb_key_t & key, nldb_value_t * value, nldb_order_t * order = NULL);
 
 // errors : NLDB_ERROR_ORDER_OUT_OF_RANGE
 extern nldb_rc_t nldb_table_get(nldb_tx_t & tx, nldb_table_t & table, const nldb_order_t & order, nldb_key_t * key, nldb_value_t * value);
@@ -188,16 +188,13 @@ extern const nldb_plugin_id_t & nldb_table_plugin_id(const nldb_table_t & table)
 extern nldb_rc_t nldb_cursor_open(const nldb_tx_t & tx, const nldb_table_t & table, nldb_cursor_t * cursor);
 
 // errors : NLDB_ERROR_CURSOR_NOT_OPEN
-extern nldb_rc_t nldb_cursor_seek_forward(const nldb_cursor_t & cursor, const nldb_key_t & key);
+extern nldb_rc_t nldb_cursor_seek(const nldb_cursor_t & cursor, const nldb_cursor_direction_t & direction, const nldb_key_t & key);
 
 // errors : NLDB_ERROR_CURSOR_NOT_OPEN
-extern nldb_rc_t nldb_cursor_seek_backward(const nldb_cursor_t & cursor, const nldb_key_t & key);
+extern nldb_rc_t nldb_cursor_seek(const nldb_cursor_t & cursor, const nldb_cursor_direction_t & direction, const nldb_order_t & order);
 
 // errors : NLDB_ERROR_CURSOR_NOT_OPEN, NLDB_ERROR_END_OF_ITERATION
-extern nldb_rc_t nldb_cursor_move_forward(const nldb_cursor_t & cursor, nldb_key_t * key, nldb_value_t * value);
-
-// errors : NLDB_ERROR_CURSOR_NOT_OPEN, NLDB_ERROR_END_OF_ITERATION
-extern nldb_rc_t nldb_cursor_move_backward(const nldb_cursor_t & cursor, nldb_key_t * key, nldb_value_t * value);
+extern nldb_rc_t nldb_cursor_fetch(const nldb_cursor_t & cursor, nldb_key_t * key, nldb_value_t * value, nldb_order_t * order = NULL );
 
 // errors : NLDB_CURSOR_NOT_OPEN
 extern nldb_rc_t nldb_cursor_close(const nldb_cursor_t & cursor);

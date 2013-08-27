@@ -276,20 +276,40 @@ nldb_rc_t nldb_plugin_leveldb_t::key_free(nldb_key_t & key) {
 	return NLDB_OK;
 }
 
+
+class leveldb_cursor_context_t
+{
+
+public :
+	leveldb::Iterator* iter_;
+
+	nldb_cursor_direction_t dir_;
+
+	leveldb_cursor_context_t(leveldb::DB* db)
+	{
+		iter_ = db->NewIterator(leveldb::ReadOptions());
+
+	}
+};
+
 nldb_rc_t nldb_plugin_leveldb_t::cursor_open(nldb_table_context_t table_ctx, nldb_cursor_context_t * cursor_ctx)
 {
 	leveldb::DB* db = (leveldb::DB*) table_ctx;
 
-	leveldb::Iterator* it = db->NewIterator(leveldb::ReadOptions());
+	leveldb_cursor_context_t * levedb_cursor = new leveldb_cursor_context_t(db);
+	tx_debug_assert(levedb_cursor);
 
-	*cursor_ctx = it;
+	*cursor_ctx = levedb_cursor;
 
 	return NLDB_OK;
 }
 
-nldb_rc_t nldb_plugin_leveldb_t::cursor_seek_forward (nldb_cursor_context_t cursor_ctx, const nldb_key_t & key)
+
+nldb_rc_t nldb_plugin_leveldb_t::cursor_seek(nldb_cursor_context_t cursor_ctx, const nldb_cursor_direction_t & direction, const nldb_key_t & key)
 {
-	leveldb::Iterator* it = (leveldb::Iterator*) cursor_ctx;
+	leveldb_cursor_context_t* leveldb_cursor = (leveldb_cursor_context_t*) cursor_ctx;
+
+	leveldb::Iterator* it = leveldb_cursor->iter_;
 
 	it->Seek( get_slice(key) );
 
@@ -301,14 +321,25 @@ nldb_rc_t nldb_plugin_leveldb_t::cursor_seek_forward (nldb_cursor_context_t curs
 	return NLDB_OK;
 }
 
-nldb_rc_t nldb_plugin_leveldb_t::cursor_seek_backward(nldb_cursor_context_t cursor_ctx, const nldb_key_t & key)
+// errors : NLDB_ERROR_CURSOR_NOT_OPEN
+nldb_rc_t nldb_plugin_leveldb_t::cursor_seek(nldb_cursor_context_t cursor_ctx, const nldb_cursor_direction_t & direction, const nldb_order_t & order)
 {
-	return cursor_seek_forward(cursor_ctx, key);
+	// Searching by key order is not suppored by leveldb.
+	return NLDB_ERROR_UNSUPPORTED_FEATURE;
 }
 
-nldb_rc_t nldb_plugin_leveldb_t::cursor_move_forward (nldb_cursor_context_t cursor_ctx, nldb_key_t * key, nldb_value_t * value)
+
+// errors : NLDB_ERROR_CURSOR_NOT_OPEN, NLDB_ERROR_END_OF_ITERATION
+nldb_rc_t nldb_plugin_leveldb_t::cursor_fetch(nldb_cursor_context_t cursor_ctx, nldb_key_t * key, nldb_value_t * value, nldb_order_t * order)
 {
-	leveldb::Iterator* it = (leveldb::Iterator*) cursor_ctx;
+	leveldb_cursor_context_t* leveldb_cursor = (leveldb_cursor_context_t*) cursor_ctx;
+
+	leveldb::Iterator* it = leveldb_cursor->iter_;
+
+	if (order != NULL) {
+		// Fetching key order is not supported by LevelDB. The order parameter should be passed as NULL always.
+		return NLDB_ERROR_UNSUPPORTED_FEATURE;
+	}
 
 	if ( ! it->status().ok() )
 	{
@@ -326,7 +357,16 @@ nldb_rc_t nldb_plugin_leveldb_t::cursor_move_forward (nldb_cursor_context_t curs
 	rc = copy_value_from_slice(value, it->value());
 	if (rc) return rc;
 
-    it->Next();
+	switch(leveldb_cursor->dir_) {
+	case NLDB_CURSOR_FORWARD :
+	    it->Next();
+		break;
+	case NLDB_CURSOR_BACKWARD :
+	    it->Prev();
+		break;
+	default :
+		tx_assert(0);
+	}
 
 	if ( ! it->status().ok() )
 	{
@@ -336,42 +376,16 @@ nldb_rc_t nldb_plugin_leveldb_t::cursor_move_forward (nldb_cursor_context_t curs
    	return NLDB_OK;
 }
 
-nldb_rc_t nldb_plugin_leveldb_t::cursor_move_backward(nldb_cursor_context_t cursor_ctx, nldb_key_t * key, nldb_value_t * value)
-{
-	leveldb::Iterator* it = (leveldb::Iterator*) cursor_ctx;
-
-	if ( ! it->status().ok() )
-	{
-		return NLDB_ERROR;
-	}
-
-	if ( ! it->Valid() )
-	{
-		return NLDB_ERROR_END_OF_ITERATION;
-	}
-
-	nldb_rc_t rc = copy_key_from_slice(key, it->key());
-	if (rc) return rc;
-
-	rc = copy_value_from_slice(value, it->value());
-	if (rc) return rc;
-
-    it->Prev();
-
-	if ( ! it->status().ok() )
-	{
-		return NLDB_ERROR;
-	}
-
-   	return NLDB_OK;
-}
 
 nldb_rc_t nldb_plugin_leveldb_t::cursor_close(nldb_table_context_t table_ctx, nldb_cursor_context_t cursor_ctx)
 {
+	leveldb_cursor_context_t* leveldb_cursor = (leveldb_cursor_context_t*) cursor_ctx;
 
-	leveldb::Iterator* it = (leveldb::Iterator*) cursor_ctx;
+	leveldb::Iterator* it = leveldb_cursor->iter_;
 
 	delete it;
+
+	delete leveldb_cursor;
 
 	return NLDB_OK;
 }

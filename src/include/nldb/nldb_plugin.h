@@ -91,13 +91,13 @@ public:
 
 	virtual nldb_rc_t cursor_open(nldb_table_context_t table_ctx, nldb_cursor_context_t * cursor_ctx) = 0;
 
-	virtual nldb_rc_t cursor_seek_forward (nldb_cursor_context_t cursor_ctx, const nldb_key_t & key) = 0;
+	virtual nldb_rc_t cursor_seek(nldb_cursor_context_t cursor_ctx, const nldb_cursor_direction_t & direction, const nldb_key_t & key) = 0;
 
-	virtual nldb_rc_t cursor_seek_backward(nldb_cursor_context_t cursor_ctx, const nldb_key_t & key) = 0;
+	// errors : NLDB_ERROR_CURSOR_NOT_OPEN
+	virtual nldb_rc_t cursor_seek(nldb_cursor_context_t cursor_ctx, const nldb_cursor_direction_t & direction, const nldb_order_t & order) = 0;
 
-	virtual nldb_rc_t cursor_move_forward (nldb_cursor_context_t cursor_ctx, nldb_key_t * key, nldb_value_t * value) = 0;
-
-	virtual nldb_rc_t cursor_move_backward(nldb_cursor_context_t cursor_ctx, nldb_key_t * key, nldb_value_t * value) = 0;
+	// errors : NLDB_ERROR_CURSOR_NOT_OPEN, NLDB_ERROR_END_OF_ITERATION
+	virtual nldb_rc_t cursor_fetch(nldb_cursor_context_t cursor_ctx, nldb_key_t * key, nldb_value_t * value, nldb_order_t * order) = 0;
 
 	virtual nldb_rc_t cursor_close(nldb_table_context_t table_ctx, nldb_cursor_context_t cursor_ctx) = 0;
 
