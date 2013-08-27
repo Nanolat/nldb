@@ -42,6 +42,7 @@
 #define _NLDB_COMMON_H_ (1)
 
 #define NLDB_OK                         (0)
+#define NLDB_ERROR_CODE_START           (-1)
 #define NLDB_ERROR                      (-1)
 #define NLDB_ERROR_DB_ALREADY_EXISTS    (-2)
 #define NLDB_ERROR_DB_NOT_FOUND         (-3)
@@ -64,6 +65,8 @@
 #define NLDB_ERROR_VARIABLE_KEY_SIZE_NOT_SUPPORTED  (-20)
 #define NLDB_ERROR_VARIABLE_VALUE_SIZE_NOT_SUPPORTED  (-21)
 #define NLDB_ERROR_ORDER_OUT_OF_RANGE (-22)
+/* Unused, but required to know the maximum number for the error code */
+#define NLDB_ERROR_CODE_END            (-22)
 
 typedef int nldb_int32_t;
 typedef unsigned int nldb_uint32_t;
@@ -96,3 +99,4 @@ typedef struct nldb_table_stat_t {
 } nldb_table_stat_t ;
 
 #endif //_NLDB_COMMON_H_
+
