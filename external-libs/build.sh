@@ -2,77 +2,45 @@
 # archives - contains tarballs or zip files of open source projects on that Nanolat Database depends.
 # lib - contains libraries built.
 # include - contains header files of libraries.
+# scripts - build scripts written in bash.
+# log - the output files of each build scripts in scripts folder.
+
+
 EXT_LIB_HOME=`pwd`
 
-rm -rf include lib build
-mkdir include lib build
+# run sudo once, not to ask the root password in the mid of building dependencies
+sudo echo "Build started at `date`"
 
-cd build
+#Read all arguments into a variable.
+DEP_LIST=$@
 
-#########################################################
-# build gtest
-#########################################################
-pushd .
-unzip ${EXT_LIB_HOME}/archives/gtest-1.6.0.zip
-cd gtest-1.6.0
-./configure
-make clean
-make
-cp -r include/* ${EXT_LIB_HOME}/include
-cp lib/.libs/* ${EXT_LIB_HOME}/lib
-popd
+if [ $# -eq 1 ] 
+then
+    if [ $1 = "all" ]
+    then
+        echo "clean up, build all dependencies."
+        # List of project on which SoTopless depends.
+        DEP_LIST="clean gtest snappy leveldb xs tc"
+    fi
+fi 
 
-#########################################################
-# build snappy (required by leveldb)
-#########################################################
-pushd .
-tar xvfz ${EXT_LIB_HOME}/archives/snappy-1.1.0.tar.gz
-cd snappy-1.1.0
-./configure
-make clean
-make
-make install DESTDIR=`pwd`/dest
-cp dest/usr/local/include/* ${EXT_LIB_HOME}/include
-cp dest/usr/local/lib/* ${EXT_LIB_HOME}/lib
-popd
-
-#########################################################
-# build leveldb
-#########################################################
-pushd .
-tar xvfz ${EXT_LIB_HOME}/archives/leveldb-1.10.0.tar.gz
-cd leveldb-1.10.0
-# no configure file exists for leveldb
-make clean
-make
-cp -r include/* ${EXT_LIB_HOME}/include
-cp libleveldb* ${EXT_LIB_HOME}/lib
-popd
-
-#########################################################
-# build crossroads
-#########################################################
-pushd .
-tar xvfz ${EXT_LIB_HOME}/archives/libxs-1.2.0.tar.gz
-cd libxs-1.2.0
-./configure
-make clean
-make
-cp -r include/* ${EXT_LIB_HOME}/include
-cp src/.libs/libxs.* ${EXT_LIB_HOME}/lib
-
-popd
-
-#########################################################
-# build tokyocabinet
-#########################################################
-pushd .
-tar xvfz ${EXT_LIB_HOME}/archives/tokyocabinet-1.4.48.tar.gz
-cd tokyocabinet-1.4.48
-./configure
-make clean
-make
-cp *.h ${EXT_LIB_HOME}/include
-cp libtokyocabinet* ${EXT_LIB_HOME}/lib
-
-popd
+for dep in $DEP_LIST
+do
+    echo $dep
+    if [ $dep = "clean" ]
+    then
+        rm -rf include lib bin build log
+        mkdir include lib bin build log
+    else
+        pushd .
+        cd build 
+        echo "##########################################################"
+        echo "building $dep"
+        echo "##########################################################"
+        LOG=../log/${dep}.log
+        echo "Started at `date`" 
+        ../scripts/${dep}.sh | tee $LOG 
+        echo "Finished at `date`"
+        popd 
+    fi 
+done

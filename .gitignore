@@ -12,6 +12,7 @@ src/tests/tests
 external-libs/include
 external-libs/lib
 external-libs/build
+external-libs/log
 
 # Exlude all files in build folders
 */*/GccDebug/*
