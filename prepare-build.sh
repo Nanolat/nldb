@@ -78,7 +78,7 @@ echo "Step 3. Build external libraries ..."
 #########################################################################
 
 cd external-libs
-./build.sh
+./build.sh all
 cd ..
 
 
