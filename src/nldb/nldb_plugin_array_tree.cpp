@@ -283,12 +283,9 @@ nldb_rc_t nldb_plugin_array_tree_t::table_get(nldb_table_context_t table_ctx, co
 		return NLDB_ERROR_KEY_NOT_FOUND;
 	}
 
-	// BUGBUG -- implement it!
-	if (order != NULL)
-		return NLDB_ERROR_UNSUPPORTED_FEATURE;
-
 	void * value_ptr = NULL;
-	rc = ctx->tree().get(key.data, &value_ptr);
+	// order is passed to tree().get function. it assigns the order of the key to *order only if order is not NULL.
+	rc = ctx->tree().get(key.data, &value_ptr, order);
 	if (rc) return rc;
 
 	if (value_ptr )
@@ -307,8 +304,35 @@ nldb_rc_t nldb_plugin_array_tree_t::table_get(nldb_table_context_t table_ctx, co
 // errors : NLDB_ERROR_ORDER_OUT_OF_RANGE
 nldb_rc_t nldb_plugin_array_tree_t::table_get(nldb_table_context_t table_ctx, const nldb_order_t & order, nldb_key_t * key, nldb_value_t * value)
 {
-	// BUGBUG -- implement it!
-	return NLDB_ERROR_UNSUPPORTED_FEATURE;
+	nldb_rc_t rc = NLDB_OK;
+
+	table_context_t * ctx = (table_context_t*) table_ctx;
+
+	if ( ! ctx->isInitialized() )
+	{
+		// The table context was not initialized. It means there was no trial to put any key.
+		return NLDB_ERROR_KEY_NOT_FOUND;
+	}
+
+	void * key_ptr = NULL;
+	void * value_ptr = NULL;
+	rc = ctx->tree().get(order, &key_ptr, &value_ptr);
+	if (rc) return rc;
+
+	if (value_ptr )
+	{
+		value->length = ctx->value_length();
+		value->data = value_ptr;
+
+		key->length = ctx->key_length();
+		key->data = key_ptr;
+	}
+	else
+	{
+		return NLDB_ERROR_KEY_NOT_FOUND;
+	}
+
+	return NLDB_OK;
 }
 
 // errors : NLDB_ERROR_KEY_NOT_FOUND
@@ -344,8 +368,22 @@ nldb_rc_t nldb_plugin_array_tree_t::table_del(nldb_table_context_t table_ctx, co
 
 nldb_rc_t nldb_plugin_array_tree_t::table_stat(nldb_table_context_t table_ctx, nldb_table_stat_t * table_stat)
 {
-	// BUGBUG -- implement it!
-	return NLDB_ERROR_UNSUPPORTED_FEATURE;
+	table_context_t * ctx = (table_context_t*)table_ctx ;
+
+	if ( ctx->isInitialized() )
+	{
+		nldb_order_t key_count;
+		nldb_rc_t rc = ctx->tree().get_key_count(&key_count);
+		if (rc) return rc;
+
+		table_stat->key_count = key_count;
+	}
+	else
+	{
+		// No key was inserted yet.
+		table_stat->key_count = 0;
+	}
+	return NLDB_OK;
 }
 
 nldb_rc_t nldb_plugin_array_tree_t::value_free(nldb_value_t & value) {
@@ -433,8 +471,38 @@ nldb_rc_t nldb_plugin_array_tree_t::cursor_seek(nldb_cursor_context_t cursor_ctx
 
 // errors : NLDB_ERROR_CURSOR_NOT_OPEN
 nldb_rc_t nldb_plugin_array_tree_t::cursor_seek(nldb_cursor_context_t cursor_ctx, const nldb_cursor_direction_t & direction, const nldb_order_t & order) {
-	// TODO : Implment it.
-	return NLDB_ERROR_NOT_IMPLEMENTED_YET;
+	cursor_context_t* the_cursor_ctx = (cursor_context_t*) cursor_ctx;
+
+	table_context_t * the_table_ctx = the_cursor_ctx->table_ctx_;
+
+	if ( the_table_ctx->isInitialized() )
+	{
+		switch(direction) {
+		case NLDB_CURSOR_FORWARD:
+		{
+			nldb_rc_t rc = the_table_ctx->tree().seek_forward( order, & the_cursor_ctx->iter_);
+			if (rc) return rc;
+			break;
+		}
+		case NLDB_CURSOR_BACKWARD:
+		{
+			nldb_rc_t rc = the_table_ctx->tree().seek_backward( order, & the_cursor_ctx->iter_);
+			if (rc) return rc;
+			break;
+		}
+		default:
+			tx_assert(0);
+		}
+		the_cursor_ctx->dir_ = direction;
+	}
+	else
+	{
+		// TODO : Do we need to search again from the key if cursor_seek is called twice?
+		// No nothing, just return NLDB_OK.
+		// cursor_move_forward will return NLDB_ERROR_END_OF_ITERATION.
+	}
+
+	return NLDB_OK;
 }
 
 

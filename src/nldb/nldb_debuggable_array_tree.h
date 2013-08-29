@@ -65,7 +65,7 @@ protected :
 		nldb_rc_t rc = node->keys_with_values().iter_forward(&iter);
 		if (rc) return rc;
 
-		printf("%*s[ LEAF-NODE (%lX) (parent:%lX)(p:%lX)(n:%lX) ]\n", indent, " ", (uint64_t)node, (uint64_t)node->parent(), (uint64_t)node->prev_, (uint64_t)node->next_);
+		printf("%*s[ LEAF-NODE (%llX) (parent:%llX)(p:%llX)(n:%llX) ]\n", indent, " ", (uint64_t)node, (uint64_t)node->parent(), (uint64_t)node->prev_, (uint64_t)node->next_);
 		while(1)
 		{
 			key_t * key = NULL;
@@ -117,7 +117,7 @@ protected :
 		nldb_rc_t rc = node->keys_with_right_children().iter_forward(&iter);
 		if (rc) return rc;
 
-		printf("%*s[ INTERNAL-NODE (%lX) (parent:%lX) ]\n", indent, " ", (uint64_t)node, (uint64_t)node->parent());
+		printf("%*s[ INTERNAL-NODE (%llX) (parent:%llX) ]\n", indent, " ", (uint64_t)node, (uint64_t)node->parent());
 
 		printf("%*sLEFT CHILD:\n", indent, " " );
 

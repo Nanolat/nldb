@@ -400,7 +400,6 @@ protected:
 			if (rc) return rc;
 
 			// Update parent of the children who moved to new_node.
-
 			{
 				typename nldb_sorted_array<key_space_size>::iterator_t iter;
 				rc = new_node->keys_with_right_children().iter_forward(&iter);
@@ -740,11 +739,18 @@ public:
 		return NLDB_OK;
 	}
 
-	nldb_rc_t get (const void * key, void ** value ) const
+	/*! Get the value and order searching by the given key.
+	 * Assign the order of the key in this tree to *order only if order is not NULL.
+	 */
+	nldb_rc_t get (const void * key, void ** value, nldb_order_t * key_order ) const
 	{
 		tx_debug_assert( is_initialized() );
 		tx_debug_assert( key != NULL );
 		tx_debug_assert( value != NULL );
+
+		if (key_order != NULL) {
+			// TODO : Implement it.
+		}
 
 		leaf_node_t * leaf_node = NULL;
 
@@ -756,6 +762,15 @@ public:
 		rc = leaf_node->get(key, value);
 		if (rc) return rc;
 
+		return NLDB_OK;
+	}
+
+	/*! Get the value and order searching by the given key.
+	 * Assign the order of the key in this tree to *order only if order is not NULL.
+	 */
+	nldb_rc_t get (const nldb_order_t key_order, void ** key, void ** value) const
+	{
+		// TODO : Implement it.
 		return NLDB_OK;
 	}
 
@@ -826,6 +841,16 @@ public:
 		if (rc) return rc;
 
 		return NLDB_OK;
+	}
+
+
+	nldb_rc_t seek_forward(const nldb_order_t key_order, iterator_t * iter) const
+	{
+		return NLDB_ERROR;
+	}
+	nldb_rc_t seek_backward(const nldb_order_t key_order, iterator_t * iter) const
+	{
+		return NLDB_ERROR;
 	}
 
 	nldb_rc_t move_forward(iterator_t & iter, void ** key, void ** value, bool * end_of_iter) const
@@ -919,6 +944,13 @@ public:
 
 		return NLDB_OK;
 	}
+
+	nldb_rc_t get_key_count(nldb_order_t * total_key_count ) const
+	{
+		// TODO : implement it.
+		return NLDB_ERROR;
+	}
+
 };
 
 #endif /* NLDB_ARRAY_TREE_H_ */
