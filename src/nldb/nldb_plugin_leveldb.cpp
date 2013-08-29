@@ -51,7 +51,7 @@ typedef struct levedb_table_desc_t {
 } levedb_table_desc_t;
 
 // The descriptor for the meta table that holds the list of tables 
-nldb_plugin_table_desc_t nldb_meta_table_desc(const nldb_db_id_t & db_id)
+nldb_plugin_table_desc_t nldb_meta_table_desc(const nldb_db_id_t db_id)
 {
 	nldb_plugin_table_desc_t meta_table_desc;
 	levedb_table_desc_t * p_leveldb_table_desc = (levedb_table_desc_t*) meta_table_desc.table_desc;
@@ -64,7 +64,7 @@ nldb_plugin_table_desc_t nldb_meta_table_desc(const nldb_db_id_t & db_id)
 	return meta_table_desc;
 }
 
-static std::string leveldb_name(const nldb_table_id_t & db_id, const nldb_table_id_t & table_id)
+static std::string leveldb_name(const nldb_table_id_t db_id, const nldb_table_id_t table_id)
 {
 	std::ostringstream os;
 	os << db_id << "-" << table_id;
@@ -78,7 +78,7 @@ static std::string leveldb_name(nldb_plugin_table_desc_t & table_desc)
 	return leveldb_name( p_leveldb_table_desc->db_id, p_leveldb_table_desc->table_id );
 }
 
-nldb_rc_t nldb_plugin_leveldb_t::table_create(const nldb_table_id_t & db_id, const nldb_table_id_t & table_id, nldb_plugin_table_desc_t * table_desc)
+nldb_rc_t nldb_plugin_leveldb_t::table_create(const nldb_table_id_t db_id, const nldb_table_id_t table_id, nldb_plugin_table_desc_t * table_desc)
 {
 	leveldb::DB* db;
 	leveldb::Options options;

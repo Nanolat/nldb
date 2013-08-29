@@ -42,7 +42,7 @@
 
 #include <tcutil.h>
 
-nldb_rc_t nldb_plugin_tc_t::table_create(const nldb_table_id_t & db_id, const nldb_table_id_t & table_id, nldb_plugin_table_desc_t * table_desc)
+nldb_rc_t nldb_plugin_tc_t::table_create(const nldb_table_id_t db_id, const nldb_table_id_t table_id, nldb_plugin_table_desc_t * table_desc)
 {
 	// no table descriptor to store.
 	table_desc->length = 0;

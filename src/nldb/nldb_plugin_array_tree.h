@@ -48,7 +48,7 @@ class nldb_plugin_array_tree_t : public nldb_plugin_t
 public:
 	virtual ~nldb_plugin_array_tree_t() {};
 
-	virtual nldb_rc_t table_create(const nldb_table_id_t & db_id, const nldb_table_id_t & table_id, nldb_plugin_table_desc_t * table_desc);
+	virtual nldb_rc_t table_create(const nldb_table_id_t db_id, const nldb_table_id_t table_id, nldb_plugin_table_desc_t * table_desc);
 
 	virtual nldb_rc_t table_drop(nldb_plugin_table_desc_t & table_desc);
 

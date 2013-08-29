@@ -77,13 +77,13 @@ public :
 		return totalLogCount_;
 	};
 
-	inline void setTransactionId(const nldb_tx_id_t & txId) {
+	inline void setTransactionId(const nldb_tx_id_t txId) {
 		// Assume : We shouldn't set the transaction id twice after clear() called.
 		tx_assert( transactionId_ == 0 );
 		transactionId_ = txId;
 	};
 
-	inline const nldb_tx_id_t & getTransactionId() {
+	inline const nldb_tx_id_t getTransactionId() {
 		// Assume : We should have set the transaction id.
 		tx_assert( transactionId_ != 0 );
 		return transactionId_;
@@ -112,7 +112,7 @@ public :
 	}log_record_header_t;
 
 	// Append a log record into the replication message.
-	inline void appendLog(const nldb_table_id_t & tableId, TxTransactionLogRedoer::log_type_t logType, void * keyData, size_t keyLength, void * valueData, size_t valueLength)
+	inline void appendLog(const nldb_table_id_t tableId, TxTransactionLogRedoer::log_type_t logType, void * keyData, size_t keyLength, void * valueData, size_t valueLength)
 	{
 		size_t logSize = calcLogSize( keyLength, valueLength);
 

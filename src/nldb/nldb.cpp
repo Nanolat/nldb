@@ -100,7 +100,7 @@ nldb_rc_t nldb_plugin_add( nldb_plugin_t & plugin, nldb_plugin_id_t * plugin_id 
 	return NLDB_OK;
 }
 
-static inline nldb_plugin_t * nldb_plugin( const nldb_plugin_id_t & id) {
+static inline nldb_plugin_t * nldb_plugin( const nldb_plugin_id_t id) {
 	tx_assert(id < NLDB_PLUGIN_MAX_COUNT );
 	return plugins[id];
 }
@@ -170,7 +170,7 @@ public :
 
 	class Replicator {
 	public :
-		Replicator(const nldb_db_id_t & dbid, TxTransactionsLogs * outer, const std::string & master_ip, const unsigned short master_port) :
+		Replicator(const nldb_db_id_t dbid, TxTransactionsLogs * outer, const std::string & master_ip, const unsigned short master_port) :
 		   	logPublisher(dbid, master_ip, master_port),
 			first_barrier( outer->txRingBuffer->NewBarrier(outer->sequence_to_track) ),
 			first_processor( outer->txRingBuffer,
@@ -191,19 +191,21 @@ public :
 			return first_consumer;
 		}
 	private :
+		// one exception handler
+		IgnoreExceptionHandler<TxTransactionEvent> exception_handler;
+
+		// one event handler
+		TxTransactionLogPublisher logPublisher;
+
 		std::unique_ptr<ProcessingSequenceBarrier> first_barrier;
 
 		BatchEventProcessor<TxTransactionEvent> first_processor;
 
-		// one exception handler
-		IgnoreExceptionHandler<TxTransactionEvent> exception_handler;
-		// one event handler
-		TxTransactionLogPublisher logPublisher;
 
 		thread_t first_consumer;
 	};
 
-	inline void addReplicator(const nldb_db_id_t & dbid, const std::string & master_ip, const unsigned short master_port)
+	inline void addReplicator(const nldb_db_id_t dbid, const std::string & master_ip, const unsigned short master_port)
 	{
 		std::shared_ptr<Replicator> replicator ( new Replicator( dbid, this, master_ip, master_port ) );
 		replicators_.push_back(replicator);
@@ -312,7 +314,7 @@ public :
 		meta_table_context_ = NULL;
 	};
 
-	inline nldb_rc_t init(const nldb_db_id_t & db_id) {
+	inline nldb_rc_t init(const nldb_db_id_t db_id) {
 		meta_table_desc_ = nldb_meta_table_desc(db_id);
 		db_id_ = db_id;
 
@@ -328,14 +330,14 @@ public :
 	};
 
 	// create the meta table.
-	inline static nldb_rc_t meta_create(const nldb_db_id_t & db_id) {
+	inline static nldb_rc_t meta_create(const nldb_db_id_t db_id) {
 		nldb_plugin_table_desc_t dummy_table_desc;
 		nldb_plugin_leveldb_t meta_table_plugin;
 		return meta_table_plugin.table_create(db_id, META_TABLE_ID, &dummy_table_desc);
 	}
 
 	// drop the meta table. removes meta table files from disk.
-	inline static nldb_rc_t meta_drop(const nldb_db_id_t & db_id) {
+	inline static nldb_rc_t meta_drop(const nldb_db_id_t db_id) {
 		nldb_plugin_table_desc_t meta_table_desc = nldb_meta_table_desc(db_id);
 		nldb_plugin_leveldb_t meta_table_plugin;
 		return meta_table_plugin.table_drop(meta_table_desc);
@@ -343,7 +345,7 @@ public :
 
 
 	// put a record(table description) into the meta table
-	inline nldb_rc_t meta_put(const nldb_table_id_t & table_id, const nldb_plugin_id_t & table_plugin_id, const nldb_plugin_table_desc_t & table_desc) {
+	inline nldb_rc_t meta_put(const nldb_table_id_t table_id, const nldb_plugin_id_t table_plugin_id, const nldb_plugin_table_desc_t & table_desc) {
 		nldb_meta_table_value_t meta_table_value;
 		meta_table_value.table_plugin_id = table_plugin_id;
 		meta_table_value.plugin_table_desc = table_desc;
@@ -354,7 +356,7 @@ public :
 	}
 
 	// get a record(table description) from the meta table
-	inline nldb_rc_t meta_get(const nldb_table_id_t & table_id, nldb_plugin_id_t * table_plugin_id, nldb_plugin_table_desc_t * table_desc) {
+	inline nldb_rc_t meta_get(const nldb_table_id_t table_id, nldb_plugin_id_t * table_plugin_id, nldb_plugin_table_desc_t * table_desc) {
 		nldb_key_t   key     = {(void*)&table_id, sizeof(table_id)};
 		nldb_value_t value;
 
@@ -369,14 +371,14 @@ public :
 		return meta_table_plugin_.value_free( value );
 	}
 	// delete a record(table description) from the meta table
-	inline nldb_rc_t meta_del(const nldb_table_id_t & table_id) {
+	inline nldb_rc_t meta_del(const nldb_table_id_t table_id) {
 		nldb_key_t   key     = {(void*)&table_id, sizeof(table_id)};
 
 		return meta_table_plugin_.table_del( meta_table_context_, key);
 	}
 
 	// Add a slave for this DB. All comitted data will be replicated to the slave.
-	inline void add_replicator(const nldb_db_id_t & dbid, const std::string & master_ip, const unsigned short master_port)
+	inline void add_replicator(const nldb_db_id_t dbid, const std::string & master_ip, const unsigned short master_port)
 	{
 		tx_logs_.addReplicator(dbid, master_ip, master_port);
 	}
@@ -457,14 +459,14 @@ public :
 		return NLDB_OK;
 	}
 
-	inline nldb_rc_t append_log_put(const nldb_table_id_t & table_id, const nldb_key_t & key, const nldb_value_t & value) {
+	inline nldb_rc_t append_log_put(const nldb_table_id_t table_id, const nldb_key_t & key, const nldb_value_t & value) {
 
 		txEvent_->getLogBuffer().appendLog(table_id, TxTransactionLogRedoer::LT_PUT, key.data, key.length, value.data, value.length);
 
 		return NLDB_OK;
 	}
 
-	inline nldb_rc_t append_log_del(const nldb_table_id_t & table_id, const nldb_key_t & key) {
+	inline nldb_rc_t append_log_del(const nldb_table_id_t table_id, const nldb_key_t & key) {
 
 		txEvent_->getLogBuffer().appendLog(table_id, TxTransactionLogRedoer::LT_DEL, key.data, key.length, NULL /* value */, 0 /* value length */);
 
@@ -516,7 +518,7 @@ private :
 class nldb_table_impl_t
 {
 public :
-	nldb_rc_t init(nldb_db_impl_t * db, const nldb_table_id_t & table_id)
+	nldb_rc_t init(nldb_db_impl_t * db, const nldb_table_id_t table_id)
 	{
 		nldb_rc_t rc;
 	
@@ -590,12 +592,12 @@ public :
 	}
 
 	// table accessors 
-	inline const nldb_table_id_t & id() const
+	inline const nldb_table_id_t id() const
 	{
 		return table_id_;
 	}
 
-	inline const nldb_plugin_id_t & plugin_id() const  {
+	inline const nldb_plugin_id_t plugin_id() const  {
 		return table_plugin_id_;
 	}
 
@@ -794,7 +796,7 @@ nldb_rc_t nldb_cursor_fetch(const nldb_cursor_t & cursor, nldb_key_t * key, nldb
 /*****************/
 /* db management */
 /*****************/
-nldb_rc_t nldb_db_create( const nldb_db_id_t & db_id )
+nldb_rc_t nldb_db_create( const nldb_db_id_t db_id )
 {
 	tx_assert( db_id < NLDB_MAX_DB_COUNT );
 	
@@ -803,7 +805,7 @@ nldb_rc_t nldb_db_create( const nldb_db_id_t & db_id )
 	return rc; 
 }
 
-nldb_rc_t nldb_db_drop( const nldb_db_id_t & db_id )
+nldb_rc_t nldb_db_drop( const nldb_db_id_t db_id )
 {
 	tx_assert( db_id < NLDB_MAX_DB_COUNT );
 
@@ -812,7 +814,7 @@ nldb_rc_t nldb_db_drop( const nldb_db_id_t & db_id )
 	return rc;
 }
 
-nldb_rc_t nldb_db_open( const nldb_db_id_t & db_id, nldb_replication_master_op_t * master_op, nldb_replication_slave_op_t * slave_op, nldb_db_t * db)
+nldb_rc_t nldb_db_open( const nldb_db_id_t db_id, nldb_replication_master_op_t * master_op, nldb_replication_slave_op_t * slave_op, nldb_db_t * db)
 {
 	nldb_db_holder_t * new_db = new nldb_db_holder_t;
 
@@ -934,7 +936,7 @@ nldb_rc_t nldb_tx_destroy(nldb_tx_t & tx)
 /********************/
 /* table management */
 /********************/
-nldb_rc_t nldb_table_create(nldb_db_t & db, const nldb_table_id_t & table_id, const nldb_plugin_id_t & table_plugin_id)
+nldb_rc_t nldb_table_create(nldb_db_t & db, const nldb_table_id_t table_id, const nldb_plugin_id_t table_plugin_id)
 {
 	nldb_rc_t rc;
 
@@ -953,14 +955,14 @@ nldb_rc_t nldb_table_create(nldb_db_t & db, const nldb_table_id_t & table_id, co
 	return NLDB_OK;
 }
 
-nldb_rc_t nldb_table_drop(nldb_db_t & db, const nldb_table_id_t & table_id)
+nldb_rc_t nldb_table_drop(nldb_db_t & db, const nldb_table_id_t table_id)
 {
 	nldb_db_impl_t * dbi = (nldb_db_impl_t*) db;
 
 	return dbi->meta_del(table_id);
 }
 
-nldb_rc_t nldb_table_open(nldb_db_t & db, const nldb_table_id_t & table_id, nldb_table_t * table)
+nldb_rc_t nldb_table_open(nldb_db_t & db, const nldb_table_id_t table_id, nldb_table_t * table)
 {
 	nldb_db_impl_t * dbi = (nldb_db_impl_t*) db;
 
@@ -1063,14 +1065,14 @@ nldb_rc_t nldb_table_stat(nldb_tx_t & tx, nldb_table_t & table, nldb_table_stat_
 }
 
 // table accessors 
-const nldb_table_id_t & nldb_table_id(const nldb_table_t & table)
+const nldb_table_id_t nldb_table_id(const nldb_table_t & table)
 {
 	nldb_table_impl_t * tablei = (nldb_table_impl_t*) table;
 
 	return tablei->id();
 }
 
-const nldb_plugin_id_t & nldb_table_plugin_id(const nldb_table_t & table)
+const nldb_plugin_id_t nldb_table_plugin_id(const nldb_table_t & table)
 {
 	nldb_table_impl_t * tablei = (nldb_table_impl_t*) table;
 

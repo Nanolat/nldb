@@ -80,9 +80,9 @@ extern nldb_rc_t nldb_destroy();
 /* db management */
 /*****************/
 
-extern nldb_rc_t nldb_db_create( const nldb_db_id_t & db_id );
+extern nldb_rc_t nldb_db_create( const nldb_db_id_t db_id );
 
-extern nldb_rc_t nldb_db_drop( const nldb_db_id_t & db_id );
+extern nldb_rc_t nldb_db_drop( const nldb_db_id_t db_id );
 
 // The options for initializing the instance as replication master. 
 // It has a list of replication slave descriptors.
@@ -108,7 +108,7 @@ typedef enum nldb_trigger_type_t
 	TT_DEL
 } nldb_trigger_type_t ;
 
-typedef nldb_rc_t (*nldb_replication_trigger_hanlder_t)(const nldb_trigger_type_t trigger_type, const nldb_table_id_t & table_id, const nldb_key_t & key, const nldb_value_t & value);
+typedef nldb_rc_t (*nldb_replication_trigger_hanlder_t)(const nldb_trigger_type_t trigger_type, const nldb_table_id_t table_id, const nldb_key_t & key, const nldb_value_t & value);
 
 // The option for initializing the instance as replication slave.
 // It has the port number to open to receive transaction log from replication.
@@ -120,7 +120,7 @@ typedef struct nldb_replication_slave_op_t {
 // Initialize the lldb instance. an lldb instance has ownership of data replication from all tables in all dbs.
 // @master_op : if not NULL, turn on the replication master feature. (sends transaction logs to slaves)
 // @slave_op : if not NULL, turn on replication slave feature (sends transaction logs to slaves)
-extern nldb_rc_t nldb_db_open( const nldb_db_id_t & db_id, nldb_replication_master_op_t * master_op, nldb_replication_slave_op_t * slave_op, nldb_db_t * db);
+extern nldb_rc_t nldb_db_open( const nldb_db_id_t db_id, nldb_replication_master_op_t * master_op, nldb_replication_slave_op_t * slave_op, nldb_db_t * db);
 
 // Wait for all replication publishers publish all commited transactional replication messages by the time this function was called.
 extern nldb_rc_t nldb_db_wait_for_replication_publishers(nldb_db_t & db);
@@ -155,11 +155,11 @@ extern nldb_rc_t nldb_tx_destroy(nldb_tx_t & tx);
 /* table management */
 /********************/
 
-extern nldb_rc_t nldb_table_create(nldb_db_t & db, const nldb_table_id_t & table_id, const nldb_plugin_id_t & table_plugin_id);
+extern nldb_rc_t nldb_table_create(nldb_db_t & db, const nldb_table_id_t table_id, const nldb_plugin_id_t table_plugin_id);
 
-extern nldb_rc_t nldb_table_drop(nldb_db_t & db, const nldb_table_id_t & table_id);
+extern nldb_rc_t nldb_table_drop(nldb_db_t & db, const nldb_table_id_t table_id);
 
-extern nldb_rc_t nldb_table_open(nldb_db_t & db, const nldb_table_id_t & table_id, nldb_table_t * table);
+extern nldb_rc_t nldb_table_open(nldb_db_t & db, const nldb_table_id_t table_id, nldb_table_t * table);
 
 extern nldb_rc_t nldb_table_close(nldb_table_t & table);
 
@@ -179,8 +179,8 @@ extern nldb_rc_t nldb_table_stat(nldb_tx_t & tx, nldb_table_t & table, nldb_tabl
 
 
 // table accessors 
-extern const nldb_table_id_t & nldb_table_id(const nldb_table_t & table);
-extern const nldb_plugin_id_t & nldb_table_plugin_id(const nldb_table_t & table);
+extern const nldb_table_id_t nldb_table_id(const nldb_table_t & table);
+extern const nldb_plugin_id_t nldb_table_plugin_id(const nldb_table_t & table);
 
 /*********************/
 /* cursor management */

@@ -104,7 +104,7 @@ class TxTransactionEventFactory : public disruptor::EventFactoryInterface<TxTran
 class TxTransactionLogPublisher : public disruptor::EventHandlerInterface<TxTransactionEvent> {
  public:
     TxTransactionLogPublisher(
-    	const nldb_db_id_t & dbid,
+    	const nldb_db_id_t dbid,
     	const std::string & master_ip,
     	const unsigned short master_port)
 		: master_ip_(master_ip), master_port_(master_port)  {
@@ -212,7 +212,7 @@ class TxTransactionLogPublisher : public disruptor::EventHandlerInterface<TxTran
 
 		if ((sequence & 0xFFFFF) == 0 )
 		{
-			printf("Log publisher (sequence = %ld): published replication messages to slaves.\n", sequence);
+			printf("Log publisher (sequence = %lld): published replication messages to slaves.\n", sequence);
 		}
 
 		event->getLogBuffer().destroyReplicationMessage(&replicationMessage);

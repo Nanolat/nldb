@@ -47,7 +47,7 @@ class nldb_plugin_leveldb_t : public nldb_plugin_t
 public:
 	virtual ~nldb_plugin_leveldb_t() {};
 
-	virtual nldb_rc_t table_create(const nldb_table_id_t & db_id, const nldb_table_id_t & table_id, nldb_plugin_table_desc_t * table_desc);
+	virtual nldb_rc_t table_create(const nldb_table_id_t db_id, const nldb_table_id_t table_id, nldb_plugin_table_desc_t * table_desc);
 
 	virtual nldb_rc_t table_drop(nldb_plugin_table_desc_t & table_desc);
 
@@ -88,6 +88,6 @@ public:
 };
 
 // The descriptor for the meta table that holds the list of tables 
-extern nldb_plugin_table_desc_t nldb_meta_table_desc(const nldb_db_id_t & db_id);
+extern nldb_plugin_table_desc_t nldb_meta_table_desc(const nldb_db_id_t db_id);
 
 #endif // _NLDB_PLUGIN_LEVELDB_H_

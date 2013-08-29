@@ -191,7 +191,7 @@ void replication_slave_thread_func(nldb_db_t db, const std::string & master_ip, 
 void nldb_start_replication_slave_thread(nldb_db_t db, const std::string & master_ip, const unsigned short master_port, const nldb_replication_trigger_hanlder_t & trigger_handler)
 {
 	// BUGBUG : need to delete the thread object
-    std::thread * serviceThread = new std::thread(replication_slave_thread_func, db, master_ip, master_port, trigger_handler);
+    new std::thread(replication_slave_thread_func, db, master_ip, master_port, trigger_handler);
 
 	// BUGBUG : while shutdown of the process, we need to join the slave replicator thread.
 }
