@@ -4,12 +4,14 @@ Nanolat Database
 What is it?
 -----------
 - An in-memory key/value store supporting put/get/del, and cursors for range search.
+- Supports searching keys by rank. (Ex> Get 100 keys from the 1000th key)
 - Supports transaction and master-slave replication.
 - Adds transactional log replication feature on top of LevelDB and TokyoCabinet.
 - Supports Table Plugins to implement your own data structure for efficient data processing for your specific domain.
 
 Target systems
 --------------
+- Leaderboard servers sorting users by scores, getting the rank of a user. 
 - Financial systems such as HFT(High Frequency Trading), FEP(Front End Processor), etc.
 - Monitoring systems that require processing huge amount of data in a second.
 
