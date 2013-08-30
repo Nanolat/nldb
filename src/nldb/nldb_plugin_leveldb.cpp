@@ -308,8 +308,10 @@ nldb_rc_t nldb_plugin_leveldb_t::cursor_open(nldb_table_context_t table_ctx, nld
 nldb_rc_t nldb_plugin_leveldb_t::cursor_seek(nldb_cursor_context_t cursor_ctx, const nldb_cursor_direction_t & direction, const nldb_key_t & key)
 {
 	leveldb_cursor_context_t* leveldb_cursor = (leveldb_cursor_context_t*) cursor_ctx;
+	leveldb_cursor->dir_ = direction;
 
 	leveldb::Iterator* it = leveldb_cursor->iter_;
+
 
 	it->Seek( get_slice(key) );
 

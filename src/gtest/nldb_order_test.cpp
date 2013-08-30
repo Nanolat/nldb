@@ -81,9 +81,9 @@ TEST_F(NLDBOrderTest, no_keys) {
 	EXPECT_EQ( stat.key_count, 0 );
 
 	// Get by order should return error.
-	EXPECT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) -1, &key, &value), NLDB_ERROR_ORDER_OUT_OF_RANGE );
-	EXPECT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 0, &key, &value), NLDB_ERROR_ORDER_OUT_OF_RANGE );
-	EXPECT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 1, &key, &value), NLDB_ERROR_ORDER_OUT_OF_RANGE );
+	EXPECT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) -1, &key, &value), NLDB_ERROR_KEY_NOT_FOUND );
+	EXPECT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 0, &key, &value), NLDB_ERROR_KEY_NOT_FOUND );
+	EXPECT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 1, &key, &value), NLDB_ERROR_KEY_NOT_FOUND );
 
 	// No key should exist at all
 	EXPECT_EQ( nldb_table_get( tx, vol_table, KEY(o_r1), & value, &order), NLDB_ERROR_KEY_NOT_FOUND );
@@ -122,8 +122,8 @@ TEST_F(NLDBOrderTest, max_5_keys) {
 	EXPECT_TRUE( IS_VALUE_EQUAL( o_r1, value));
 
 	// Get by order - Out of range
-	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 0, &key, &value), NLDB_ERROR_ORDER_OUT_OF_RANGE );
-	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 2, &key, &value), NLDB_ERROR_ORDER_OUT_OF_RANGE );
+	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 0, &key, &value), NLDB_ERROR_KEY_NOT_FOUND );
+	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 2, &key, &value), NLDB_ERROR_KEY_NOT_FOUND );
 
 	// Check key count
 	ASSERT_EQ( nldb_table_stat(tx, vol_table, &stat), 0 );
@@ -152,8 +152,8 @@ TEST_F(NLDBOrderTest, max_5_keys) {
 
 
 	// Get by order - Out of range
-	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 0, &key, &value), NLDB_ERROR_ORDER_OUT_OF_RANGE );
-	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 3, &key, &value), NLDB_ERROR_ORDER_OUT_OF_RANGE );
+	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 0, &key, &value), NLDB_ERROR_KEY_NOT_FOUND );
+	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 3, &key, &value), NLDB_ERROR_KEY_NOT_FOUND );
 
 	// Check key count
 	ASSERT_EQ( nldb_table_stat(tx, vol_table, &stat), 0 );
@@ -175,8 +175,8 @@ TEST_F(NLDBOrderTest, max_5_keys) {
 	EXPECT_TRUE( IS_VALUE_EQUAL( o_r2, value));
 
 	// Get by order - Out of range
-	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 0, &key, &value), NLDB_ERROR_ORDER_OUT_OF_RANGE );
-	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 2, &key, &value), NLDB_ERROR_ORDER_OUT_OF_RANGE );
+	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 0, &key, &value), NLDB_ERROR_KEY_NOT_FOUND );
+	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 2, &key, &value), NLDB_ERROR_KEY_NOT_FOUND );
 
 	// Check key count
 	ASSERT_EQ( nldb_table_stat(tx, vol_table, &stat), 0 );
@@ -194,11 +194,11 @@ TEST_F(NLDBOrderTest, max_5_keys) {
 	EXPECT_EQ( order, 1);
 
 	ASSERT_EQ( nldb_table_get( tx, vol_table, KEY(o_r3), & value, &order), 0 );
-	EXPECT_TRUE( IS_VALUE_EQUAL( o_r2, value ) );
+	EXPECT_TRUE( IS_VALUE_EQUAL( o_r3, value ) );
 	EXPECT_EQ( order, 2);
 
 	ASSERT_EQ( nldb_table_get( tx, vol_table, KEY(o_r4), & value, &order), 0 );
-	EXPECT_TRUE( IS_VALUE_EQUAL( o_r3, value ) );
+	EXPECT_TRUE( IS_VALUE_EQUAL( o_r4, value ) );
 	EXPECT_EQ( order, 3);
 
 	// Get by order
@@ -216,8 +216,8 @@ TEST_F(NLDBOrderTest, max_5_keys) {
 
 
 	// Get by order - Out of range
-	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 0, &key, &value), NLDB_ERROR_ORDER_OUT_OF_RANGE );
-	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 4, &key, &value), NLDB_ERROR_ORDER_OUT_OF_RANGE );
+	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 0, &key, &value), NLDB_ERROR_KEY_NOT_FOUND );
+	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 4, &key, &value), NLDB_ERROR_KEY_NOT_FOUND );
 
 	// Check key count
 	ASSERT_EQ( nldb_table_stat(tx, vol_table, &stat), 0 );
@@ -236,11 +236,11 @@ TEST_F(NLDBOrderTest, max_5_keys) {
 	EXPECT_EQ( order, 2);
 
 	ASSERT_EQ( nldb_table_get( tx, vol_table, KEY(o_r3), & value, &order), 0 );
-	EXPECT_TRUE( IS_VALUE_EQUAL( o_r2, value ) );
+	EXPECT_TRUE( IS_VALUE_EQUAL( o_r3, value ) );
 	EXPECT_EQ( order, 3);
 
 	ASSERT_EQ( nldb_table_get( tx, vol_table, KEY(o_r4), & value, &order), 0 );
-	EXPECT_TRUE( IS_VALUE_EQUAL( o_r3, value ) );
+	EXPECT_TRUE( IS_VALUE_EQUAL( o_r4, value ) );
 	EXPECT_EQ( order, 4);
 
 	// Get by order
@@ -262,8 +262,8 @@ TEST_F(NLDBOrderTest, max_5_keys) {
 
 
 	// Get by order - Out of range
-	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 0, &key, &value), NLDB_ERROR_ORDER_OUT_OF_RANGE );
-	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 5, &key, &value), NLDB_ERROR_ORDER_OUT_OF_RANGE );
+	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 0, &key, &value), NLDB_ERROR_KEY_NOT_FOUND );
+	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 5, &key, &value), NLDB_ERROR_KEY_NOT_FOUND );
 
 	// Check key count
 	ASSERT_EQ( nldb_table_stat(tx, vol_table, &stat), 0 );
@@ -329,8 +329,8 @@ TEST_F(NLDBOrderTest, max_5_keys) {
 	EXPECT_TRUE( IS_VALUE_EQUAL( o_r8, value));
 
 	// Get by order - Out of range
-	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 0, &key, &value), NLDB_ERROR_ORDER_OUT_OF_RANGE );
-	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 6, &key, &value), NLDB_ERROR_ORDER_OUT_OF_RANGE );
+	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 0, &key, &value), NLDB_ERROR_KEY_NOT_FOUND );
+	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 6, &key, &value), NLDB_ERROR_KEY_NOT_FOUND );
 
 	// Check key count
 	ASSERT_EQ( nldb_table_stat(tx, vol_table, &stat), 0 );
@@ -345,8 +345,8 @@ TEST_F(NLDBOrderTest, max_5_keys) {
 	ASSERT_EQ( nldb_table_del( tx, vol_table, KEY(o_r8)), 0 );
 
 	// Get by order should return error.
-	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 0, &key, &value), NLDB_ERROR_ORDER_OUT_OF_RANGE );
-	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 1, &key, &value), NLDB_ERROR_ORDER_OUT_OF_RANGE );
+	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 0, &key, &value), NLDB_ERROR_KEY_NOT_FOUND );
+	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 1, &key, &value), NLDB_ERROR_KEY_NOT_FOUND );
 
 	// Check key count
 	ASSERT_EQ( nldb_table_stat(tx, vol_table, &stat), 0 );
@@ -489,8 +489,8 @@ TEST_F(NLDBOrderTest, max_12_keys) {
 
 
 	// Get by order should return error.
-	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 0, &key, &value), NLDB_ERROR_ORDER_OUT_OF_RANGE );
-	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 13, &key, &value), NLDB_ERROR_ORDER_OUT_OF_RANGE );
+	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 0, &key, &value), NLDB_ERROR_KEY_NOT_FOUND );
+	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 13, &key, &value), NLDB_ERROR_KEY_NOT_FOUND );
 
 	// Check key count
 	ASSERT_EQ( nldb_table_stat(tx, vol_table, &stat), 0 );
@@ -579,8 +579,8 @@ TEST_F(NLDBOrderTest, max_12_keys) {
 	EXPECT_TRUE( IS_VALUE_EQUAL( o_r11, value));
 
 	// Get by order should return error.
-	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 0, &key, &value), NLDB_ERROR_ORDER_OUT_OF_RANGE );
-	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 7, &key, &value), NLDB_ERROR_ORDER_OUT_OF_RANGE );
+	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 0, &key, &value), NLDB_ERROR_KEY_NOT_FOUND );
+	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 7, &key, &value), NLDB_ERROR_KEY_NOT_FOUND );
 
 	// Check key count
 	ASSERT_EQ( nldb_table_stat(tx, vol_table, &stat), 0 );
@@ -633,8 +633,8 @@ TEST_F(NLDBOrderTest, max_12_keys) {
 	EXPECT_TRUE( IS_VALUE_EQUAL( o_r11, value));
 
 	// Get by order should return error.
-	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 0, &key, &value), NLDB_ERROR_ORDER_OUT_OF_RANGE );
-	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 4, &key, &value), NLDB_ERROR_ORDER_OUT_OF_RANGE );
+	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 0, &key, &value), NLDB_ERROR_KEY_NOT_FOUND );
+	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 4, &key, &value), NLDB_ERROR_KEY_NOT_FOUND );
 
 	// Check key count
 	ASSERT_EQ( nldb_table_stat(tx, vol_table, &stat), 0 );
@@ -656,8 +656,8 @@ TEST_F(NLDBOrderTest, max_12_keys) {
 	EXPECT_TRUE( IS_VALUE_EQUAL( o_r9, value));
 
 	// Get by order should return error.
-	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 0, &key, &value), NLDB_ERROR_ORDER_OUT_OF_RANGE );
-	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 2, &key, &value), NLDB_ERROR_ORDER_OUT_OF_RANGE );
+	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 0, &key, &value), NLDB_ERROR_KEY_NOT_FOUND );
+	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 2, &key, &value), NLDB_ERROR_KEY_NOT_FOUND );
 
 	// Check key count
 	ASSERT_EQ( nldb_table_stat(tx, vol_table, &stat), 0 );
@@ -668,8 +668,8 @@ TEST_F(NLDBOrderTest, max_12_keys) {
 	ASSERT_EQ( nldb_table_del( tx, vol_table, KEY(o_r9)), 0 );
 
 	// Get by order should return error.
-	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 0, &key, &value), NLDB_ERROR_ORDER_OUT_OF_RANGE );
-	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 1, &key, &value), NLDB_ERROR_ORDER_OUT_OF_RANGE );
+	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 0, &key, &value), NLDB_ERROR_KEY_NOT_FOUND );
+	ASSERT_EQ( nldb_table_get( tx, vol_table, (nldb_order_t) 1, &key, &value), NLDB_ERROR_KEY_NOT_FOUND );
 
 	// Check key count
 	ASSERT_EQ( nldb_table_stat(tx, vol_table, &stat), 0 );

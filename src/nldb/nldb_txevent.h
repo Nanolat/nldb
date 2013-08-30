@@ -212,7 +212,8 @@ class TxTransactionLogPublisher : public disruptor::EventHandlerInterface<TxTran
 
 		if ((sequence & 0xFFFFF) == 0 )
 		{
-			printf("Log publisher (sequence = %lld): published replication messages to slaves.\n", sequence);
+			printf("Log publisher (sequence = %lld): published replication messages to slaves.\n",
+					(unsigned long long int)sequence);
 		}
 
 		event->getLogBuffer().destroyReplicationMessage(&replicationMessage);

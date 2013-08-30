@@ -65,7 +65,12 @@ protected :
 		nldb_rc_t rc = node->keys_with_values().iter_forward(&iter);
 		if (rc) return rc;
 
-		printf("%*s[ LEAF-NODE (%llX) (keys:%lld) (parent:%llX)(p:%llX)(n:%llX) ]\n", indent, " ", (uint64_t)node, (uint64_t)node->key_count(), (uint64_t)node->parent(), (uint64_t)node->prev_, (uint64_t)node->next_);
+		printf("%*s[ LEAF-NODE (%llX) (keys:%lld) (parent:%llX)(p:%llX)(n:%llX) ]\n", indent, " ",
+				(long long unsigned int)node,
+				(long long unsigned int)node->key_count(),
+				(long long unsigned int)node->parent(),
+				(long long unsigned int)node->prev_,
+				(long long unsigned int)node->next_);
 		while(1)
 		{
 			key_t * key = NULL;
@@ -117,7 +122,10 @@ protected :
 		nldb_rc_t rc = node->keys_with_right_children().iter_forward(&iter);
 		if (rc) return rc;
 
-		printf("%*s[ INTERNAL-NODE (%llX) (keys:%lld) (parent:%llX) ]\n", indent, " ", (uint64_t)node, (uint64_t)node->key_count(), (uint64_t)node->parent());
+		printf("%*s[ INTERNAL-NODE (%llX) (keys:%lld) (parent:%llX) ]\n", indent, " ",
+				(long long unsigned int)node,
+				(long long unsigned int)node->key_count(),
+				(long long unsigned int)node->parent());
 
 		printf("%*sLEFT CHILD:\n", indent, " " );
 
@@ -228,7 +236,7 @@ public :
 		}
 	}
 
-#define PRINT_DEBUG_TRACE (1)
+//#define PRINT_DEBUG_TRACE (1)
 
 	nldb_rc_t put (const void * key, const void * value)
 	{

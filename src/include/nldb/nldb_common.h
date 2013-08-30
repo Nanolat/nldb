@@ -64,9 +64,8 @@
 #define NLDB_ERROR_UNSUPPORTED_FEATURE  (-19)
 #define NLDB_ERROR_VARIABLE_KEY_SIZE_NOT_SUPPORTED  (-20)
 #define NLDB_ERROR_VARIABLE_VALUE_SIZE_NOT_SUPPORTED  (-21)
-#define NLDB_ERROR_ORDER_OUT_OF_RANGE (-22)
 /* Unused, but required to know the maximum number for the error code */
-#define NLDB_ERROR_CODE_END            (-22)
+#define NLDB_ERROR_CODE_END            (-21)
 
 typedef int nldb_int32_t;
 typedef unsigned int nldb_uint32_t;
