@@ -65,7 +65,7 @@ protected :
 		nldb_rc_t rc = node->keys_with_values().iter_forward(&iter);
 		if (rc) return rc;
 
-		printf("%*s[ LEAF-NODE (%llX) (parent:%llX)(p:%llX)(n:%llX) ]\n", indent, " ", (uint64_t)node, (uint64_t)node->parent(), (uint64_t)node->prev_, (uint64_t)node->next_);
+		printf("%*s[ LEAF-NODE (%llX) (keys:%lld) (parent:%llX)(p:%llX)(n:%llX) ]\n", indent, " ", (uint64_t)node, (uint64_t)node->key_count(), (uint64_t)node->parent(), (uint64_t)node->prev_, (uint64_t)node->next_);
 		while(1)
 		{
 			key_t * key = NULL;
@@ -117,7 +117,7 @@ protected :
 		nldb_rc_t rc = node->keys_with_right_children().iter_forward(&iter);
 		if (rc) return rc;
 
-		printf("%*s[ INTERNAL-NODE (%llX) (parent:%llX) ]\n", indent, " ", (uint64_t)node, (uint64_t)node->parent());
+		printf("%*s[ INTERNAL-NODE (%llX) (keys:%lld) (parent:%llX) ]\n", indent, " ", (uint64_t)node, (uint64_t)node->key_count(), (uint64_t)node->parent());
 
 		printf("%*sLEFT CHILD:\n", indent, " " );
 
@@ -228,6 +228,7 @@ public :
 		}
 	}
 
+#define PRINT_DEBUG_TRACE (1)
 
 	nldb_rc_t put (const void * key, const void * value)
 	{
@@ -235,15 +236,18 @@ public :
 		tx_debug_assert( key != NULL );
 		tx_debug_assert( value != NULL );
 
-		//int i = get_print_iteration();
+#if defined(PRINT_DEBUG_TRACE)
+		int i = get_print_iteration();
+#endif
 
 		nldb_rc_t rc = nldb_array_tree<key_space_size>::put(key, value);
 		if (rc) return rc;
-/*
+
+#if defined(PRINT_DEBUG_TRACE)
 		printf("<<after put : %llu>>\n", get_uint64_key(key, this->key_length_));
 		print_tree(i);
 		check_consistency(i);
-*/
+#endif
 		return NLDB_OK;
 	}
 
@@ -252,13 +256,14 @@ public :
 		tx_debug_assert( this->is_initialized() );
 		tx_debug_assert( key != NULL );
 		tx_debug_assert( deleted_value != NULL );
-/*
+
+#if defined(PRINT_DEBUG_TRACE)
 		int i = get_print_iteration();
 
 		printf("<<before del : %llu>>\n", get_uint64_key(key, this->key_length_));
 		print_tree(i);
 		check_consistency(i);
-*/
+#endif
 		nldb_rc_t rc = nldb_array_tree<key_space_size>::del(key, deleted_value);
 		if (rc) return rc;
 

@@ -316,21 +316,15 @@ nldb_rc_t nldb_plugin_array_tree_t::table_get(nldb_table_context_t table_ctx, co
 
 	void * key_ptr = NULL;
 	void * value_ptr = NULL;
+
 	rc = ctx->tree().get(order, &key_ptr, &value_ptr);
 	if (rc) return rc;
 
-	if (value_ptr )
-	{
-		value->length = ctx->value_length();
-		value->data = value_ptr;
+	value->length = ctx->value_length();
+	value->data = value_ptr;
 
-		key->length = ctx->key_length();
-		key->data = key_ptr;
-	}
-	else
-	{
-		return NLDB_ERROR_KEY_NOT_FOUND;
-	}
+	key->length = ctx->key_length();
+	key->data = key_ptr;
 
 	return NLDB_OK;
 }

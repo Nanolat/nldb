@@ -178,7 +178,7 @@ TEST_F(TreeInternalNodeTest, left_child) {
 
 }
 
-// Test put/del/find_serving_node where an internal node's child is an internal node.
+// Test put/del/find_serving_node_by_key where an internal node's child is an internal node.
 TEST_F(TreeInternalNodeTest, put_del_find_serving_internal_node) {
 
 	tree_internal_node_t internal(TREE_KEY_LEN);
@@ -192,55 +192,55 @@ TEST_F(TreeInternalNodeTest, put_del_find_serving_internal_node) {
 	tree_node_t * node = NULL;
 	// Finding a serving node without any key in the internal node - should return the left child node.
 	{
-		ASSERT_TRUE( internal.find_serving_node(KEY_01, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_01, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( node == & left_child);
 	}
 
 	// put : put a new key
 	ASSERT_TRUE( internal.put(KEY_02, NODE_02) == NLDB_OK );
 
-	// test find_serving_node
+	// test find_serving_node_by_key
 	{
 		// KEY_01 is less than KEY_02. So KEY_01 should be served by the left child.
-		ASSERT_TRUE( internal.find_serving_node(KEY_01, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_01, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( node == & left_child);
 
 		// KEY_02 should be served by the NODE_02.
-		ASSERT_TRUE( internal.find_serving_node(KEY_02, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_02, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( NODE_MATCHES(node, NODE_02) );
 
 		// KEY_03 is greater than KEY_02, so it should be served by the NODE_02.
-		ASSERT_TRUE( internal.find_serving_node(KEY_03, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_03, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( NODE_MATCHES(node, NODE_02) );
 
 		// KEY_04 is greater than KEY_02, so it should be served by the NODE_02.
-		ASSERT_TRUE( internal.find_serving_node(KEY_04, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_04, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( NODE_MATCHES(node, NODE_02) );
 	}
 
 	// put : put a new key
 	ASSERT_TRUE( internal.put(KEY_04, NODE_04) == NLDB_OK );
 
-	// test find_serving_node
+	// test find_serving_node_by_key
 	{
 		// KEY_01 is less than KEY_02. So KEY_01 should be served by the left child.
-		ASSERT_TRUE( internal.find_serving_node(KEY_01, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_01, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( node == & left_child);
 
 		// KEY_02 should be served by the NODE_02.
-		ASSERT_TRUE( internal.find_serving_node(KEY_02, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_02, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( NODE_MATCHES(node, NODE_02) );
 
 		// KEY_03 is greater than KEY_02, so it should be served by the NODE_02.
-		ASSERT_TRUE( internal.find_serving_node(KEY_03, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_03, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( NODE_MATCHES(node, NODE_02) );
 
 		// KEY_04 should be served by the NODE_04.
-		ASSERT_TRUE( internal.find_serving_node(KEY_04, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_04, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( NODE_MATCHES(node, NODE_04) );
 
 		// KEY_05 should be served by the NODE_04.
-		ASSERT_TRUE( internal.find_serving_node(KEY_05, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_05, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( NODE_MATCHES(node, NODE_04) );
 	}
 
@@ -249,26 +249,26 @@ TEST_F(TreeInternalNodeTest, put_del_find_serving_internal_node) {
 	// put : replace an existing key
 	ASSERT_TRUE( internal.put(KEY_02, NEW_NODE_02) == NLDB_OK );
 
-	// test find_serving_node
+	// test find_serving_node_by_key
 	{
 		// KEY_01 is less than KEY_02. So KEY_01 should be served by the left child.
-		ASSERT_TRUE( internal.find_serving_node(KEY_01, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_01, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( node == & left_child);
 
 		// KEY_02 should be served by the NODE_02.
-		ASSERT_TRUE( internal.find_serving_node(KEY_02, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_02, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( NODE_MATCHES(node, NEW_NODE_02) );
 
 		// KEY_03 is greater than KEY_02, so it should be served by the NODE_02.
-		ASSERT_TRUE( internal.find_serving_node(KEY_03, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_03, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( NODE_MATCHES(node, NEW_NODE_02) );
 
 		// KEY_04 should be served by the NODE_04.
-		ASSERT_TRUE( internal.find_serving_node(KEY_04, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_04, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( NODE_MATCHES(node, NODE_04) );
 
 		// KEY_05 should be served by the NODE_04.
-		ASSERT_TRUE( internal.find_serving_node(KEY_05, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_05, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( NODE_MATCHES(node, NODE_04) );
 	}
 
@@ -281,52 +281,52 @@ TEST_F(TreeInternalNodeTest, put_del_find_serving_internal_node) {
 	EXPECT_TRUE( NODE_MATCHES(node, NEW_NODE_02) );
 
 
-	// test find_serving_node
+	// test find_serving_node_by_key
 	{
 		// KEY_01, KEY_02, KEY_03 is less than KEY_04. So KEY_01 should be served by the left child.
-		ASSERT_TRUE( internal.find_serving_node(KEY_01, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_01, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( node == & left_child);
 
-		ASSERT_TRUE( internal.find_serving_node(KEY_02, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_02, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( node == & left_child);
 
-		ASSERT_TRUE( internal.find_serving_node(KEY_03, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_03, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( node == & left_child);
 
 		// KEY_04 should be served by the NODE_04.
-		ASSERT_TRUE( internal.find_serving_node(KEY_04, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_04, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( NODE_MATCHES(node, NODE_04) );
 
 		// KEY_05 should be served by the NODE_04.
-		ASSERT_TRUE( internal.find_serving_node(KEY_05, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_05, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( NODE_MATCHES(node, NODE_04) );
 	}
 
 	ASSERT_TRUE( internal.del(KEY_04, &node) == NLDB_OK );
 	EXPECT_TRUE( NODE_MATCHES(node, NODE_04) );
 
-	// find_serving_node
+	// find_serving_node_by_key
 	{
 		// No key exists in the internal node. All keys should be served by the left_child.
-		ASSERT_TRUE( internal.find_serving_node(KEY_01, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_01, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( node == & left_child);
 
-		ASSERT_TRUE( internal.find_serving_node(KEY_02, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_02, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( node == & left_child);
 
-		ASSERT_TRUE( internal.find_serving_node(KEY_03, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_03, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( node == & left_child);
 
-		ASSERT_TRUE( internal.find_serving_node(KEY_04, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_04, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( node == & left_child);
 
-		ASSERT_TRUE( internal.find_serving_node(KEY_05, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_05, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( node == & left_child);
 	}
 
 }
 
-// Test put/del/find_serving_node where an internal node's child is a leaf node.
+// Test put/del/find_serving_node_by_key where an internal node's child is a leaf node.
 TEST_F(TreeInternalNodeTest, put_del_find_serving_leaf_node) {
 
 	tree_internal_node_t internal(TREE_KEY_LEN);
@@ -343,55 +343,55 @@ TEST_F(TreeInternalNodeTest, put_del_find_serving_leaf_node) {
 	tree_node_t * node = NULL;
 	// Finding a serving node without any key in the internal node - should return the left child node.
 	{
-		ASSERT_TRUE( internal.find_serving_node(KEY_01, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_01, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( node == & left_child);
 	}
 
 	// put : put a new key
 	ASSERT_TRUE( internal.put(KEY_02, LEAF_02) == NLDB_OK );
 
-	// test find_serving_node
+	// test find_serving_node_by_key
 	{
 		// KEY_01 is less than KEY_02. So KEY_01 should be served by the left child.
-		ASSERT_TRUE( internal.find_serving_node(KEY_01, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_01, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( node == & left_child);
 
 		// KEY_02 should be served by the LEAF_02.
-		ASSERT_TRUE( internal.find_serving_node(KEY_02, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_02, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( NODE_MATCHES(node, LEAF_02) );
 
 		// KEY_03 is greater than KEY_02, so it should be served by the LEAF_02.
-		ASSERT_TRUE( internal.find_serving_node(KEY_03, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_03, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( NODE_MATCHES(node, LEAF_02) );
 
 		// KEY_04 is greater than KEY_02, so it should be served by the LEAF_02.
-		ASSERT_TRUE( internal.find_serving_node(KEY_04, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_04, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( NODE_MATCHES(node, LEAF_02) );
 	}
 
 	// put : put a new key
 	ASSERT_TRUE( internal.put(KEY_04, LEAF_04) == NLDB_OK );
 
-	// test find_serving_node
+	// test find_serving_node_by_key
 	{
 		// KEY_01 is less than KEY_02. So KEY_01 should be served by the left child.
-		ASSERT_TRUE( internal.find_serving_node(KEY_01, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_01, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( node == & left_child);
 
 		// KEY_02 should be served by the LEAF_02.
-		ASSERT_TRUE( internal.find_serving_node(KEY_02, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_02, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( NODE_MATCHES(node, LEAF_02) );
 
 		// KEY_03 is greater than KEY_02, so it should be served by the LEAF_02.
-		ASSERT_TRUE( internal.find_serving_node(KEY_03, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_03, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( NODE_MATCHES(node, LEAF_02) );
 
 		// KEY_04 should be served by the LEAF_04.
-		ASSERT_TRUE( internal.find_serving_node(KEY_04, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_04, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( NODE_MATCHES(node, LEAF_04) );
 
 		// KEY_05 should be served by the LEAF_04.
-		ASSERT_TRUE( internal.find_serving_node(KEY_05, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_05, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( NODE_MATCHES(node, LEAF_04) );
 	}
 
@@ -400,26 +400,26 @@ TEST_F(TreeInternalNodeTest, put_del_find_serving_leaf_node) {
 	// put : replace an existing key
 	ASSERT_TRUE( internal.put(KEY_02, NEW_LEAF_02) == NLDB_OK );
 
-	// test find_serving_node
+	// test find_serving_node_by_key
 	{
 		// KEY_01 is less than KEY_02. So KEY_01 should be served by the left child.
-		ASSERT_TRUE( internal.find_serving_node(KEY_01, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_01, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( node == & left_child);
 
 		// KEY_02 should be served by the LEAF_02.
-		ASSERT_TRUE( internal.find_serving_node(KEY_02, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_02, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( NODE_MATCHES(node, NEW_LEAF_02) );
 
 		// KEY_03 is greater than KEY_02, so it should be served by the LEAF_02.
-		ASSERT_TRUE( internal.find_serving_node(KEY_03, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_03, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( NODE_MATCHES(node, NEW_LEAF_02) );
 
 		// KEY_04 should be served by the LEAF_04.
-		ASSERT_TRUE( internal.find_serving_node(KEY_04, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_04, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( NODE_MATCHES(node, LEAF_04) );
 
 		// KEY_05 should be served by the LEAF_04.
-		ASSERT_TRUE( internal.find_serving_node(KEY_05, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_05, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( NODE_MATCHES(node, LEAF_04) );
 	}
 
@@ -432,46 +432,46 @@ TEST_F(TreeInternalNodeTest, put_del_find_serving_leaf_node) {
 	EXPECT_TRUE( NODE_MATCHES(node, NEW_LEAF_02) );
 
 
-	// test find_serving_node
+	// test find_serving_node_by_key
 	{
 		// KEY_01, KEY_02, KEY_03 is less than KEY_04. So KEY_01 should be served by the left child.
-		ASSERT_TRUE( internal.find_serving_node(KEY_01, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_01, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( node == & left_child);
 
-		ASSERT_TRUE( internal.find_serving_node(KEY_02, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_02, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( node == & left_child);
 
-		ASSERT_TRUE( internal.find_serving_node(KEY_03, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_03, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( node == & left_child);
 
 		// KEY_04 should be served by the LEAF_04.
-		ASSERT_TRUE( internal.find_serving_node(KEY_04, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_04, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( NODE_MATCHES(node, LEAF_04) );
 
 		// KEY_05 should be served by the LEAF_04.
-		ASSERT_TRUE( internal.find_serving_node(KEY_05, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_05, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( NODE_MATCHES(node, LEAF_04) );
 	}
 
 	ASSERT_TRUE( internal.del(KEY_04, &node) == NLDB_OK );
 	EXPECT_TRUE( NODE_MATCHES(node, LEAF_04) );
 
-	// find_serving_node
+	// find_serving_node_by_key
 	{
 		// No key exists in the internal node. All keys should be served by the left_child.
-		ASSERT_TRUE( internal.find_serving_node(KEY_01, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_01, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( node == & left_child);
 
-		ASSERT_TRUE( internal.find_serving_node(KEY_02, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_02, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( node == & left_child);
 
-		ASSERT_TRUE( internal.find_serving_node(KEY_03, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_03, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( node == & left_child);
 
-		ASSERT_TRUE( internal.find_serving_node(KEY_04, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_04, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( node == & left_child);
 
-		ASSERT_TRUE( internal.find_serving_node(KEY_05, &node) == NLDB_OK );
+		ASSERT_TRUE( internal.find_serving_node_by_key(KEY_05, &node, NULL) == NLDB_OK );
 		EXPECT_TRUE( node == & left_child);
 	}
 

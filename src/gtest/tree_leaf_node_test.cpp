@@ -179,22 +179,22 @@ TEST_F(TreeLeafNodeTest, put_get_del) {
 	// get : the key does not exist
 	void * value = NULL;
 
-	ASSERT_TRUE( leaf.get(KEY_01, &value) == NLDB_OK );
+	ASSERT_TRUE( leaf.get(KEY_01, &value, NULL) == NLDB_OK );
 	EXPECT_TRUE( value == NULL );
 
 	// put : put a new key
 	ASSERT_TRUE( leaf.put(KEY_01, VALUE_01) == NLDB_OK );
-	ASSERT_TRUE( leaf.get(KEY_01, &value) == NLDB_OK );
+	ASSERT_TRUE( leaf.get(KEY_01, &value, NULL) == NLDB_OK );
 	EXPECT_TRUE( VALUE_01_MATCHES(value) );
 
 	// put : put a new key
 	ASSERT_TRUE( leaf.put(KEY_02, VALUE_02) == NLDB_OK );
-	ASSERT_TRUE( leaf.get(KEY_02, &value) == NLDB_OK );
+	ASSERT_TRUE( leaf.get(KEY_02, &value, NULL) == NLDB_OK );
 	EXPECT_TRUE( VALUE_02_MATCHES(value) );
 
 	// put : replace an existing key
 	ASSERT_TRUE( leaf.put(KEY_02, "new_value_02") == NLDB_OK );
-	ASSERT_TRUE( leaf.get(KEY_02, &value) == NLDB_OK );
+	ASSERT_TRUE( leaf.get(KEY_02, &value, NULL) == NLDB_OK );
 	EXPECT_TRUE( VALUE_MATCHES(value, "new_value_02") );
 
 	// del : del a non-existing key
@@ -206,7 +206,7 @@ TEST_F(TreeLeafNodeTest, put_get_del) {
 	EXPECT_TRUE( VALUE_MATCHES(value, "new_value_02") );
 
 	// del : get a deleted key
-	ASSERT_TRUE( leaf.get(KEY_02, &value) == NLDB_OK );
+	ASSERT_TRUE( leaf.get(KEY_02, &value, NULL) == NLDB_OK );
 	EXPECT_TRUE( value == NULL );
 }
 

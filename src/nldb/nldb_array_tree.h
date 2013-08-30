@@ -66,34 +66,80 @@ protected:
 			LEAF_NODE_MAGIC=0xcafebebe
 		}NODE_MAGIC_VALUE;
 	protected :
+		/*! The number of keys under this node.
+		 * For example, the root node has the total number of keys.
+		 * An internal node has total number of keys in all leaf nodes under it.
+		 * A leaf node has total number of keys in the node.
+		 */
+		nldb_order_t key_count_;
 		// The parent node.
 		node_t * parent_;
 		// Magic value.
 		NODE_MAGIC_VALUE magic_;
 	public :
-		inline bool is_internal_node() const
-		{
-			return (magic_ == INTERNAL_NODE_MAGIC) ? true : false;
-		}
-
-		inline bool is_leaf_node() const
-		{
-			return (magic_ == LEAF_NODE_MAGIC) ? true : false;
-		}
-
 		node_t(NODE_MAGIC_VALUE magic) {
 			tx_debug_assert(magic == INTERNAL_NODE_MAGIC || magic == LEAF_NODE_MAGIC);
-
+			key_count_ = 0;
 			parent_ = NULL;
 			magic_ = magic;
 		}
 		virtual ~node_t() {}
 
+		#define has_valid_magic() (magic_ == INTERNAL_NODE_MAGIC || magic_ == LEAF_NODE_MAGIC)
+
+		inline nldb_order_t key_count() {
+			tx_debug_assert( has_valid_magic() );
+
+			return key_count_;
+		}
+
+		inline void set_key_count(const nldb_order_t key_count) {
+			tx_debug_assert( has_valid_magic() );
+
+			key_count_ = key_count;
+		}
+
+
+		/*! Increase the key count.
+		 */
+		inline void inc_key_count() {
+			tx_debug_assert( has_valid_magic() );
+
+			key_count_ ++;
+		}
+
+		/*! Decrease the key count.
+		 */
+		inline void dec_key_count() {
+			tx_debug_assert( has_valid_magic() );
+
+			key_count_ --;
+		}
+
+		inline bool is_internal_node() const
+		{
+			tx_debug_assert( has_valid_magic() );
+
+			return (magic_ == INTERNAL_NODE_MAGIC) ? true : false;
+		}
+
+		inline bool is_leaf_node() const
+		{
+			tx_debug_assert( has_valid_magic() );
+
+			return (magic_ == LEAF_NODE_MAGIC) ? true : false;
+		}
+
+
 		inline node_t * parent() {
+			tx_debug_assert( has_valid_magic() );
+
 			return parent_;
 		}
 
 		inline void set_parent( node_t * parent ) {
+			tx_debug_assert( has_valid_magic() );
+
 			parent_ = parent;
 		}
 	};
@@ -172,18 +218,40 @@ protected:
 
 			return NLDB_OK;
 		}
-		nldb_rc_t get (const void * key, void ** value ) const
+
+		nldb_rc_t get(const void * key, void ** value, nldb_order_t * key_order ) const
 		{
 			tx_debug_assert( node_t::is_leaf_node() );
 
 			tx_debug_assert( key != NULL );
 			tx_debug_assert( value != NULL );
+			// key_order could be NULL if there is no need to get the order of the key.
 
-			nldb_rc_t rc = keys_with_values_.get(key, value);
+			nldb_rc_t rc = keys_with_values_.get(key, value, key_order);
 			if (rc) return rc;
 
 			return NLDB_OK;
 		}
+
+		/*! Get the key_order th the key and data.
+		 * @param key_order 1-based index to the key array.
+		 */
+		nldb_rc_t get(const nldb_order_t key_order, void ** key, void ** value ) const
+		{
+			tx_debug_assert( node_t::is_leaf_node() );
+
+			tx_debug_assert( key_order >= 1 );
+			tx_debug_assert( key_order <= keys_with_values_.key_count() );
+			tx_debug_assert( key != NULL );
+			tx_debug_assert( value != NULL );
+			// key_order could be NULL if there is no need to get the order of the key.
+
+			nldb_rc_t rc = keys_with_values_.get(key_order, key, value);
+			if (rc) return rc;
+
+			return NLDB_OK;
+		}
+
 		nldb_rc_t del (const void * key, void ** value)
 		{
 			tx_debug_assert( node_t::is_leaf_node() );
@@ -234,6 +302,10 @@ protected:
 				this->next_->prev_ = new_node;
 
 			this->next_ = new_node;
+
+			// Adjust key count.
+			this->key_count_ = keys_with_values_.key_count();
+			new_node->set_key_count( new_node->keys_with_values().key_count() );
 
 			*right_node = new_node;
 
@@ -328,18 +400,65 @@ protected:
 			return NLDB_OK;
 		}
 
-		// Return the subtree which should serve the given key.
-		// Note that the key might not exist in the subtree.
-		// Set the root of the subtree to *node.
-		nldb_rc_t find_serving_node (const void * key, node_t ** node ) const
+		/*! Get the number of all keys under the left siblings of a child node at the given position.
+		 * @node_position The position of the child node in keys_with_right_children_.
+		 * @o_all_keys_before_position (out) the total number of all keys under the left siblings of the given child node.
+		 */
+		nldb_rc_t count_all_keys_before_position(int node_position, nldb_order_t * o_all_keys_before_position) const {
+			tx_debug_assert( o_all_keys_before_position );
+
+			int total_key_count_before_the_position = 0;
+			if (node_position >= 0) {
+				total_key_count_before_the_position += left_child_->key_count();
+			}
+
+			for (int pos = 0; pos < node_position; pos ++) {
+				// Get each child node before the serving node.
+				node_t * child = (node_t *) keys_with_right_children_.get_data(pos);
+
+				tx_debug_assert(child);
+
+				total_key_count_before_the_position += child->key_count();
+			}
+			*o_all_keys_before_position = total_key_count_before_the_position;
+
+			return NLDB_OK;
+		}
+
+		/*! Return the subtree which should serve the given key.
+		 * Note that the key might not exist in the subtree.
+		 * Set the root of the subtree to *node.
+		 *
+		 * @param key The key should be served by the found node.
+		 * @param node The found serving node.
+		 * @param key_count_before_the_serving_node The total number of keys in leaf nodes before the serving node.
+         *                                          For the details, see nldb_sorted_array::find_last_le_key
+         *
+		 * @param key The key to find.
+		 * @param data (out) The found serving node.
+		 * @param key_count_before_the_serving_node (out) The total number of keys in leaf nodes under the left siblings of the serving node.
+		 *
+		 * Assume that an internal node has key1, key2, key3.
+		 * The serving node for keys in [-oo, key1)  is node1. *key_count_before_the_serving_node is set to 0.
+		 * The serving node for keys in [key1, key2) is node2. *key_count_before_the_serving_node is set to node1->key_count().
+		 * The serving node for keys in [key2, +oo)  is node3. *key_count_before_the_serving_node is set to node1->key_count() + node2->key_count().
+		 *
+		 *       +----<key1>---<key2>
+		 *       |      |        |
+		 *   <node1>  <node2>  <node3>
+		 *
+	     */
+		nldb_rc_t find_serving_node_by_key (const void * key, node_t ** node, nldb_order_t * o_key_count_before_the_serving_node ) const
 		{
 			tx_debug_assert( node_t::is_internal_node() );
 
 			tx_debug_assert( key != NULL );
 			tx_debug_assert( node != NULL );
 
-			// find the node that is mapped with the first greater than or equal to the given key.
-			nldb_rc_t rc = keys_with_right_children_.find_first_le_key(key, (void**)node);
+			int node_position;
+
+			// find the node that is mapped with the last less than or equal to the given key.
+			nldb_rc_t rc = keys_with_right_children_.find_last_le_key(key, (void**)node, &node_position);
 			if (rc) return rc;
 
 			// keys_with_right_children_ does not have the serving node for the key.
@@ -348,8 +467,77 @@ protected:
 			if ( *node == NULL )
 				*node = left_child_;
 
+			if (o_key_count_before_the_serving_node) {
+				rc = count_all_keys_before_position(node_position, o_key_count_before_the_serving_node);
+				if (rc) return rc;
+			}
+
 			return NLDB_OK;
 		}
+
+		/*! Return the subtree which should serve a key whose ranking is key_order.
+		 * @param key_order The serving node should serve a key whose rank is key_order.
+		 * @param node (out) The found serving node.
+		 * @param key_count_before_the_serving_node (out) The total number of keys in leaf nodes under the left siblings of the serving node.
+		 *
+		 * Assume that an internal node has key1, key2, key3.
+		 * The serving node for key_order in (-oo, node1.key_count] is node1. *key_count_before_the_serving_node is set to 0.
+		 * The serving node for key_order in (node1.key_count, node1.key_count + node2.key_count] is node2. *key_count_before_the_serving_node is set to node1->key_count().
+		 * The serving node for key_order in (node1.key_count + node2.key_count, node1.key_count + node2.key_count + node3.key_count] is node3.
+		 * In this case, *key_count_before_the_serving_node is set to node1->key_count() + node2->key_count().
+		 *
+		 *       +----<key1>---<key2>
+		 *       |       |        |
+		 *   <node1>  <node2>  <node3>
+		 *
+		 */
+		nldb_rc_t find_serving_node_by_order (const nldb_order_t key_order, node_t ** o_node, nldb_order_t * o_key_count_before_the_serving_node) const
+		{
+			tx_debug_assert( node_t::is_internal_node() );
+
+			tx_debug_assert( key_order > 0 );
+			tx_debug_assert( o_node != NULL );
+
+			nldb_order_t key_count_left = key_order;
+
+			node_t * serving_node = NULL;
+
+			int node_position;
+
+			// Does the left child contain the key whose rank is key_order?
+			if (key_count_left <= left_child_->key_count() ) {
+				serving_node = left_child_;
+				node_position = -1;
+			}
+			else
+			{
+				key_count_left -= left_child_->key_count();
+
+				for ( node_position = 0; node_position < keys_with_right_children_.key_count(); node_position++ ) {
+					node_t * child = (node_t*) keys_with_right_children_.get_data( node_position );
+
+					tx_debug_assert(child);
+
+					if (key_count_left <= child->key_count() ) {
+						serving_node = child;
+						break;
+					}
+
+					key_count_left -= child->key_count();
+				}
+			}
+
+			// If serving_node is NULL, it means that the key_order was greater than the total keys under the node.
+			tx_assert(serving_node);
+
+			*o_node = serving_node;
+
+			nldb_rc_t rc = count_all_keys_before_position(node_position, o_key_count_before_the_serving_node);
+			if (rc) return rc;
+
+			return NLDB_OK;
+		}
+
 
 		nldb_rc_t del (const void * key, node_t ** deleted_node )
 		{
@@ -422,12 +610,13 @@ protected:
 			rc = keys_with_right_children_.remove_max_key(mid_key, & mid_key_node);
 			if (rc) return rc;
 
-
 			// Even after removing the maximum key, the node should have at least a key.
 			tx_assert(keys_with_right_children_.key_count() > 0 );
 
 			// Set the node attached with the mid key to the left child of the new split node.
 			(void)new_node->set_left_child((node_t*)mid_key_node);
+
+			// TODO : Set key count
 
 			*right_node = new_node;
 
@@ -509,11 +698,23 @@ protected:
 		return memcmp(key1, key2, key_length_);
 	}
 
-	nldb_rc_t find_leaf_node(const void * key, leaf_node_t ** node) const {
+	/*! Find the leaf node that has the given key.
+	 * @param key_order the order of the key in the tree.
+	 * @param node the found node which has key_order the key.
+	 * @param key_count_before_the_found_node the number of keys stored in all leaf nodes before the found node.
+	 *        For example, if the found node were <leaf4>, all keys in <leaf1>, <leaf2>, <leaf3> are less than the min key of <leaf4>.
+	 *        *key_count_before_the_found_node is set to the number of all keys in <leaf1>, <leaf2>, <leaf3>.
+	 *        <leaf1> - <leaf2> - <leaf3> - <leaf4> - <leaf5>
+	 *        This parameter can be NULL if there is no need to get the key count.
+	 */
+
+	nldb_rc_t find_leaf_node(const void * key, leaf_node_t ** node, nldb_order_t * o_key_count_before_the_found_node) const {
 		tx_debug_assert( is_initialized() );
 
 		tx_debug_assert( key != NULL );
 		tx_debug_assert( node != NULL );
+
+		nldb_order_t total_key_count_before_the_leaf_node = 0;
 
 		node_t * n;
 		for (n = root_node_;
@@ -522,15 +723,79 @@ protected:
 		{
 			internal_node_t * internal_node = (internal_node_t*) n ;
 
-			nldb_rc_t rc = internal_node->find_serving_node(key, &n);
-			if (rc) return rc;
+			if (o_key_count_before_the_found_node) { // Do we need to get the key order as well?
+				nldb_order_t all_key_count_before_n;
+				nldb_rc_t rc = internal_node->find_serving_node_by_key(key, &n, &all_key_count_before_n);
+				if (rc) return rc;
+
+				total_key_count_before_the_leaf_node += all_key_count_before_n;
+			} else { // No need to get the key order.
+				nldb_rc_t rc = internal_node->find_serving_node_by_key(key, &n, NULL);
+				if (rc) return rc;
+			}
 
 			tx_debug_assert(n);
+
 		}
 
 		tx_debug_assert( n->is_leaf_node() );
 
 		*node = (leaf_node_t*) n;
+
+		if (o_key_count_before_the_found_node) {
+			*o_key_count_before_the_found_node = total_key_count_before_the_leaf_node;
+		}
+
+		return NLDB_OK;
+	}
+
+	/*! Find the leaf node that has the key_order th key.
+	 * @param key_order the order of the key in the tree.
+	 * @param node the found node which has key_order the key.
+	 * @param key_count_before_the_found_node the number of keys stored in all leaf nodes before the found node.
+	 *        For example, if the found node were <leaf4>, all keys in <leaf1>, <leaf2>, <leaf3> are less than the min key of <leaf4>.
+	 *        *key_count_before_the_found_node is set to the number of all keys in <leaf1>, <leaf2>, <leaf3>.
+	 *        <leaf1> - <leaf2> - <leaf3> - <leaf4> - <leaf5>
+	 *        this parameter should NOT be NULL.
+	 */
+	nldb_rc_t find_leaf_node(const nldb_order_t key_order, leaf_node_t ** node, nldb_order_t * o_key_count_before_the_found_node) const {
+		tx_debug_assert( is_initialized() );
+
+		tx_debug_assert( key_order >= 1 );
+		tx_debug_assert( key_order <= root_node_->key_count() );
+		tx_debug_assert( node != NULL );
+		tx_debug_assert( o_key_count_before_the_found_node );
+
+		nldb_order_t total_key_count_before_the_leaf_node = 0;
+
+		nldb_order_t key_count_left = key_order;
+
+		node_t * n;
+		for (n = root_node_;
+			 n->is_internal_node();
+			 )
+		{
+			internal_node_t * internal_node = (internal_node_t*) n ;
+
+			nldb_order_t all_key_count_before_n;
+
+			nldb_rc_t rc = internal_node->find_serving_node_by_order( key_count_left, &n, &all_key_count_before_n );
+			if (rc) return rc;
+
+			tx_debug_assert(n);
+
+			key_count_left -= all_key_count_before_n;
+			tx_debug_assert( key_count_left > 0 );
+
+			total_key_count_before_the_leaf_node += all_key_count_before_n;
+
+		}
+
+		tx_debug_assert( n->is_leaf_node() );
+
+		*node = (leaf_node_t*) n;
+
+		*o_key_count_before_the_found_node = total_key_count_before_the_leaf_node;
 
 		return NLDB_OK;
 	}
@@ -606,13 +871,22 @@ protected:
 		return NLDB_OK;
 	}
 
-	nldb_rc_t put_to_leaf_node(leaf_node_t * node, const void * key, const void * value)
+	/*! Put a key into the given leaf node.
+	 * @node The node where the key will be put.
+	 * @key The key to put
+	 * @value The value to put
+	 * @o_key_existing_node The node that the key exists after the put operation.
+	 *                      In case the original node is split, the key can be put into the newly created node.
+	 *                      In this case, o_key_existing_node points to the newly created node.
+	 */
+	nldb_rc_t put_to_leaf_node(leaf_node_t * node, const void * key, const void * value, leaf_node_t ** o_key_existing_node)
 	{
 		tx_debug_assert( is_initialized() );
 
 		tx_debug_assert( node != NULL );
 		tx_debug_assert( key != NULL );
 		tx_debug_assert( value != NULL );
+		tx_debug_assert( o_key_existing_node != NULL );
 
 		if ( node->is_full() )
 		{
@@ -630,11 +904,15 @@ protected:
 			{
 				rc = node->put(key, value);
 				if (rc) return rc;
+
+				*o_key_existing_node = node;
 			}
 			else
 			{
 				rc = right_node->put(key,value);
 				if (rc) return rc;
+
+				*o_key_existing_node = right_node;
 			}
 
 			rc = put_to_internal_node( (internal_node_t*) node->parent(), mid_key, right_node);
@@ -644,7 +922,10 @@ protected:
 		{
 			nldb_rc_t rc = node->put(key, value);
 			if (rc) return rc;
+
+			*o_key_existing_node = node;
 		}
+
 		return NLDB_OK;
 	}
 
@@ -664,6 +945,32 @@ protected:
 			return NLDB_OK;
 		}
 
+		return NLDB_OK;
+	}
+
+	/*! Starting from the leaf node, increase the key_count counter in each node up to the root node.
+	 */
+	nldb_rc_t propagate_key_count_increment(leaf_node_t * leaf_node) {
+		tx_debug_assert(leaf_node);
+
+		for (node_t * n = leaf_node;
+ 		     n != NULL;
+			 n = n->parent()) {
+			n->inc_key_count();
+		}
+		return NLDB_OK;
+	}
+
+	/*! Starting from the leaf node, decrease the key_count counter in each node up to the root node.
+	 */
+	nldb_rc_t propagate_key_count_decrement(leaf_node_t * leaf_node) {
+		tx_debug_assert(leaf_node);
+
+		for (node_t * n = leaf_node;
+ 		     n != NULL;
+			 n = n->parent()) {
+			n->dec_key_count();
+		}
 		return NLDB_OK;
 	}
 
@@ -729,11 +1036,18 @@ public:
 		tx_debug_assert( value != NULL );
 
 		leaf_node_t * leaf = NULL;
+		leaf_node_t * key_existing_node = NULL;
 
-		nldb_rc_t rc = find_leaf_node(key, &leaf);
+		nldb_rc_t rc = find_leaf_node(key, &leaf, NULL /*key_count_before_the_found_node*/ );
 		if (rc) return rc;
 
-		rc = put_to_leaf_node(leaf, key, value);
+		// In case the leaf node was split, key_existing_node points to the new node.
+		// Otherwise, it points to the leaf node.
+		rc = put_to_leaf_node(leaf, key, value, &key_existing_node);
+		if (rc) return rc;
+
+		// Increase the key_count counter in each node from key_existing_node up to the root node.
+		rc = propagate_key_count_increment(key_existing_node);
 		if (rc) return rc;
 
 		return NLDB_OK;
@@ -748,19 +1062,30 @@ public:
 		tx_debug_assert( key != NULL );
 		tx_debug_assert( value != NULL );
 
-		if (key_order != NULL) {
-			// TODO : Implement it.
-		}
 
 		leaf_node_t * leaf_node = NULL;
 
-		nldb_rc_t rc = find_leaf_node(key, & leaf_node);
-		if (rc) return rc;
+		if (key_order == NULL) {
+			// Because key_order is NULL, we don't need to get the order of the key. Simply pass NULL as the last argument.
+			nldb_rc_t rc = find_leaf_node(key, & leaf_node, NULL);
+			if (rc) return rc;
 
-		tx_assert(leaf_node);
+			tx_assert(leaf_node);
 
-		rc = leaf_node->get(key, value);
-		if (rc) return rc;
+			rc = leaf_node->get(key, value, NULL);
+			if (rc) return rc;
+		} else {
+			nldb_order_t key_count_before_leaf_node;
+			nldb_rc_t rc = find_leaf_node(key, & leaf_node, & key_count_before_leaf_node);
+			if (rc) return rc;
+
+			nldb_order_t key_order_in_the_leaf_node;
+			rc = leaf_node->get(key, value, & key_order_in_the_leaf_node);
+			if (rc) return rc;
+
+			*key_order = key_count_before_leaf_node + key_order_in_the_leaf_node;
+		}
+
 
 		return NLDB_OK;
 	}
@@ -770,7 +1095,35 @@ public:
 	 */
 	nldb_rc_t get (const nldb_order_t key_order, void ** key, void ** value) const
 	{
-		// TODO : Implement it.
+		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key != NULL );
+		tx_debug_assert( value != NULL );
+
+		nldb_order_t key_count_before_leaf_node;
+
+		leaf_node_t * leaf_node = NULL;
+
+		// The key_order is out of range.
+		if (key_order < 1 || key_order > root_node_->key_count() ) {
+			return NLDB_ERROR_ORDER_OUT_OF_RANGE;
+		}
+
+		nldb_rc_t rc = find_leaf_node(key_order, & leaf_node, &key_count_before_leaf_node);
+		if (rc) return rc;
+
+		tx_assert(leaf_node);
+
+		// Because the key_order th key exists in the found leaf_node, the keys before the leaf node should be less than key_order.
+		tx_debug_assert( key_order > key_count_before_leaf_node );
+
+		// The key order in the leaf node.
+		nldb_order_t key_order_in_leaf_node = key_order - key_count_before_leaf_node;
+
+		tx_debug_assert( key_order_in_leaf_node <= leaf_node->key_count() );
+
+		rc = leaf_node->get(key_order_in_leaf_node, key, value);
+		if (rc) return rc;
+
 		return NLDB_OK;
 	}
 
@@ -782,13 +1135,20 @@ public:
 
 		leaf_node_t * leaf_node = NULL;
 
-		nldb_rc_t rc = find_leaf_node(key, & leaf_node);
+		nldb_rc_t rc = find_leaf_node(key, & leaf_node, NULL /*key_count_before_the_found_node*/);
 		if (rc) return rc;
 
 		tx_assert(leaf_node);
 
 		rc = del_from_leaf_node(leaf_node, key, deleted_value);
 		if (rc) return rc;
+
+
+		rc = propagate_key_count_decrement(leaf_node);
+		if (rc) return rc;
+
+		// No need to remove the key and the leaf node from the parent node if there is no more key in the node.
+		// Because the empty leaf node will be reused when a new key within the range of the empty leaf node is put.
 
 		return NLDB_OK;
 	}
@@ -801,7 +1161,7 @@ public:
 
 		leaf_node_t * leaf_node = NULL;
 
-		nldb_rc_t rc = find_leaf_node(key, & leaf_node);
+		nldb_rc_t rc = find_leaf_node(key, & leaf_node, NULL /*key_count_before_the_found_node*/);
 		if (rc) return rc;
 
 		// Even when the key does not exist, find_leaf_node returns a node where the key "SHOULD" be inserted.
@@ -826,7 +1186,7 @@ public:
 
 		leaf_node_t * leaf_node = NULL;
 
-		nldb_rc_t rc = find_leaf_node(key, & leaf_node);
+		nldb_rc_t rc = find_leaf_node(key, & leaf_node, NULL /*key_count_before_the_found_node*/);
 		if (rc) return rc;
 
 		// Even when the key does not exist, find_leaf_node returns a node where the key "SHOULD" be inserted.
@@ -843,14 +1203,86 @@ public:
 		return NLDB_OK;
 	}
 
-
+	/*! Seek forward from the key_order th key. key_order starts from 1.
+	 */
 	nldb_rc_t seek_forward(const nldb_order_t key_order, iterator_t * iter) const
 	{
-		return NLDB_ERROR;
+		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_order > 0 );
+		tx_debug_assert( iter != NULL );
+
+		nldb_order_t key_count_before_leaf_node;
+		leaf_node_t * leaf_node = NULL;
+
+		// The key_order is out of range.
+		if (key_order < 1 || key_order > root_node_->key_count() ) {
+			return NLDB_ERROR_ORDER_OUT_OF_RANGE;
+		}
+
+		nldb_rc_t rc = find_leaf_node(key_order, & leaf_node, &key_count_before_leaf_node);
+		if (rc) return rc;
+
+		// Even when the key does not exist, find_leaf_node returns a node where the key "SHOULD" be inserted.
+		// leaf_node should not be NULL in any case.
+		tx_assert( leaf_node );
+
+		// Because the key_order th key exists in the found leaf_node, the keys before the leaf node should be less than key_order.
+		tx_debug_assert( key_order > key_count_before_leaf_node );
+
+		iter->current_node_ = leaf_node;
+
+		nldb_sorted_array<key_space_size> & keys_with_values = leaf_node->keys_with_values();
+
+		// The key order in the leaf node.
+		nldb_order_t key_order_in_leaf_node = key_order - key_count_before_leaf_node;
+
+		tx_debug_assert( key_order_in_leaf_node <= keys_with_values.key_count() );
+
+		rc = keys_with_values.iter_forward(key_order_in_leaf_node, &iter->key_iter_);
+		if (rc) return rc;
+
+		return NLDB_OK;
 	}
+
+	/*! Seek backward from the key_order th key. key_order starts from 1.
+	 */
 	nldb_rc_t seek_backward(const nldb_order_t key_order, iterator_t * iter) const
 	{
-		return NLDB_ERROR;
+		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_order > 0 );
+		tx_debug_assert( iter != NULL );
+
+		nldb_order_t key_count_before_leaf_node;
+		leaf_node_t * leaf_node = NULL;
+
+		// The key_order is out of range.
+		if (key_order < 1 || key_order > root_node_->key_count() ) {
+			return NLDB_ERROR_ORDER_OUT_OF_RANGE;
+		}
+
+		nldb_rc_t rc = find_leaf_node(key_order, & leaf_node, &key_count_before_leaf_node);
+		if (rc) return rc;
+
+		// Even when the key does not exist, find_leaf_node returns a node where the key "SHOULD" be inserted.
+		// leaf_node should not be NULL in any case.
+		tx_assert( leaf_node );
+
+		// Because the key_order th key exists in the found leaf_node, the keys before the leaf node should be less than key_order.
+		tx_debug_assert( key_order > key_count_before_leaf_node );
+
+		iter->current_node_ = leaf_node;
+
+		nldb_sorted_array<key_space_size> & keys_with_values = leaf_node->keys_with_values();
+
+		// The key order in the leaf node.
+		nldb_order_t key_order_in_leaf_node = key_order - key_count_before_leaf_node;
+
+		tx_debug_assert( key_order_in_leaf_node <= keys_with_values.key_count() );
+
+		rc = keys_with_values.iter_backward(key_order_in_leaf_node, &iter->key_iter_);
+		if (rc) return rc;
+
+		return NLDB_OK;
 	}
 
 	nldb_rc_t move_forward(iterator_t & iter, void ** key, void ** value, bool * end_of_iter) const
@@ -945,10 +1377,18 @@ public:
 		return NLDB_OK;
 	}
 
+	/*! Return the total nubmer of keys in the tree.
+	 */
 	nldb_rc_t get_key_count(nldb_order_t * total_key_count ) const
 	{
-		// TODO : implement it.
-		return NLDB_ERROR;
+		tx_debug_assert(total_key_count);
+
+		tx_debug_assert(root_node_);
+
+		// The root node has the total number of keys in the whole tree.
+		*total_key_count = root_node_->key_count();
+
+		return NLDB_OK;
 	}
 
 };

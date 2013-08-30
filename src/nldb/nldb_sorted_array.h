@@ -149,6 +149,7 @@ private :
 		tx_debug_assert( out_key_pos != NULL );
 		tx_debug_assert( out_data_pos != NULL );
 		tx_debug_assert( out_key_found != NULL );
+		// key_count_before_the_key_position can be NULL.
 
 		int prev_cmp = -1; // The result of compare_keys for the previous loop
 
@@ -264,16 +265,6 @@ private :
 		tx_debug_assert( data != NULL );
 
 		data_[data_pos] = (void*) data;
-	}
-
-	void * get_data(int data_pos) const
-	{
-		tx_debug_assert( is_initialized() );
-
-		tx_debug_assert( data_pos >= 0 );
-		tx_debug_assert( data_pos < max_key_count_ );
-
-		return data_[data_pos];
 	}
 
 	void * get_key(int key_pos) const
@@ -523,6 +514,16 @@ public:
 		return NLDB_OK;
 	}
 
+	void * get_data(int data_pos) const
+	{
+		tx_debug_assert( is_initialized() );
+
+		tx_debug_assert( data_pos >= 0 );
+		tx_debug_assert( data_pos < max_key_count_ );
+
+		return data_[data_pos];
+	}
+
 	nldb_rc_t destroy()
 	{
 		tx_debug_assert( is_initialized() );
@@ -551,7 +552,7 @@ public:
 		return NLDB_OK;
 	}
 
-	nldb_rc_t get(const void * key, void ** data ) const
+	nldb_rc_t get(const void * key, void ** data, nldb_order_t * key_order ) const
 	{
 		tx_debug_assert( is_initialized() );
 		tx_debug_assert( key != NULL );
@@ -568,21 +569,45 @@ public:
 		{
 			// The key was found.
 			*data = get_data(data_pos);
+			if (key_order) // set *key_order with 1-based index only if key_order is not NULL.
+				*key_order = (data_pos + 1);
 		}
 		else
 		{
 			// We don't have the key.
 			*data = NULL;
+			if (key_order)
+				*key_order = 0;
 		}
 
 		return NLDB_OK;
 	}
+	/*! Get the key_order th the key and data.
+	 * @param key_order 1-based index to the key array.
+	 */
+	nldb_rc_t get(const nldb_order_t key_order, void ** key, void ** data ) const
+	{
+		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_order >= 1 );
+		tx_debug_assert( key_order <= key_count_ );
+		tx_debug_assert( key != NULL );
+		tx_debug_assert( data != NULL );
+		tx_debug_assert( key_length_ > 0 );
 
-	// Set the data of the first less than or equal key in key_space_ to *data.
-	// Set NULL to *data in case the key_space_ does not have any key greater than or equal to the given key.
-	//
-	// c.f. "le" means "less than or equal to".
-	nldb_rc_t find_first_le_key(const void * key, void ** data ) const
+		// Get the key and data at the position key_order, which is 1-based index.
+		*key  = get_key( (key_order-1) * key_length_ );
+		*data = get_data( key_order-1 );
+
+		return NLDB_OK;
+	}
+
+	/*! Set the data of the last less than or equal key in key_space_ to *data.
+	 * Set NULL to *data in case the key_space_ does not have any key less than or equal to the given key.
+	 *
+	 * c.f. "le" means "less than or equal to".
+	 *
+	 */
+	nldb_rc_t find_last_le_key(const void * key, void ** data, int * o_data_pos ) const
 	{
 		tx_debug_assert( is_initialized() );
 		tx_debug_assert( key != NULL );
@@ -591,6 +616,7 @@ public:
 		int key_pos = 0;
 		int data_pos = 0;
 		bool key_found = false;
+
 		nldb_rc_t rc = search_forward(key, &key_pos, &data_pos, &key_found);
 		if (rc) return rc;
 
@@ -602,6 +628,8 @@ public:
 		{
 			*data = get_data(data_pos);
 		}
+
+		*o_data_pos = data_pos;
 
 		return NLDB_OK;
 	}
@@ -705,6 +733,35 @@ public:
 		iter->data_pos_ = data_pos;
 
 		return NLDB_OK;
+	}
+
+	/*! Start forward iteration from key_order th key.
+	 * @param key_order the 1-based index pointing to a key.
+	 * @param iter the iterator to initialize.
+	 */
+	nldb_rc_t iter_forward(const nldb_order_t key_order, iterator_t * iter) const
+	{
+		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_order >= 1 );
+		tx_debug_assert( key_order <= key_count_ );
+		tx_debug_assert( iter != NULL );
+		tx_debug_assert( key_length_ > 0 );
+
+		// TODO : Optimization - Try adding key_length_ by (key_order-1) times instead of multiplying key_length_.
+		iter->key_pos_ = (key_order-1) * key_length_;
+		iter->data_pos_ = key_order-1;
+
+		return NLDB_OK;
+	}
+
+	/*! Start backward iteration from key_order th key.
+	 * @param key_order the 1-based index pointing to a key.
+	 * @param iter the iterator to initialize.
+	 */
+	nldb_rc_t iter_backward(const nldb_order_t key_order, iterator_t * iter) const
+	{
+		// The implementation is same to iter_forward.
+		return iter_forward(key_order, iter);
 	}
 
 	// Iterate forward for all keys within the sorted array.
