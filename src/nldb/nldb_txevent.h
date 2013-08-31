@@ -207,8 +207,8 @@ class TxTransactionLogPublisher : public disruptor::EventHandlerInterface<TxTran
 		int rc = xs_sendmsg(publisher_, &replicationMessage, 0);
 		tx_assert(rc);
 
-		// We are done. Clear the log buffer before other transactions use it.
-		event->getLogBuffer().clear();
+		// We are done. Reset the log buffer before other transactions use it.
+		event->getLogBuffer().reset();
 
 		if ((sequence & 0xFFFFF) == 0 )
 		{

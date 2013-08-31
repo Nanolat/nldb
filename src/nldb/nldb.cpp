@@ -478,7 +478,7 @@ public :
 
 		// If a transaction aborts, the transaction event in the ring buffer is reused by next transaction.
 		// Simply clear the transaction log buffer in case the transaction aborts.
-		txEvent_->getLogBuffer().clear();
+		txEvent_->getLogBuffer().clearLog();
 
 		// The replication publisher will publish replication message with no log records.
 		// This is required for subscribers to check if there is any missing transaction ids or duplicate transaction ids.
@@ -532,7 +532,7 @@ private :
 		else
 		{
 			// There is no replicator at all. Simply clear the log buffer, which is cleared by replicators after they publish the replication message constructed by reading the log buffer.
-			txEvent_->getLogBuffer().clear();
+			txEvent_->getLogBuffer().reset();
 		}
 
 		txEvent_ = NULL;

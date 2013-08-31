@@ -74,7 +74,6 @@ TEST_F(NLDBTest, transaction_commit) {
 }
 
 // TODO : Fix it. Transaction abort clears transaction log buffer resulting in resetting transaction ID.
-#if defined(NLDB_TEST_FIXME)
 TEST_F(NLDBTest, transaction_abort) {
 
 	ASSERT_TRUE( nldb_tx_begin(tx) == 0 );
@@ -106,7 +105,7 @@ TEST_F(NLDBTest, transaction_abort) {
 	}
 
 }
-#endif
+
 
 TEST_F(NLDBTest, get_before_put) {
 	nldb_value_t v;
