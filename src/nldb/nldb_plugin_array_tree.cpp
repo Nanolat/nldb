@@ -63,8 +63,8 @@ class table_context_t
 {
 public :
 #if defined(DEBUG)
-	/* Set the key space size to 24, to make node split happen more frequently and make the depth of the tree deeper */
-#define KEY_SPACE_SIZE (24)
+	/* We can set the key space size to 24, to make node split happen more frequently and make the depth of the tree deeper */
+#define KEY_SPACE_SIZE (64)
 	typedef nldb_debuggable_array_tree<KEY_SPACE_SIZE> tree_t;
 #else
 #define KEY_SPACE_SIZE (64)
