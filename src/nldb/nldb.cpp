@@ -308,13 +308,16 @@ const nldb_table_id_t META_TABLE_ID = 0;
 class nldb_db_impl_t
 {
 public : 
+	const int DB_IMPL_OBJECT_MAGIC = 0x19760622;
 	nldb_db_impl_t()
 	{
+		magic_ = 0;
 		db_id_ = 0;
 		meta_table_context_ = NULL;
 	};
 
 	inline nldb_rc_t init(const nldb_db_id_t db_id) {
+		magic_ = DB_IMPL_OBJECT_MAGIC;
 		meta_table_desc_ = nldb_meta_table_desc(db_id);
 		db_id_ = db_id;
 
@@ -328,6 +331,10 @@ public :
 		nldb_rc_t rc = meta_table_plugin_.table_close( meta_table_context_);
 		return rc;
 	};
+
+	inline bool is_valid() const {
+		return magic_ == DB_IMPL_OBJECT_MAGIC;
+	}
 
 	// create the meta table.
 	inline static nldb_rc_t meta_create(const nldb_db_id_t db_id) {
@@ -343,9 +350,23 @@ public :
 		return meta_table_plugin.table_drop(meta_table_desc);
 	}
 
+	// check if the meta table exists. if the meta table successfully opens, it means the meta table exists.
+	inline static nldb_rc_t meta_exists(const nldb_db_id_t db_id, bool * exists) {
+		tx_debug_assert(exists);
+
+		nldb_plugin_table_desc_t meta_table_desc = nldb_meta_table_desc(db_id);
+
+		nldb_rc_t rc = nldb_table_exists(meta_table_desc, exists);
+		if (rc) return rc;
+
+		return NLDB_OK;
+	}
+
 
 	// put a record(table description) into the meta table
 	inline nldb_rc_t meta_put(const nldb_table_id_t table_id, const nldb_plugin_id_t table_plugin_id, const nldb_plugin_table_desc_t & table_desc) {
+		tx_debug_assert( is_valid() );
+
 		nldb_meta_table_value_t meta_table_value;
 		meta_table_value.table_plugin_id = table_plugin_id;
 		meta_table_value.plugin_table_desc = table_desc;
@@ -357,6 +378,8 @@ public :
 
 	// get a record(table description) from the meta table
 	inline nldb_rc_t meta_get(const nldb_table_id_t table_id, nldb_plugin_id_t * table_plugin_id, nldb_plugin_table_desc_t * table_desc) {
+		tx_debug_assert( is_valid() );
+
 		nldb_key_t   key     = {(void*)&table_id, sizeof(table_id)};
 		nldb_value_t value;
 
@@ -372,6 +395,8 @@ public :
 	}
 	// delete a record(table description) from the meta table
 	inline nldb_rc_t meta_del(const nldb_table_id_t table_id) {
+		tx_debug_assert( is_valid() );
+
 		nldb_key_t   key     = {(void*)&table_id, sizeof(table_id)};
 
 		return meta_table_plugin_.table_del( meta_table_context_, key);
@@ -380,6 +405,7 @@ public :
 	// Add a slave for this DB. All comitted data will be replicated to the slave.
 	inline void add_replicator(const nldb_db_id_t dbid, const std::string & master_ip, const unsigned short master_port)
 	{
+		tx_debug_assert( is_valid() );
 		tx_logs_.addReplicator(dbid, master_ip, master_port);
 	}
 
@@ -387,9 +413,12 @@ public :
     TxTransactionsLogs tx_logs_;
 
 	inline nldb_db_id_t db_id() const {
+		tx_debug_assert( is_valid() );
 		return db_id_;
 	}
 private:
+	// The magic value for checking if the db object was initialized.
+	int magic_;
 	// The table db plugin
 	nldb_plugin_table_desc_t meta_table_desc_;
 	// The table plugin that has persistent implementation of put/get/del to store meta table records persistently on disk.
@@ -798,31 +827,61 @@ nldb_rc_t nldb_cursor_fetch(const nldb_cursor_t & cursor, nldb_key_t * key, nldb
 /*****************/
 nldb_rc_t nldb_db_create( const nldb_db_id_t db_id )
 {
-	tx_assert( db_id < NLDB_MAX_DB_COUNT );
+	if ( db_id < 0 ) return NLDB_ERROR_INVALID_ARGUMENT;
+	if ( db_id > NLDB_MAX_DB_COUNT ) return NLDB_ERROR_INVALID_ARGUMENT;
 	
-	nldb_rc_t rc = nldb_db_impl_t::meta_create(db_id);
+	bool exists;
+
+	nldb_rc_t rc = nldb_db_impl_t::meta_exists(db_id, & exists);
+	if (rc) return rc;
+
+	if (exists)
+		return NLDB_ERROR_DB_ALREADY_EXISTS;
+
+	rc = nldb_db_impl_t::meta_create(db_id);
 
 	return rc; 
 }
 
 nldb_rc_t nldb_db_drop( const nldb_db_id_t db_id )
 {
-	tx_assert( db_id < NLDB_MAX_DB_COUNT );
+	if ( db_id < 0 ) return NLDB_ERROR_INVALID_ARGUMENT;
+	if ( db_id > NLDB_MAX_DB_COUNT ) return NLDB_ERROR_INVALID_ARGUMENT;
 
-	nldb_rc_t rc = nldb_db_impl_t::meta_drop(db_id);
+	bool exists;
+
+	nldb_rc_t rc = nldb_db_impl_t::meta_exists(db_id, & exists);
+	if (rc) return rc;
+
+	if (!exists)
+		return NLDB_ERROR_DB_NOT_FOUND;
+
+	rc = nldb_db_impl_t::meta_drop(db_id);
 
 	return rc;
 }
 
 nldb_rc_t nldb_db_open( const nldb_db_id_t db_id, nldb_replication_master_op_t * master_op, nldb_replication_slave_op_t * slave_op, nldb_db_t * db)
 {
+	if ( db_id < 0 ) return NLDB_ERROR_INVALID_ARGUMENT;
+	if ( db_id > NLDB_MAX_DB_COUNT ) return NLDB_ERROR_INVALID_ARGUMENT;
+	if ( db == NULL ) return NLDB_ERROR_INVALID_ARGUMENT;
+
+	bool exists;
+
+	nldb_rc_t rc = nldb_db_impl_t::meta_exists(db_id, & exists);
+	if (rc) return rc;
+
+	if (!exists)
+		return NLDB_ERROR_DB_NOT_FOUND;
+
 	nldb_db_holder_t * new_db = new nldb_db_holder_t;
 
 	if ( ! new_db ) return NLDB_ERROR_NO_MEM;
 
 	nldb_db_impl_t * dbi = (nldb_db_impl_t*) new_db;
 
-	nldb_rc_t rc = dbi->init(db_id);
+	rc = dbi->init(db_id);
 	if ( rc ) return rc;
 
 	*db = new_db ;
@@ -855,6 +914,9 @@ nldb_rc_t nldb_db_wait_for_replication_publishers(nldb_db_t & db)
 nldb_rc_t nldb_db_close( nldb_db_t & db)
 {
 	nldb_db_impl_t * dbi = (nldb_db_impl_t*) db;
+
+	if (dbi == NULL) return NLDB_ERROR_INVALID_ARGUMENT;
+	if (!dbi->is_valid()) return NLDB_ERROR_INVALID_ARGUMENT;
 
 	nldb_rc_t rc = dbi->destroy();
 	if ( rc ) return rc;

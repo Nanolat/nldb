@@ -71,6 +71,12 @@ TEST(sample_test_case, tbb)
  * 4) Get table statistics
  *    (LevelDB, TC should fail, ArrayTree should succeed)
  */
+
+/*
+ * List of tests to add.
+ * 1) Check db parameter. If invalid or NULL, return NLDB_ERROR_INVALID_ARGUMENT.
+ * 2) Check if the transaction already began. Change code to return error code instead of assertion, and add test.
+ */
 int main(int argc, char** argv)  
 {  
     testing::InitGoogleTest(&argc, argv);  

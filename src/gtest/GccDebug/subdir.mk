@@ -9,6 +9,7 @@ CPP_SRCS += \
 ../nldb_cursor_dirty_test.cpp \
 ../nldb_cursor_test.cpp \
 ../nldb_data.cpp \
+../nldb_db_test.cpp \
 ../nldb_order_test.cpp \
 ../nldb_test.cpp \
 ../plugin_array_tree_test.cpp \
@@ -24,6 +25,7 @@ OBJS += \
 ./nldb_cursor_dirty_test.o \
 ./nldb_cursor_test.o \
 ./nldb_data.o \
+./nldb_db_test.o \
 ./nldb_order_test.o \
 ./nldb_test.o \
 ./plugin_array_tree_test.o \
@@ -39,6 +41,7 @@ CPP_DEPS += \
 ./nldb_cursor_dirty_test.d \
 ./nldb_cursor_test.d \
 ./nldb_data.d \
+./nldb_db_test.d \
 ./nldb_order_test.d \
 ./nldb_test.d \
 ./plugin_array_tree_test.d \
