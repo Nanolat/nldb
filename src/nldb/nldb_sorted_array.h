@@ -929,7 +929,8 @@ public:
 	{
 		tx_debug_assert( is_initialized() );
 
-		return (used_key_space_ < key_space_size) ? false : true;
+		// It is not full if we can have at least one more key.
+		return (used_key_space_ + key_length_ <= key_space_size) ? false : true;
 	}
 
 	// Return NULL if no key exists in this node.

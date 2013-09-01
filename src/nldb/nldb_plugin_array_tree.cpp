@@ -62,13 +62,13 @@ nldb_rc_t nldb_plugin_array_tree_t::table_drop(nldb_plugin_table_desc_t & table_
 class table_context_t
 {
 public :
-#if defined(DEBUG)
+#if defined(NDEBUG)
+#define KEY_SPACE_SIZE (64)
+	typedef nldb_array_tree<KEY_SPACE_SIZE> tree_t;
+#else
 	/* We can set the key space size to 24, to make node split happen more frequently and make the depth of the tree deeper */
 #define KEY_SPACE_SIZE (64)
 	typedef nldb_debuggable_array_tree<KEY_SPACE_SIZE> tree_t;
-#else
-#define KEY_SPACE_SIZE (64)
-	typedef nldb_array_tree<KEY_SPACE_SIZE> tree_t;
 #endif
 
 private :
