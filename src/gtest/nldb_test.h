@@ -61,6 +61,8 @@ class NLDBTest : public testing::Test {
     virtual void SetUp() {
     	ASSERT_TRUE( nldb_init() == 0 );
 
+    	(void)nldb_db_drop( TEST_DB_ID );
+
     	ASSERT_TRUE( nldb_db_create( TEST_DB_ID ) == 0 );
 
     	ASSERT_TRUE( nldb_db_open( TEST_DB_ID, NULL/*master*/, NULL/*slave*/, &db ) == 0 );

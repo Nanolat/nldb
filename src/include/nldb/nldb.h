@@ -46,7 +46,7 @@
 // When you create a table, you don't specify a string for a table name, but you specify an integer, table id. 
 // Why? strings are not efficient data format, using an integer is enough to identify a table.
 // The table ID begins from 1 and can have any number up to NLDB_MAX_TABLE_ID.
-#define NLDB_MAX_DB_COUNT (8)
+#define NLDB_MAX_DB_COUNT (1024)
 #define NLDB_MAX_TABLE_COUNT_PER_DB ( 65536 )
 
 /******************/

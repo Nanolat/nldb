@@ -6,13 +6,17 @@ src/nldb/.settings/
 src/nldb/libnldb.so
 src/gtest/.settings/
 src/gtest/gtest
-src/gtest/1-2/
+src/gtest/core
 src/tests/.settings/
 src/tests/tests
 external-libs/include
 external-libs/lib
 external-libs/build
 external-libs/log
+
+# test data files
+src/gtest/nldb-*
+src/tests/nldb-*
 
 # Exlude all files in build folders
 */*/GccDebug/*

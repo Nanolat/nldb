@@ -70,7 +70,7 @@ public :
 	}replication_message_header_t;
 
     TxTransactionLogBuffer() {
-		clear();
+    	reset();
 	};
 
 	inline size_t getLogRecordCount() {
@@ -89,14 +89,18 @@ public :
 		return transactionId_;
 	};
 
-	inline void clear() {
+	inline void clearLog() {
 		// The begining address to write log records 
 		// - Skip the area to write the replication message header within the replication message.
 		nextLogAddr_ = (char*) replicationMessageBuffer_ + sizeof(replication_message_header_t);
 		totalLogCount_ = 0;
 		totalLogSize_ = 0;
-		transactionId_ = 0;
 		isFinalized_ = false;
+	};
+
+	inline void reset() {
+		clearLog();
+		transactionId_ = 0;
 	};
 
 	inline bool isClear() {
@@ -114,6 +118,8 @@ public :
 	// Append a log record into the replication message.
 	inline void appendLog(const nldb_table_id_t tableId, TxTransactionLogRedoer::log_type_t logType, void * keyData, size_t keyLength, void * valueData, size_t valueLength)
 	{
+		tx_debug_assert( !isFinalized_ ); // can not append log when the log buffer is finalized.
+
 		size_t logSize = calcLogSize( keyLength, valueLength);
 
 		// Make sure that we have enough space.
@@ -241,7 +247,7 @@ public :
 	inline void finalize() {
 		tx_assert( transactionId_ > 0 );
 
-		// ASSUME : Master/Slave nodes are all using the same endian. No marshalling required.
+		// ASSUME : Master/Slave nodes are all using the same endian. No marshaling required.
 		replication_message_header_t * replicationHeader = (replication_message_header_t*) replicationMessageBuffer_;
 		replicationHeader->transactionId_ = transactionId_;
 		replicationHeader->totalLogSize_ = totalLogSize_;

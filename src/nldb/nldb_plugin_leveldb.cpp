@@ -50,6 +50,20 @@ typedef struct levedb_table_desc_t {
 	nldb_table_id_t table_id;
 } levedb_table_desc_t;
 
+static std::string leveldb_name(const nldb_table_id_t db_id, const nldb_table_id_t table_id)
+{
+	std::ostringstream os;
+	os <<  "nldb-" << db_id << "-persistent-table-" << table_id;
+	return os.str();
+}
+
+static std::string leveldb_name(nldb_plugin_table_desc_t & table_desc)
+{
+	levedb_table_desc_t * p_leveldb_table_desc = (levedb_table_desc_t*) table_desc.table_desc;
+
+	return leveldb_name( p_leveldb_table_desc->db_id, p_leveldb_table_desc->table_id );
+}
+
 // The descriptor for the meta table that holds the list of tables 
 nldb_plugin_table_desc_t nldb_meta_table_desc(const nldb_db_id_t db_id)
 {
@@ -64,18 +78,28 @@ nldb_plugin_table_desc_t nldb_meta_table_desc(const nldb_db_id_t db_id)
 	return meta_table_desc;
 }
 
-static std::string leveldb_name(const nldb_table_id_t db_id, const nldb_table_id_t table_id)
-{
-	std::ostringstream os;
-	os << db_id << "-" << table_id;
-	return os.str();
+static void fatal_error(const std::string & error_message) {
+	printf("leveldb plugin fatal error : %s\n", error_message.c_str());
 }
 
-static std::string leveldb_name(nldb_plugin_table_desc_t & table_desc)
+nldb_rc_t nldb_table_exists(nldb_plugin_table_desc_t & table_desc, bool * exists)
 {
-	levedb_table_desc_t * p_leveldb_table_desc = (levedb_table_desc_t*) table_desc.table_desc;
+	leveldb::DB* db = NULL;
+	leveldb::Options options;
+	options.create_if_missing = false;
 
-	return leveldb_name( p_leveldb_table_desc->db_id, p_leveldb_table_desc->table_id );
+	leveldb::Status status = leveldb::DB::Open(options, leveldb_name( table_desc ), &db);
+
+	// BUGBUG : return error code.
+	if (status.ok()) {
+		*exists = true;
+		tx_assert(db);
+		delete db;
+	} else {
+		*exists = false;
+	}
+
+	return NLDB_OK;
 }
 
 nldb_rc_t nldb_plugin_leveldb_t::table_create(const nldb_table_id_t db_id, const nldb_table_id_t table_id, nldb_plugin_table_desc_t * table_desc)
@@ -89,7 +113,10 @@ nldb_rc_t nldb_plugin_leveldb_t::table_create(const nldb_table_id_t db_id, const
 	leveldb::Status status = leveldb::DB::Open(options, dbname, &db);
 
 	// BUGBUG : return error code.
-	tx_assert(status.ok());
+	if(!status.ok()) {
+		fatal_error(status.ToString());
+		tx_assert(0);
+	}
 
 	if ( ! db ) {
 		return NLDB_ERROR;
@@ -116,7 +143,10 @@ nldb_rc_t nldb_plugin_leveldb_t::table_drop(nldb_plugin_table_desc_t & table_des
 	leveldb::Status status = leveldb::DestroyDB( leveldb_name( table_desc ), options);
 
 	// BUGBUG : return error code.
-	tx_assert(status.ok());
+	if(!status.ok()) {
+		fatal_error(status.ToString());
+		tx_assert(0);
+	}
 
 	return NLDB_OK;
 }
@@ -130,7 +160,10 @@ nldb_rc_t nldb_plugin_leveldb_t::table_open(nldb_plugin_table_desc_t & table_des
 	leveldb::Status status = leveldb::DB::Open(options, leveldb_name( table_desc ), &db);
 
 	// BUGBUG : return error code.
-	tx_assert(status.ok());
+	if(!status.ok()) {
+		fatal_error(status.ToString());
+		tx_assert(0);
+	}
 
 	if ( ! db ) {
 		return NLDB_ERROR;
@@ -219,7 +252,10 @@ nldb_rc_t nldb_plugin_leveldb_t::table_get(nldb_table_context_t table_ctx, const
 		return NLDB_ERROR_KEY_NOT_FOUND;
 
 	// BUGBUG return error code.
-	tx_assert(status.ok());
+	if(!status.ok()) {
+		fatal_error(status.ToString());
+		tx_assert(0);
+	}
 
 	// BUGBUG : improve performance by implementing malloc inside of db->Get and by passing value ptr to it.
 	nldb_rc_t rc =copy_value_from_slice(value, gotValue );
@@ -251,7 +287,10 @@ nldb_rc_t nldb_plugin_leveldb_t::table_del(nldb_table_context_t table_ctx, const
 	status = db->Delete(leveldb::WriteOptions(), get_slice(key));
 
 	// BUGBUG return error code.
-	tx_assert(status.ok());
+	if(!status.ok()) {
+		fatal_error(status.ToString());
+		tx_assert(0);
+	}
 
 	return NLDB_OK;
 }
@@ -308,8 +347,10 @@ nldb_rc_t nldb_plugin_leveldb_t::cursor_open(nldb_table_context_t table_ctx, nld
 nldb_rc_t nldb_plugin_leveldb_t::cursor_seek(nldb_cursor_context_t cursor_ctx, const nldb_cursor_direction_t & direction, const nldb_key_t & key)
 {
 	leveldb_cursor_context_t* leveldb_cursor = (leveldb_cursor_context_t*) cursor_ctx;
+	leveldb_cursor->dir_ = direction;
 
 	leveldb::Iterator* it = leveldb_cursor->iter_;
+
 
 	it->Seek( get_slice(key) );
 

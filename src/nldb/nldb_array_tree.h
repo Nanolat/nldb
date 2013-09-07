@@ -99,23 +99,6 @@ protected:
 			key_count_ = key_count;
 		}
 
-
-		/*! Increase the key count.
-		 */
-		inline void inc_key_count() {
-			tx_debug_assert( has_valid_magic() );
-
-			key_count_ ++;
-		}
-
-		/*! Decrease the key count.
-		 */
-		inline void dec_key_count() {
-			tx_debug_assert( has_valid_magic() );
-
-			key_count_ --;
-		}
-
 		inline bool is_internal_node() const
 		{
 			tx_debug_assert( has_valid_magic() );
@@ -298,6 +281,11 @@ protected:
 			new_node->prev_ = this;
 			new_node->next_ = this->next_;
 
+			// The parent is not set yet.
+			// It can be set after the min key of the new node is put into a parent node.
+			// However, we can't guarantee that node->parent is new_node's parent
+			// because the node->parent may split while putting the min key of the new node into it.
+
 			if ( this->next_ )
 				this->next_->prev_ = new_node;
 
@@ -425,6 +413,22 @@ protected:
 			return NLDB_OK;
 		}
 
+		/*! Count all keys in leaf nodes under the current internal node.
+		 * This is necessary to count keys after the split of an internal node.
+		 */
+		nldb_rc_t count_all_keys_in_leaf_nodes(nldb_order_t * o_key_count) {
+			tx_debug_assert(o_key_count);
+
+			int after_the_last_node_position = keys_with_right_children_.key_count();
+			nldb_order_t all_key_count;
+			nldb_rc_t rc = count_all_keys_before_position(after_the_last_node_position, &all_key_count);
+			if (rc) return rc;
+
+			*o_key_count = all_key_count;
+
+			return NLDB_OK;
+		}
+
 		/*! Return the subtree which should serve the given key.
 		 * Note that the key might not exist in the subtree.
 		 * Set the root of the subtree to *node.
@@ -532,8 +536,12 @@ protected:
 
 			*o_node = serving_node;
 
-			nldb_rc_t rc = count_all_keys_before_position(node_position, o_key_count_before_the_serving_node);
-			if (rc) return rc;
+			tx_debug_assert( key_order >= key_count_left );
+
+			// Now key_count_left becomes the rank of the key in the subtree whose root is the serving node.
+			// Simply subtract key_count_left from the original rank of the key
+			// to get the number of all keys under the left siblings of the serving node.
+			*o_key_count_before_the_serving_node = key_order - key_count_left;
 
 			return NLDB_OK;
 		}
@@ -616,7 +624,17 @@ protected:
 			// Set the node attached with the mid key to the left child of the new split node.
 			(void)new_node->set_left_child((node_t*)mid_key_node);
 
-			// TODO : Set key count
+			// Set key count
+			{
+				nldb_order_t key_count ;
+				nldb_rc_t rc = new_node->count_all_keys_in_leaf_nodes(&key_count);
+				if (rc) return rc;
+				new_node->set_key_count(key_count);
+
+				rc = this->count_all_keys_in_leaf_nodes(&key_count);
+				if (rc) return rc;
+				this->set_key_count(key_count);
+			}
 
 			*right_node = new_node;
 
@@ -800,16 +818,28 @@ protected:
 		return NLDB_OK;
 	}
 
-	nldb_rc_t put_to_internal_node(internal_node_t * node, const void * key, node_t * key_node)
+	/*! Put a key into an internal node. Let the key point to another node.
+	 * @param node The internal node where the key is put.
+	 * @param key The key to put into the internal node.
+	 * @param key_node The key node that the key will point to.
+	 * @param o_unsplit_top_node (out) the top-most node that were not split.
+	 *                           This will be used as a fence node for propagating the increment of the key count in the right split leaf node,
+	 *                           which was not included when we recalcuate key count of each split internal node.
+	 */
+	nldb_rc_t put_to_internal_node(internal_node_t * node, const void * key, node_t * key_node, internal_node_t ** o_unsplit_top_node)
 	{
 		tx_debug_assert( is_initialized() );
 
-		tx_debug_assert( node != NULL );
-		tx_debug_assert( key != NULL );
-		tx_debug_assert( key_node != NULL );
+		tx_debug_assert( node );
+		tx_debug_assert( key );
+		tx_debug_assert( key_node );
+		tx_debug_assert( o_unsplit_top_node );
 
 		if ( node->is_full() )
 		{
+#if !defined(NDEBUG)
+			nldb_order_t key_count_before_split = node->key_count();
+#endif
 			internal_node_t * right_node = NULL;
 
 			// The key in the middle between the original node and the right node.
@@ -827,30 +857,44 @@ protected:
 			// So, we first modify parent nodes, before puting the 'key' parameter in either node or right_node.
 			if ( node->parent() ) // not a root node
 			{
-				rc = put_to_internal_node( (internal_node_t*) node->parent(), mid_key, right_node);
+				rc = put_to_internal_node( (internal_node_t*) node->parent(), mid_key, right_node, o_unsplit_top_node);
 				if (rc) return rc;
 			}
 			else // root node
 			{
 				// create a new root node
 				internal_node_t * new_root_node = node_factory::new_internal_node(key_length_);
-				// Set the old root node as the left child of the new root node
+				// Set the old root node as the left child of the new root node.
+				// node->parent_ is set to new_root_node by this code.
 				new_root_node->set_left_child(node);
 				// Set the right node as the 2nd child of the new root node.
 				new_root_node->put(mid_key, right_node);
+
+				// Because the keys in the newly split leaf node is not counted,
+				// the original key count is always greater than sum of key counts in the two split nodes.
+				tx_debug_assert(key_count_before_split > node->key_count() + right_node->key_count() );
+
+				// Set key count of the new root node
+				new_root_node->set_key_count( node->key_count() + right_node->key_count() );
 				// Yes! the new root node is elected!
 				root_node_ = new_root_node;
+
+				// The root node was split. Set the fence node to NULL
+				// so that missing key count can be propagated from the newly split leaf node up to the root node.
+				*o_unsplit_top_node = NULL;
 			}
 
 			int cmp = compare_keys(key, mid_key);
 
 			if ( cmp < 0 )
 			{
+				// put the key into the parent node. This code also sets the key_node's parent.
 				rc = node->put(key, key_node);
 				if (rc) return rc;
 			}
 			else if (cmp > 0 )
 			{
+				// put the key into the parent node. This code also sets the key_node's parent.
 				rc = right_node->put(key, key_node);
 				if (rc) return rc;
 			}
@@ -864,8 +908,13 @@ protected:
 		}
 		else
 		{
+			// put the key into the parent node. This code also sets the key_node's parent.
 			nldb_rc_t rc = node->put(key, key_node);
 			if (rc) return rc;
+
+			// Ok, the node was not split, set it to *o_unsplit_top_node so that it can be used for the fence node for propagating
+			// increment of key count for the missing keys that were not included while recalculating key count of each split internal node.
+			*o_unsplit_top_node = node;
 		}
 
 		return NLDB_OK;
@@ -892,10 +941,17 @@ protected:
 		{
 			leaf_node_t * right_node = NULL;
 
+#if !defined(NDEBUG)
+			nldb_order_t key_count_before_split = node->key_count();
+#endif
+
 			nldb_rc_t rc = node->split( &right_node );
 			if (rc) return rc;
 
 			tx_debug_assert( right_node != NULL );
+
+			// the keys in the split nodes should be equal to the key count before the split.
+			tx_debug_assert( key_count_before_split == node->key_count() + right_node->key_count() );
 
 			const void * mid_key = right_node->min_key();
 			tx_debug_assert(mid_key);
@@ -915,7 +971,15 @@ protected:
 				*o_key_existing_node = right_node;
 			}
 
-			rc = put_to_internal_node( (internal_node_t*) node->parent(), mid_key, right_node);
+			internal_node_t * unsplit_top_node;
+
+			rc = put_to_internal_node( (internal_node_t*) node->parent(), mid_key, right_node, &unsplit_top_node);
+			if (rc) return rc;
+
+			// Keys in the right node are not counted when we recalculate the key count of all split nodes in put_to_internal_node.
+			// Add the number of keys in right_node to all split nodes above the right_node.
+			// unsplit_top_node can be NULL if all nodes up to the root node was split.
+			rc = propagate_key_count_increment(right_node->parent(), unsplit_top_node /*fence*/, right_node->key_count() );
 			if (rc) return rc;
 		}
 		else
@@ -948,28 +1012,30 @@ protected:
 		return NLDB_OK;
 	}
 
-	/*! Starting from the leaf node, increase the key_count counter in each node up to the root node.
+	/*! Starting from a node, increase the key_count counter in each node up any child of fence_node.
+	 * By default fence_node is NULL, meaning to increase the key_count counter up to root node.
 	 */
-	nldb_rc_t propagate_key_count_increment(leaf_node_t * leaf_node) {
-		tx_debug_assert(leaf_node);
+	nldb_rc_t propagate_key_count_increment(node_t * from_node, node_t * fence_node = NULL, nldb_order_t increment = 1) {
+		tx_debug_assert(from_node);
 
-		for (node_t * n = leaf_node;
- 		     n != NULL;
+		for (node_t * n = from_node;
+ 		     n != fence_node;
 			 n = n->parent()) {
-			n->inc_key_count();
+			n->set_key_count( n->key_count() + increment);
 		}
 		return NLDB_OK;
 	}
 
-	/*! Starting from the leaf node, decrease the key_count counter in each node up to the root node.
+	/*! Starting from a node, decrease the key_count counter in each node up any child of fence_node.
+	 * By default fence_node is NULL, meaning to increase the key_count counter up to root node.
 	 */
-	nldb_rc_t propagate_key_count_decrement(leaf_node_t * leaf_node) {
-		tx_debug_assert(leaf_node);
+	nldb_rc_t propagate_key_count_decrement(node_t * from_node, node_t * fence_node = NULL, nldb_order_t decrement = 1) {
+		tx_debug_assert(from_node);
 
-		for (node_t * n = leaf_node;
- 		     n != NULL;
+		for (node_t * n = from_node;
+ 		     n != fence_node;
 			 n = n->parent()) {
-			n->dec_key_count();
+			n->set_key_count( n->key_count() - decrement);
 		}
 		return NLDB_OK;
 	}
@@ -1105,7 +1171,7 @@ public:
 
 		// The key_order is out of range.
 		if (key_order < 1 || key_order > root_node_->key_count() ) {
-			return NLDB_ERROR_ORDER_OUT_OF_RANGE;
+			return NLDB_ERROR_KEY_NOT_FOUND;
 		}
 
 		nldb_rc_t rc = find_leaf_node(key_order, & leaf_node, &key_count_before_leaf_node);
@@ -1216,7 +1282,7 @@ public:
 
 		// The key_order is out of range.
 		if (key_order < 1 || key_order > root_node_->key_count() ) {
-			return NLDB_ERROR_ORDER_OUT_OF_RANGE;
+			return NLDB_ERROR_KEY_NOT_FOUND;
 		}
 
 		nldb_rc_t rc = find_leaf_node(key_order, & leaf_node, &key_count_before_leaf_node);
@@ -1257,7 +1323,7 @@ public:
 
 		// The key_order is out of range.
 		if (key_order < 1 || key_order > root_node_->key_count() ) {
-			return NLDB_ERROR_ORDER_OUT_OF_RANGE;
+			return NLDB_ERROR_KEY_NOT_FOUND;
 		}
 
 		nldb_rc_t rc = find_leaf_node(key_order, & leaf_node, &key_count_before_leaf_node);

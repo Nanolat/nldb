@@ -43,8 +43,11 @@
 #include "nldb_test.h"
 #include "nldb_data.h"
 
-const long exepceted_value = 1004;
-DECLARE_KEY_VALUE(rec1, 100, 100, exepceted_value, -1);
+const long exepceted_value1 = 1004;
+const long exepceted_value2 = 2004;
+
+DECLARE_KEY_VALUE(rec1, 100, 100, exepceted_value1, -1);
+DECLARE_KEY_VALUE(rec2, 200, 200, exepceted_value2, -1);
 
 
 TEST_F(NLDBTest, transaction_commit) {
@@ -70,15 +73,39 @@ TEST_F(NLDBTest, transaction_commit) {
 	}
 }
 
-// TODO : Implement it.
-/*
+// TODO : Fix it. Transaction abort clears transaction log buffer resulting in resetting transaction ID.
 TEST_F(NLDBTest, transaction_abort) {
+
 	ASSERT_TRUE( nldb_tx_begin(tx) == 0 );
 
+	ASSERT_TRUE( nldb_table_put( tx, vol_table, KEY(rec1), VALUE(rec1) ) == 0 );
 
+	ASSERT_TRUE( nldb_tx_commit(tx) == 0 );
+
+	ASSERT_TRUE( nldb_tx_begin(tx) == 0 );
+
+	// Put the value with rec2 temporarily.
+	ASSERT_TRUE( nldb_table_put( tx, vol_table, KEY(rec1), VALUE(rec2) ) == 0 );
+
+	// Check before abort
+	{
+		nldb_value_t v;
+		ASSERT_TRUE( nldb_table_get( tx, vol_table, KEY(rec1), & v, NULL /*nldb_order_t*/) == 0 );
+		// The value should be rec2
+		ASSERT_TRUE( IS_VALUE_EQUAL(rec2, v));
+	}
 	ASSERT_TRUE( nldb_tx_abort(tx) == 0 );
+
+	// Check value after abort
+	{
+		nldb_value_t v;
+		ASSERT_TRUE( nldb_table_get( tx, vol_table, KEY(rec1), & v, NULL /*nldb_order_t*/ ) == 0 );
+		// The value should be rec1 after aborting the transaction.
+		ASSERT_TRUE( IS_VALUE_EQUAL(rec1, v));
+	}
+
 }
-*/
+
 
 TEST_F(NLDBTest, get_before_put) {
 	nldb_value_t v;

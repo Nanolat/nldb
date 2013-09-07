@@ -87,7 +87,11 @@ public:
 	virtual nldb_rc_t cursor_close(nldb_table_context_t table_ctx, nldb_cursor_context_t cursor_ctx);
 };
 
-// The descriptor for the meta table that holds the list of tables 
+// The descriptor for the meta table that keeps the list of tables.
 extern nldb_plugin_table_desc_t nldb_meta_table_desc(const nldb_db_id_t db_id);
+
+// Check if a table exists.
+extern nldb_rc_t nldb_table_exists(nldb_plugin_table_desc_t & table_desc, bool * exists);
+
 
 #endif // _NLDB_PLUGIN_LEVELDB_H_
