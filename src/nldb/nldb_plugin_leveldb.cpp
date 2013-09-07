@@ -395,8 +395,10 @@ nldb_rc_t nldb_plugin_leveldb_t::cursor_fetch(nldb_cursor_context_t cursor_ctx, 
 	nldb_rc_t rc = copy_key_from_slice(key, it->key());
 	if (rc) return rc;
 
-	rc = copy_value_from_slice(value, it->value());
-	if (rc) return rc;
+	if (value) {
+		rc = copy_value_from_slice(value, it->value());
+		if (rc) return rc;
+	}
 
 	switch(leveldb_cursor->dir_) {
 	case NLDB_CURSOR_FORWARD :

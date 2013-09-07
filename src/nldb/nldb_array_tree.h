@@ -859,6 +859,12 @@ protected:
 			{
 				rc = put_to_internal_node( (internal_node_t*) node->parent(), mid_key, right_node, o_unsplit_top_node);
 				if (rc) return rc;
+
+				// Keys in the right node are not counted when we recalculate the key count of all split nodes in put_to_internal_node.
+				// Add the number of keys in right_node to all split nodes above the right_node.
+				// The fence node, *o_unsplit_top_node can be NULL if all nodes up to the root node was split.
+				rc = propagate_key_count_increment(right_node->parent(), *o_unsplit_top_node /*fence*/, right_node->key_count() );
+				if (rc) return rc;
 			}
 			else // root node
 			{
@@ -1017,10 +1023,11 @@ protected:
 	 */
 	nldb_rc_t propagate_key_count_increment(node_t * from_node, node_t * fence_node = NULL, nldb_order_t increment = 1) {
 		tx_debug_assert(from_node);
-
+//printf("propagating key increment up to %llX, %lld\n", fence_node, increment);
 		for (node_t * n = from_node;
  		     n != fence_node;
 			 n = n->parent()) {
+//printf("adding key increment for node : %llX, %lld + %lld\n", n, n->key_count(), increment);
 			n->set_key_count( n->key_count() + increment);
 		}
 		return NLDB_OK;
@@ -1351,7 +1358,7 @@ public:
 		return NLDB_OK;
 	}
 
-	nldb_rc_t move_forward(iterator_t & iter, void ** key, void ** value, bool * end_of_iter) const
+	nldb_rc_t move_forward(iterator_t & iter, void ** key, void ** value, nldb_order_t * order, bool * end_of_iter) const
 	{
 		tx_debug_assert( is_initialized() );
 		tx_debug_assert( key != NULL );
@@ -1397,7 +1404,7 @@ public:
 		return NLDB_OK;
 	}
 
-	nldb_rc_t move_backward(iterator_t & iter, void ** key, void ** value, bool * end_of_iter) const
+	nldb_rc_t move_backward(iterator_t & iter, void ** key, void ** value, nldb_order_t * order, bool * end_of_iter) const
 	{
 		tx_debug_assert( is_initialized() );
 		tx_debug_assert( key != NULL );
