@@ -53,11 +53,22 @@ protected :
 	// The previous key printed in print_node.
 	// This is to check consistency by verifying that the keys printed in print_node are growing.
 	// Because print_node prints keys by running depth first search, the keys visited should be ordered.
-	mutable unsigned long long prev_printed_key;
+	mutable void * prev_printed_key;
 
 #define INDENT_PER_DEPTH (2)
 
-	template<typename key_t>
+	nldb_rc_t check_prev_key_less_than_or_equal_to_new_key(void* prev_key, void*new_key) const {
+		int cmp = this->compare_keys( prev_key, new_key);
+		if ( cmp > 0 )
+		{
+			std::string prev_key_str = get_string_key(prev_key, this->key_length_);
+			std::string new_key_str = get_string_key(new_key, this->key_length_);
+			printf("invalid key order : prev_key : %s, cur_key : %s\n", prev_key_str.c_str(), new_key_str.c_str());
+			return NLDB_ERROR;
+		}
+		return NLDB_OK;
+	}
+
 	nldb_rc_t print_leaf_node(int indent, SUPER::leaf_node_t * node ) const
 	{
 		typename nldb_sorted_array<key_space_size>::iterator_t iter;
@@ -68,8 +79,8 @@ protected :
 		printf("%*s[ LEAF-NODE (%llX) (keys:%lld) (parent:%llX)(p:%llX)(n:%llX) ]\n", indent, " ", (uint64_t)node, (uint64_t)node->key_count(), (uint64_t)node->parent(), (uint64_t)node->prev_, (uint64_t)node->next_);
 		while(1)
 		{
-			key_t * key = NULL;
-			void  * value = NULL;
+			void * key = NULL;
+			void * value = NULL;
 			rc = node->keys_with_values().iter_next(iter, (void**)&key, (void**)&value);
 			if (rc) return rc;
 
@@ -78,38 +89,34 @@ protected :
 
 			tx_debug_assert(value != NULL);
 
-			unsigned long long cur_key = get_uint64_key(key, this->key_length_);
-			printf("%*sKEY:%llu\n", indent, " ", cur_key );
+			std::string key_str = get_string_key(key, this->key_length_);
+			printf("%*sKEY:%s\n", indent, " ", key_str.c_str() );
 
-			if ( prev_printed_key > cur_key)
-			{
-				printf("invalid key order : prev_key : %llu, cur_key : %llu\n", prev_printed_key, cur_key);
-				tx_debug_assert(0);
+			if (prev_printed_key) {
+				tx_assert( check_prev_key_less_than_or_equal_to_new_key(prev_printed_key, key) == NLDB_OK );
 			}
-			prev_printed_key = cur_key;
+			prev_printed_key = key;
 		}
 
 		return NLDB_OK;
 	}
 
-	template<typename key_t>
 	nldb_rc_t print_node(int indent, SUPER::node_t * node ) const
 	{
 		if ( node->is_internal_node() )
 		{
-			nldb_rc_t rc = print_internal_node<key_t>( indent + INDENT_PER_DEPTH, (SUPER::internal_node_t*) node );
+			nldb_rc_t rc = print_internal_node( indent + INDENT_PER_DEPTH, (SUPER::internal_node_t*) node );
 			if (rc) return rc;
 		}
 		else if (node->is_leaf_node() )
 		{
-			nldb_rc_t rc = print_leaf_node<key_t>( indent + INDENT_PER_DEPTH, (SUPER::leaf_node_t*) node );
+			nldb_rc_t rc = print_leaf_node( indent + INDENT_PER_DEPTH, (SUPER::leaf_node_t*) node );
 			if (rc) return rc;
 		}
 
 		return NLDB_OK;
 	}
 
-	template<typename key_t>
 	nldb_rc_t print_internal_node(int indent, SUPER::internal_node_t * node ) const
 	{
 		typename nldb_sorted_array<key_space_size>::iterator_t iter;
@@ -124,11 +131,11 @@ protected :
 		SUPER::node_t * left_child = node->left_child();
 		tx_debug_assert(left_child);
 
-		print_node<key_t>(indent + INDENT_PER_DEPTH, left_child);
+		print_node(indent + INDENT_PER_DEPTH, left_child);
 
 		while(1)
 		{
-			key_t * key = NULL;
+			void * key = NULL;
 			SUPER::node_t * child_node = NULL;
 			rc = node->keys_with_right_children().iter_next(iter, (void**)&key, (void**)&child_node);
 			if (rc) return rc;
@@ -138,18 +145,16 @@ protected :
 
 			tx_debug_assert(child_node != NULL);
 
-			unsigned long long cur_key = get_uint64_key(key, this->key_length_);
+			std::string str_key = get_string_key(key, this->key_length_);
 
-			printf("%*sKEY:%llu\n", indent, " ", cur_key );
+			printf("%*sKEY:%s\n", indent, " ", str_key.c_str() );
 
-			if ( prev_printed_key > cur_key)
-			{
-				printf("invalid key order : prev_key : %llu, cur_key : %llu\n", prev_printed_key, cur_key);
-				tx_debug_assert(0);
+			if (prev_printed_key) {
+				tx_assert( check_prev_key_less_than_or_equal_to_new_key(prev_printed_key, key) == NLDB_OK );
 			}
-			prev_printed_key = cur_key;
+			prev_printed_key = key;
 
-			print_node<key_t>(indent + INDENT_PER_DEPTH, child_node);
+			print_node(indent + INDENT_PER_DEPTH, child_node);
 		}
 
 		return NLDB_OK;
@@ -205,27 +210,11 @@ public :
 
 	void print_tree(int iteration) const
 	{
-		prev_printed_key = 0;
+		prev_printed_key = NULL;
 
 		printf("ARRAY TREE[%d]=========================\n", iteration);
-		switch(this->key_length_)
-		{
-		case 1:
-			this->template print_internal_node<unsigned char>( 0, this->root_node_ );
-			break;
-		case 2:
-			this->template print_internal_node<unsigned short>( 0, this->root_node_ );
-			break;
-		case 4:
-			this->template print_internal_node<unsigned int>( 0, this->root_node_ );
-			break;
-		case 8:
-			this->template print_internal_node<unsigned long long>( 0, this->root_node_ );
-			break;
-		default:
-			printf("print_tree supports key size with 1,2,4,8 only.\n");
-			break;
-		}
+
+		this->template print_internal_node( 0, this->root_node_ );
 	}
 
 #define PRINT_DEBUG_TRACE (1)
@@ -244,7 +233,7 @@ public :
 		if (rc) return rc;
 
 #if defined(PRINT_DEBUG_TRACE)
-		printf("<<after put : %llu>>\n", get_uint64_key(key, this->key_length_));
+		printf("<<after put : %s>>\n", get_string_key(key, this->key_length_).c_str() );
 		print_tree(i);
 		check_consistency(i);
 #endif
@@ -260,7 +249,7 @@ public :
 #if defined(PRINT_DEBUG_TRACE)
 		int i = get_print_iteration();
 
-		printf("<<before del : %llu>>\n", get_uint64_key(key, this->key_length_));
+		printf("<<before del : %s>>\n", get_string_key(key, this->key_length_).c_str());
 		print_tree(i);
 		check_consistency(i);
 #endif

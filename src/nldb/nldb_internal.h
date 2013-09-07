@@ -77,6 +77,9 @@
 # include <endian.h>
 #endif
 
+#include <string>
+#include <sstream>
+
 // The keys in tree are encoded in big endian to simply use memcmp for key comparison.
 // To get the key from three nodes, we need to convert the key from big endian to host machine encoding.
 inline unsigned long long get_uint64_key(const void * key, int key_length)
@@ -94,6 +97,7 @@ inline unsigned long long get_uint64_key(const void * key, int key_length)
 		k = (unsigned long long) ntohl( *((unsigned int*)key) ) ;
 		break;
 	case 8:
+	case 16:
 		k = be64toh( *((unsigned long long*)key) );
 		break;
 	default:
@@ -101,6 +105,21 @@ inline unsigned long long get_uint64_key(const void * key, int key_length)
 		break;
 	}
 	return k;
+}
+
+inline std::string get_string_key(const void * key, int key_length)
+{
+	unsigned long long int_key = get_uint64_key(key, key_length);
+
+	if (int_key != 0) {
+		std::stringstream stream;
+
+		stream << int_key;
+
+		return stream.str();
+	}
+
+	return std::string((const char*)key, key_length);
 }
 
 #endif
