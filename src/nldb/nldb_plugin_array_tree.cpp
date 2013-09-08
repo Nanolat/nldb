@@ -218,10 +218,12 @@ static inline nldb_rc_t check_context_initialized(table_context_t * ctx, const k
 	{
 		if ( ctx->key_length() != key_length )
 		{
+			printf("Different key size detected. original:%d, new:%d\n", ctx->key_length() , key_length );
 			return NLDB_ERROR_VARIABLE_KEY_SIZE_NOT_SUPPORTED;
 		}
 		if ( ctx->value_length() != value_length)
 		{
+			printf("Different value size detected. original:%d, new:%d\n", ctx->value_length()  , value_length );
 			return NLDB_ERROR_VARIABLE_VALUE_SIZE_NOT_SUPPORTED;
 		}
 	}
@@ -404,6 +406,8 @@ public :
 
 	nldb_cursor_direction_t dir_;
 
+	nldb_order_t key_order_;
+
 	cursor_context_t(table_context_t * table_ctx)
 	{
 		table_ctx_ = table_ctx;
@@ -452,7 +456,17 @@ nldb_rc_t nldb_plugin_array_tree_t::cursor_seek(nldb_cursor_context_t cursor_ctx
 		default:
 			tx_assert(0);
 		}
+
+		// Get the key order and keep it in key_order field.
+		nldb_order_t key_order;
+		void * value;
+
+		rc = the_table_ctx->tree().get(key.data, & value, & key_order);
+		if (rc) return rc;
+
 		the_cursor_ctx->dir_ = direction;
+		the_cursor_ctx->key_order_ = key_order;
+
 	}
 	else
 	{
@@ -490,6 +504,7 @@ nldb_rc_t nldb_plugin_array_tree_t::cursor_seek(nldb_cursor_context_t cursor_ctx
 			tx_assert(0);
 		}
 		the_cursor_ctx->dir_ = direction;
+		the_cursor_ctx->key_order_ = order;
 	}
 	else
 	{
@@ -520,14 +535,20 @@ nldb_rc_t nldb_plugin_array_tree_t::cursor_fetch (nldb_cursor_context_t cursor_c
 		switch(the_cursor_ctx->dir_) {
 		case NLDB_CURSOR_FORWARD :
 		{
-			nldb_rc_t rc = the_table_ctx->tree().move_forward( the_cursor_ctx->iter_, & key_data, & value_data, & order, & end_of_iteration);
+			nldb_rc_t rc = the_table_ctx->tree().move_forward( the_cursor_ctx->iter_, & key_data, & value_data, & end_of_iteration);
 			if (rc) return rc;
+
+			order = the_cursor_ctx->key_order_++;
+
 			break;
 		}
 		case NLDB_CURSOR_BACKWARD :
 		{
-			nldb_rc_t rc = the_table_ctx->tree().move_backward( the_cursor_ctx->iter_, & key_data, & value_data, & order, & end_of_iteration);
+			nldb_rc_t rc = the_table_ctx->tree().move_backward( the_cursor_ctx->iter_, & key_data, & value_data, & end_of_iteration);
 			if (rc) return rc;
+
+			order = the_cursor_ctx->key_order_--;
+
 			break;
 		}
 		default:

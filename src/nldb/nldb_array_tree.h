@@ -1358,7 +1358,7 @@ public:
 		return NLDB_OK;
 	}
 
-	nldb_rc_t move_forward(iterator_t & iter, void ** key, void ** value, nldb_order_t * order, bool * end_of_iter) const
+	nldb_rc_t move_forward(iterator_t & iter, void ** key, void ** value, bool * end_of_iter) const
 	{
 		tx_debug_assert( is_initialized() );
 		tx_debug_assert( key != NULL );
@@ -1404,7 +1404,7 @@ public:
 		return NLDB_OK;
 	}
 
-	nldb_rc_t move_backward(iterator_t & iter, void ** key, void ** value, nldb_order_t * order, bool * end_of_iter) const
+	nldb_rc_t move_backward(iterator_t & iter, void ** key, void ** value, bool * end_of_iter) const
 	{
 		tx_debug_assert( is_initialized() );
 		tx_debug_assert( key != NULL );
