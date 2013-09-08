@@ -225,7 +225,7 @@ public :
 		this->template print_internal_node( 0, this->root_node_ );
 	}
 
-#define PRINT_DEBUG_TRACE (1)
+//#define PRINT_DEBUG_TRACE (1)
 
 	nldb_rc_t put (const void * key, const void * value)
 	{
