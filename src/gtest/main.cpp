@@ -70,6 +70,7 @@ TEST(sample_test_case, tbb)
  *    (LevelDB, TC should fail, ArrayTree should succeed)
  * 4) Get table statistics
  *    (LevelDB, TC should fail, ArrayTree should succeed)
+ * 5) Put the same key, check the count of keys in root node does not change.
  */
 
 /*

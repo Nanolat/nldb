@@ -188,16 +188,23 @@ protected:
 			return keys_with_values_;
 		}
 
-		nldb_rc_t put (const void * key, const void * value)
+		nldb_rc_t put (const void * key, const void * value, bool * isReplaced)
 		{
 			tx_debug_assert( node_t::is_leaf_node() );
-
 			tx_debug_assert( key != NULL );
 			tx_debug_assert( value != NULL );
+			tx_debug_assert( isReplaced != NULL);
 
+			int key_count_before_put = keys_with_values_.key_count();
 
 			nldb_rc_t rc = keys_with_values_.put(key, value);
 			if (rc) return rc;
+
+			if (key_count_before_put == keys_with_values_.key_count()) {
+				*isReplaced = true;
+			} else {
+				*isReplaced = false;
+			}
 
 			return NLDB_OK;
 		}
@@ -933,8 +940,10 @@ protected:
 	 * @o_key_existing_node The node that the key exists after the put operation.
 	 *                      In case the original node is split, the key can be put into the newly created node.
 	 *                      In this case, o_key_existing_node points to the newly created node.
+	 * @isReplaced indicates if the key was replaced because the same key existed before.
+	 *             We won't increase key count if this is true.
 	 */
-	nldb_rc_t put_to_leaf_node(leaf_node_t * node, const void * key, const void * value, leaf_node_t ** o_key_existing_node)
+	nldb_rc_t put_to_leaf_node(leaf_node_t * node, const void * key, const void * value, leaf_node_t ** o_key_existing_node, bool *isReplaced)
 	{
 		tx_debug_assert( is_initialized() );
 
@@ -942,6 +951,7 @@ protected:
 		tx_debug_assert( key != NULL );
 		tx_debug_assert( value != NULL );
 		tx_debug_assert( o_key_existing_node != NULL );
+		tx_debug_assert( isReplaced != NULL);
 
 		if ( node->is_full() )
 		{
@@ -964,14 +974,14 @@ protected:
 
 			if ( compare_keys(key, mid_key) < 0 )
 			{
-				rc = node->put(key, value);
+				rc = node->put(key, value, isReplaced);
 				if (rc) return rc;
 
 				*o_key_existing_node = node;
 			}
 			else
 			{
-				rc = right_node->put(key,value);
+				rc = right_node->put(key,value, isReplaced);
 				if (rc) return rc;
 
 				*o_key_existing_node = right_node;
@@ -990,7 +1000,7 @@ protected:
 		}
 		else
 		{
-			nldb_rc_t rc = node->put(key, value);
+			nldb_rc_t rc = node->put(key, value, isReplaced);
 			if (rc) return rc;
 
 			*o_key_existing_node = node;
@@ -1108,6 +1118,7 @@ public:
 		tx_debug_assert( key != NULL );
 		tx_debug_assert( value != NULL );
 
+		bool isReplaced = false;
 		leaf_node_t * leaf = NULL;
 		leaf_node_t * key_existing_node = NULL;
 
@@ -1116,12 +1127,14 @@ public:
 
 		// In case the leaf node was split, key_existing_node points to the new node.
 		// Otherwise, it points to the leaf node.
-		rc = put_to_leaf_node(leaf, key, value, &key_existing_node);
+		rc = put_to_leaf_node(leaf, key, value, &key_existing_node, &isReplaced);
 		if (rc) return rc;
 
-		// Increase the key_count counter in each node from key_existing_node up to the root node.
-		rc = propagate_key_count_increment(key_existing_node);
-		if (rc) return rc;
+		if (!isReplaced) { // increase the key count only if the same key did not exist.
+			// Increase the key_count counter in each node from key_existing_node up to the root node.
+			rc = propagate_key_count_increment(key_existing_node);
+			if (rc) return rc;
+		}
 
 		return NLDB_OK;
 	}

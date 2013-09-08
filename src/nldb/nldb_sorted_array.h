@@ -69,6 +69,7 @@ private :
 	inline int compare_keys(const char* key1, const char* key2) const
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
 		tx_debug_assert( key_length_ > 0 );
 
 		tx_debug_assert( key1 != NULL );
@@ -81,6 +82,7 @@ private :
 	inline void next_key(int & key_pos, int & data_pos) const
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
 
 		key_pos  += key_length_;
 		data_pos ++;
@@ -89,6 +91,7 @@ private :
 	inline void prev_key(int & key_pos, int & data_pos) const
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
 
 		key_pos  -= key_length_;
 		data_pos --;
@@ -144,6 +147,7 @@ private :
 	nldb_rc_t search_forward(const void * key, int * out_key_pos, int * out_data_pos, bool * out_key_found) const
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
 
 		tx_debug_assert( key != NULL );
 		tx_debug_assert( out_key_pos != NULL );
@@ -217,6 +221,7 @@ private :
 	nldb_rc_t search_backward(const void * key, int * out_key_pos, int * out_data_pos, bool * out_key_found) const
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
 
 		tx_debug_assert( key != NULL );
 		tx_debug_assert( out_key_pos != NULL );
@@ -259,17 +264,22 @@ private :
 	void set_data(int data_pos, const void * data)
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
 
 		tx_debug_assert( data_pos >= 0 );
 		tx_debug_assert( data_pos < max_key_count_ );
 		tx_debug_assert( data != NULL );
 
 		data_[data_pos] = (void*) data;
+
+		tx_debug_assert( key_count_ <= max_key_count_ );
 	}
 
 	void * get_key(int key_pos) const
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
+
 		tx_debug_assert( key_length_ > 0 );
 
 		tx_debug_assert( key_pos >= 0 );
@@ -282,6 +292,8 @@ private :
 	inline void move_keys_right_by_the_key_length_from(int key_pos)
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
+
 		tx_debug_assert( key_length_ > 0 );
 
 		tx_debug_assert( key_pos >= 0 );
@@ -301,6 +313,8 @@ private :
 
 		// The dest and src overlaps, so use memmove instead of memcpy.
 		memmove(shift_dest, shift_src, size_of_keys_to_shift);
+
+		tx_debug_assert( key_count_ <= max_key_count_ );
 	}
 
 	// move keys left by the key length from the given key position.
@@ -308,6 +322,8 @@ private :
 	inline void move_keys_left_by_the_key_length_from(int key_pos)
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
+
 		tx_debug_assert( key_length_ > 0 );
 
 		tx_debug_assert( key_pos >= key_length_ );
@@ -328,11 +344,15 @@ private :
 
 		// The dest and src overlaps, so use memmove instead of memcpy.
 		memmove(shift_dest, shift_src, size_of_keys_to_shift);
+
+		tx_debug_assert( key_count_ <= max_key_count_ );
 	}
 
 	inline void set_key_data_at(int key_pos, int data_pos, const void * key, const void * data)
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
+
 		tx_debug_assert( key_length_ > 0 );
 
 		tx_debug_assert( key_pos >= 0 );
@@ -347,11 +367,14 @@ private :
 
 		// set value
 		(void)set_data(data_pos, data);
+
+		tx_debug_assert( key_count_ <= max_key_count_ );
 	}
 
 	inline void move_data_right_by_one_from(int data_pos)
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
 
 		tx_debug_assert( data_pos >= 0 );
 		tx_debug_assert( data_pos + 1 < max_key_count_ );
@@ -370,11 +393,14 @@ private :
 
 		// The dest and src overlaps, so use memmove instead of memcpy.
 		memmove(shift_dest, shift_src, size_of_data_to_shift);
+
+		tx_debug_assert( key_count_ <= max_key_count_ );
 	}
 
 	inline void move_data_left_by_one_from(int data_pos)
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
 
 		tx_debug_assert( data_pos > 0 );
 		tx_debug_assert( data_pos < max_key_count_ );
@@ -393,12 +419,16 @@ private :
 
 		// The dest and src overlaps, so use memmove instead of memcpy.
 		memmove(shift_dest, shift_src, size_of_data_to_shift);
+
+		tx_debug_assert( key_count_ <= max_key_count_ );
 	}
 
 
 	inline void insert_key_data_at(int key_pos, int data_pos, const void * key, const void * data)
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
+
 		tx_debug_assert( key_length_ > 0 );
 
 		tx_debug_assert( key_pos >= 0 );
@@ -423,11 +453,16 @@ private :
 
 		key_count_++;
 		used_key_space_ += key_length_;
+
+		tx_debug_assert( key_count_ <= max_key_count_ );
+		tx_debug_assert(used_key_space_ <= key_space_size);
 	}
 
 	inline void remove_key_data_at(int key_pos, int data_pos)
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
+
 		tx_debug_assert( key_length_ > 0 );
 
 		tx_debug_assert( key_pos >= 0 );
@@ -451,6 +486,11 @@ private :
 
 		key_count_ --;
 		used_key_space_ -= key_length_;
+
+		tx_debug_assert(key_count_ >= 0);
+		tx_debug_assert(used_key_space_ >= 0);
+
+		tx_debug_assert( key_count_ <= max_key_count_ );
 	}
 
 public:
@@ -483,6 +523,8 @@ public:
 		used_key_space_ = 0;
 		key_length_ = key_length;
 
+		tx_debug_assert( key_count_ <= max_key_count_ );
+
 		return NLDB_OK;
 	}
 
@@ -511,6 +553,8 @@ public:
 		memcpy( key_space_, key_space, used_key_space);
 		memcpy( data_, data_area, sizeof(void*) * key_count);
 
+		tx_debug_assert( key_count_ <= max_key_count_ );
+
 		return NLDB_OK;
 	}
 
@@ -534,6 +578,8 @@ public:
 	nldb_rc_t put(const void * key, const void * data)
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
+
 		tx_debug_assert( key != NULL );
 		tx_debug_assert( data != NULL );
 		tx_debug_assert( key_length_ > 0 );
@@ -549,12 +595,17 @@ public:
 		} else { // The exact key is not found. Insert the key at the position.
 			(void)insert_key_data_at(key_pos + key_length_, data_pos+1, key, data);
 		}
+
+		tx_debug_assert( key_count_ <= max_key_count_ );
+
 		return NLDB_OK;
 	}
 
 	nldb_rc_t get(const void * key, void ** data, nldb_order_t * key_order ) const
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
+
 		tx_debug_assert( key != NULL );
 		tx_debug_assert( data != NULL );
 
@@ -588,6 +639,8 @@ public:
 	nldb_rc_t get(const nldb_order_t key_order, void ** key, void ** data ) const
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
+
 		tx_debug_assert( key_order >= 1 );
 		tx_debug_assert( key_order <= key_count_ );
 		tx_debug_assert( key != NULL );
@@ -610,6 +663,8 @@ public:
 	nldb_rc_t find_last_le_key(const void * key, void ** data, int * o_data_pos ) const
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
+
 		tx_debug_assert( key != NULL );
 		tx_debug_assert( data != NULL );
 
@@ -637,6 +692,7 @@ public:
 	nldb_rc_t del(const void * key, void ** data )
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
 
 		tx_debug_assert( key != NULL );
 		tx_debug_assert( data != NULL );
@@ -659,12 +715,17 @@ public:
 			*data = NULL;
 		}
 
+		tx_debug_assert( key_count_ >= 0 );
+		tx_debug_assert( key_count_ <= max_key_count_ );
+
 		return NLDB_OK;
 	}
 
 	nldb_rc_t remove_max_key( void ** key, void ** data )
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
+
 		tx_debug_assert( key != NULL );
 		tx_debug_assert( data != NULL );
 		tx_debug_assert( key_length_ > 0 );
@@ -682,12 +743,17 @@ public:
 			(void) remove_key_data_at( max_key_pos, max_data_pos);
 		}
 
+		tx_debug_assert( key_count_ >= 0 );
+		tx_debug_assert( key_count_ <= max_key_count_ );
+
 		return NLDB_OK;
 	}
 
 	nldb_rc_t iter_forward(const void * key, iterator_t * iter) const
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
+
 		tx_debug_assert( key != NULL );
 		tx_debug_assert( iter != NULL );
 		tx_debug_assert( key_length_ > 0 );
@@ -713,6 +779,8 @@ public:
 	nldb_rc_t iter_backward(const void * key, iterator_t * iter) const
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
+
 		tx_debug_assert( key != NULL );
 		tx_debug_assert( iter != NULL );
 		tx_debug_assert( key_length_ > 0 );
@@ -742,6 +810,8 @@ public:
 	nldb_rc_t iter_forward(const nldb_order_t key_order, iterator_t * iter) const
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
+
 		tx_debug_assert( key_order >= 1 );
 		tx_debug_assert( key_order <= key_count_ );
 		tx_debug_assert( iter != NULL );
@@ -760,6 +830,11 @@ public:
 	 */
 	nldb_rc_t iter_backward(const nldb_order_t key_order, iterator_t * iter) const
 	{
+		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
+
+		tx_debug_assert( iter != NULL );
+
 		// The implementation is same to iter_forward.
 		return iter_forward(key_order, iter);
 	}
@@ -768,7 +843,10 @@ public:
 	nldb_rc_t iter_forward(iterator_t * iter) const
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
+
 		tx_debug_assert( iter != NULL );
+
 		tx_debug_assert( key_length_ > 0 );
 
 		iter->key_pos_ = 0;
@@ -781,6 +859,8 @@ public:
 	nldb_rc_t iter_backward(iterator_t * iter) const
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
+
 		tx_debug_assert( iter != NULL );
 		tx_debug_assert( key_length_ > 0 );
 
@@ -793,6 +873,8 @@ public:
 	nldb_rc_t iter_next(iterator_t & iter, void ** key, void ** data) const
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
+
 		tx_debug_assert( key != NULL );
 		tx_debug_assert( data != NULL );
 		tx_debug_assert( key_length_ > 0 );
@@ -822,6 +904,8 @@ public:
 	nldb_rc_t iter_prev(iterator_t & iter, void ** key, void ** data) const
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
+
 		tx_debug_assert( key != NULL );
 		tx_debug_assert( data != NULL );
 		tx_debug_assert( key_length_ > 0 );
@@ -851,6 +935,8 @@ public:
 	nldb_rc_t merge_with(nldb_sorted_array<key_space_size> * right)
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
+
 		tx_debug_assert( right != NULL );
 
 		// Not implemented yet. Merging nodes is P2. We will implement the feature after the first release of NLDB.
@@ -860,6 +946,8 @@ public:
 	nldb_rc_t split(nldb_sorted_array<key_space_size> * right_half )
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
+
 
 		tx_debug_assert( right_half != NULL );
 		tx_debug_assert( right_half->key_count() == 0 );
@@ -893,6 +981,10 @@ public:
 		key_count_ = new_key_count;
 		used_key_space_ = new_used_key_space;
 
+		tx_debug_assert( key_count_ > 0 );
+		tx_debug_assert( used_key_space_ > 0 );
+		tx_debug_assert( key_count_ <= max_key_count_ );
+		tx_debug_assert( used_key_space_ <= key_space_size );
 		return NLDB_OK;
 	}
 
@@ -902,18 +994,21 @@ public:
 
 	int key_count() const {
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
 
 		return key_count_;
 	}
 
 	int key_length() const {
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
 
 		return key_length_;
 	}
 
 	int used_key_space() {
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
 
 		return used_key_space_;
 	}
@@ -921,6 +1016,7 @@ public:
 	bool is_empty() const
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
 
 		return (used_key_space_ == 0 ) ? true : false;
 	}
@@ -928,6 +1024,7 @@ public:
 	bool is_full() const
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
 
 		// It is not full if we can have at least one more key.
 		return (used_key_space_ + key_length_ <= key_space_size) ? false : true;
@@ -938,6 +1035,7 @@ public:
 	const void * min_key() const
 	{
 		tx_debug_assert( is_initialized() );
+		tx_debug_assert( key_count_ <= max_key_count_ );
 
 		if (used_key_space_ == 0)
 		{
