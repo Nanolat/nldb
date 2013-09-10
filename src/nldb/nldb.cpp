@@ -71,7 +71,7 @@ using namespace disruptor;
 // Need to check why.
 //#define NLDB_TX_EVENT_COUNT (4)
 
-#define NLDB_TX_EVENT_COUNT (1024 * 32)
+#define NLDB_TX_EVENT_COUNT (1024 * 2 )
 
 /*********************/
 /* plugin management */

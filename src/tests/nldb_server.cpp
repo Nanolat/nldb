@@ -537,18 +537,18 @@ int llcep_nldb_master(int arc, char** argv) {
 
 	nldb_rc_t rc;
 	rc = nldb_init();
-	if (rc) fatal_exit("Failed to initialize LLDB system", rc);
+	if (rc) fatal_exit("Failed to initialize Nanolat Database system", rc);
 
 	// BUGBUG : The master hangs if it runs in the same db path with a slave which is running.
 	// Fix : Need to show an error message "An instance is already up and running on this db path"
 	rc = nldb_db_create( TEST_DB_ID );
-	if (rc) fatal_exit("Failed to create LLDB", rc);
+	if (rc) fatal_exit("Failed to create Nanolat Database", rc);
 
 	nldb_replication_master_op_t master_op = { "*", REPLICATION_PORT };
 
 	nldb_db_t db;
 	rc = nldb_db_open( TEST_DB_ID, & master_op, NULL/*slave*/, &db );
-	if (rc) fatal_exit("Failed to open LLDB", rc);
+	if (rc) fatal_exit("Failed to open Nanolat Database", rc);
 
 	create_tables( db );
 
@@ -573,13 +573,13 @@ int llcep_nldb_master(int arc, char** argv) {
 	drop_tables( db );
 
 	rc = nldb_db_close( db );
-	if (rc) fatal_exit("Failed to close LLDB", rc);
+	if (rc) fatal_exit("Failed to close Nanolat Database", rc);
 
 	rc = nldb_db_drop( TEST_DB_ID );
-	if (rc) fatal_exit("Failed to drop LLDB", rc);
+	if (rc) fatal_exit("Failed to drop Nanolat Database", rc);
 
 	rc = nldb_destroy();
-	if (rc) fatal_exit("Failed to finalize LLDB instance", rc);
+	if (rc) fatal_exit("Failed to finalize Nanolat Database instance", rc);
 
     return EXIT_SUCCESS;
 }
@@ -594,10 +594,10 @@ int llcep_nldb_slave(int arc, char** argv) {
 
 	nldb_rc_t rc;
 	rc = nldb_init();
-	if (rc) fatal_exit("Failed to initialize LLDB system", rc);
+	if (rc) fatal_exit("Failed to initialize Nanolat Database system", rc);
 
 	rc = nldb_db_create( TEST_DB_ID );
-	if (rc) fatal_exit("Failed to create LLDB", rc);
+	if (rc) fatal_exit("Failed to create Nanolat Database", rc);
 
 	nldb_replication_slave_op_t slave_op = { {"localhost", REPLICATION_PORT},  };
 	slave_op.trigger_handler = NULL;
@@ -605,7 +605,7 @@ int llcep_nldb_slave(int arc, char** argv) {
 
 	nldb_db_t db;
 	rc = nldb_db_open( TEST_DB_ID, NULL /*master*/, & slave_op/*slave*/, & db );
-	if (rc) fatal_exit("Failed to open LLDB", rc);
+	if (rc) fatal_exit("Failed to open Nanolat Database", rc);
 
 	create_tables( db );
 
@@ -615,10 +615,10 @@ int llcep_nldb_slave(int arc, char** argv) {
 	drop_tables( db );
 
 	rc = nldb_db_close( db );
-	if (rc) fatal_exit("Failed to close LLDB", rc);
+	if (rc) fatal_exit("Failed to close Nanolat Database", rc);
 
 	rc = nldb_db_drop( TEST_DB_ID );
-	if (rc) fatal_exit("Failed to drop LLDB", rc);
+	if (rc) fatal_exit("Failed to drop Nanolat Database", rc);
 
     return EXIT_SUCCESS;
 }
