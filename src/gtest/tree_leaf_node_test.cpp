@@ -66,8 +66,9 @@ class TreeLeafNodeTest : public testing::Test  {
 TEST_F(TreeLeafNodeTest, is_empty) {
 	tree_leaf_node_t leaf(TREE_KEY_LEN);
 	EXPECT_TRUE( leaf.is_empty() );
-
-	ASSERT_TRUE( leaf.put(KEY_01, VALUE_01) == NLDB_OK );
+        
+        bool isReplaced;
+	ASSERT_TRUE( leaf.put(KEY_01, VALUE_01, &isReplaced) == NLDB_OK );
 
 	EXPECT_TRUE( ! leaf.is_empty() );
 
@@ -80,17 +81,17 @@ TEST_F(TreeLeafNodeTest, is_empty) {
 
 TEST_F(TreeLeafNodeTest, is_full) {
 	tree_leaf_node_t leaf(TREE_KEY_LEN);
-
+        bool             isReplaced;
 	ASSERT_TRUE( TREE_KEYS_PER_NODE == 3 );
 
 	EXPECT_TRUE( ! leaf.is_full() );
-	ASSERT_TRUE( leaf.put(KEY_01, VALUE_01) == NLDB_OK );
+	ASSERT_TRUE( leaf.put(KEY_01, VALUE_01, &isReplaced) == NLDB_OK );
 
 	EXPECT_TRUE( ! leaf.is_full() );
-	ASSERT_TRUE( leaf.put(KEY_02, VALUE_02) == NLDB_OK );
+	ASSERT_TRUE( leaf.put(KEY_02, VALUE_02, &isReplaced) == NLDB_OK );
 
 	EXPECT_TRUE( ! leaf.is_full() );
-	ASSERT_TRUE( leaf.put(KEY_03, VALUE_03) == NLDB_OK );
+	ASSERT_TRUE( leaf.put(KEY_03, VALUE_03, &isReplaced) == NLDB_OK );
 
 	EXPECT_TRUE( leaf.is_full() );
 
@@ -110,17 +111,19 @@ TEST_F(TreeLeafNodeTest, is_full) {
 TEST_F(TreeLeafNodeTest, min_key) {
 	tree_leaf_node_t leaf(TREE_KEY_LEN);
 
+        bool isReplaced;
+
 	ASSERT_TRUE( TREE_KEYS_PER_NODE == 3 );
 
 	EXPECT_TRUE( leaf.min_key() == NULL );
 
-	ASSERT_TRUE( leaf.put(KEY_02, VALUE_02) == NLDB_OK );
+	ASSERT_TRUE( leaf.put(KEY_02, VALUE_02, &isReplaced) == NLDB_OK );
 	EXPECT_TRUE( KEY_02_MATCHES( leaf.min_key() )  );
 
-	ASSERT_TRUE( leaf.put(KEY_01, VALUE_01) == NLDB_OK );
+	ASSERT_TRUE( leaf.put(KEY_01, VALUE_01, &isReplaced) == NLDB_OK );
 	EXPECT_TRUE( KEY_01_MATCHES( leaf.min_key() )  );
 
-	ASSERT_TRUE( leaf.put(KEY_03, VALUE_03) == NLDB_OK );
+	ASSERT_TRUE( leaf.put(KEY_03, VALUE_03, &isReplaced) == NLDB_OK );
 	EXPECT_TRUE( KEY_01_MATCHES( leaf.min_key() )  );
 
 	void * value = NULL;
@@ -138,20 +141,21 @@ TEST_F(TreeLeafNodeTest, min_key) {
 
 TEST_F(TreeLeafNodeTest, keys_with_values) {
 	tree_leaf_node_t leaf(TREE_KEY_LEN);
+        bool isReplaced;
 
 	ASSERT_TRUE( TREE_KEYS_PER_NODE == 3 );
 
 	EXPECT_TRUE( leaf.keys_with_values().key_count() == 0 );
 
-	ASSERT_TRUE( leaf.put(KEY_02, VALUE_02) == NLDB_OK );
+	ASSERT_TRUE( leaf.put(KEY_02, VALUE_02, &isReplaced) == NLDB_OK );
 	EXPECT_TRUE( leaf.keys_with_values().key_count() == 1 );
 	EXPECT_TRUE( KEY_MATCHES( leaf.keys_with_values().min_key(), KEY_02 ) );
 
-	ASSERT_TRUE( leaf.put(KEY_01, VALUE_01) == NLDB_OK );
+	ASSERT_TRUE( leaf.put(KEY_01, VALUE_01, &isReplaced) == NLDB_OK );
 	EXPECT_TRUE( leaf.keys_with_values().key_count() == 2 );
 	EXPECT_TRUE( KEY_MATCHES( leaf.keys_with_values().min_key(), KEY_01 KEY_02 ) );
 
-	ASSERT_TRUE( leaf.put(KEY_03, VALUE_03) == NLDB_OK );
+	ASSERT_TRUE( leaf.put(KEY_03, VALUE_03, &isReplaced) == NLDB_OK );
 	EXPECT_TRUE( leaf.keys_with_values().key_count() == 3 );
 	EXPECT_TRUE( KEY_MATCHES( leaf.keys_with_values().min_key(), KEY_01 KEY_02 KEY_03 ) );
 
@@ -178,24 +182,28 @@ TEST_F(TreeLeafNodeTest, put_get_del) {
 
 	// get : the key does not exist
 	void * value = NULL;
+        bool isReplaced;
 
 	ASSERT_TRUE( leaf.get(KEY_01, &value, NULL) == NLDB_OK );
 	EXPECT_TRUE( value == NULL );
 
 	// put : put a new key
-	ASSERT_TRUE( leaf.put(KEY_01, VALUE_01) == NLDB_OK );
+	ASSERT_TRUE( leaf.put(KEY_01, VALUE_01, &isReplaced) == NLDB_OK );
 	ASSERT_TRUE( leaf.get(KEY_01, &value, NULL) == NLDB_OK );
 	EXPECT_TRUE( VALUE_01_MATCHES(value) );
+        EXPECT_FALSE( isReplaced );
 
 	// put : put a new key
-	ASSERT_TRUE( leaf.put(KEY_02, VALUE_02) == NLDB_OK );
+	ASSERT_TRUE( leaf.put(KEY_02, VALUE_02, &isReplaced) == NLDB_OK );
 	ASSERT_TRUE( leaf.get(KEY_02, &value, NULL) == NLDB_OK );
 	EXPECT_TRUE( VALUE_02_MATCHES(value) );
+        EXPECT_FALSE( isReplaced );
 
 	// put : replace an existing key
-	ASSERT_TRUE( leaf.put(KEY_02, "new_value_02") == NLDB_OK );
+	ASSERT_TRUE( leaf.put(KEY_02, "new_value_02", &isReplaced) == NLDB_OK );
 	ASSERT_TRUE( leaf.get(KEY_02, &value, NULL) == NLDB_OK );
 	EXPECT_TRUE( VALUE_MATCHES(value, "new_value_02") );
+        EXPECT_TRUE( isReplaced );
 
 	// del : del a non-existing key
 	ASSERT_TRUE( leaf.del(KEY_03, &value) == NLDB_OK );
@@ -220,10 +228,10 @@ TEST_F(TreeLeafNodeTest, merge_with) {
 
 TEST_F(TreeLeafNodeTest, split_with_two_keys) {
 	tree_leaf_node_t leaf(TREE_KEY_LEN);
-
+        bool isReplaced;
 	// put two keys
-	ASSERT_TRUE( leaf.put(KEY_02, VALUE_02) == NLDB_OK );
-	ASSERT_TRUE( leaf.put(KEY_01, VALUE_01) == NLDB_OK );
+	ASSERT_TRUE( leaf.put(KEY_02, VALUE_02, &isReplaced) == NLDB_OK );
+	ASSERT_TRUE( leaf.put(KEY_01, VALUE_01, &isReplaced) == NLDB_OK );
 
 	// the original leaf should have KEY_01, KEY_02.
 	EXPECT_TRUE( leaf.keys_with_values().key_count() == 2 );
