@@ -84,6 +84,12 @@ TEST(sample_test_case, tbb)
  * 1) Test put/get/del in case the size of key space in array tree is not multiple of key size. ex> key space size = 64, key size = 20.
  */
 
+/*
+ * List of tests to add.
+ * 1) Variable length value.
+ */
+
+
 
 int main(int argc, char** argv)  
 {  

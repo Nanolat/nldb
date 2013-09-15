@@ -46,6 +46,8 @@
 #include "nldb_object_pool.h"
 #include <txbase/tx_assert.h>
 
+const int NLDB_VALUE_TAIL_MAGIC = 0xcafe7777;
+
 nldb_rc_t nldb_plugin_array_tree_t::table_create(const nldb_table_id_t db_id, const nldb_table_id_t table_id, nldb_plugin_table_desc_t * table_desc)
 {
 	// no table descriptor to store.
@@ -88,11 +90,6 @@ public :
 		return key_length_;
 	}
 
-	inline const value_length_t & value_length()
-	{
-		return value_length_;
-	}
-
 	inline tree_t & tree() {
 		return tree_;
 	}
@@ -112,21 +109,19 @@ public :
 		value_pool_ = NULL;
 		initialized_ = false;
 		key_length_ = 0;
-		value_length_ = 0;
 	}
 
-	nldb_rc_t init( const key_length_t & key_length, const value_length_t & value_length )
+	nldb_rc_t init( const key_length_t & key_length )
 	{
 		tx_assert(!initialized_);
 
 		key_length_ = key_length;
-		value_length_ = value_length;
 
 		nldb_rc_t rc = tree_.init(key_length_);
 		if (rc)
 			return rc;
 
-		value_pool_ = new nldb_object_pool(value_length_);
+		value_pool_ = new nldb_object_pool();
 
 		initialized_ = true;
 
@@ -212,7 +207,7 @@ nldb_rc_t nldb_plugin_array_tree_t::table_close(nldb_table_context_t table_ctx)
 	return NLDB_OK;
 }
 
-static inline nldb_rc_t check_context_initialized(table_context_t * ctx, const key_length_t & key_length, const value_length_t & value_length)
+static inline nldb_rc_t check_context_initialized(table_context_t * ctx, const key_length_t & key_length)
 {
 	if (ctx->isInitialized())
 	{
@@ -221,16 +216,11 @@ static inline nldb_rc_t check_context_initialized(table_context_t * ctx, const k
 			printf("Different key size detected. original:%d, new:%d\n", ctx->key_length() , key_length );
 			return NLDB_ERROR_VARIABLE_KEY_SIZE_NOT_SUPPORTED;
 		}
-		if ( ctx->value_length() != value_length)
-		{
-			printf("Different value size detected. original:%d, new:%d\n", ctx->value_length()  , value_length );
-			return NLDB_ERROR_VARIABLE_VALUE_SIZE_NOT_SUPPORTED;
-		}
 	}
 	else
 	{
 		// Initialize the tree.
-		nldb_rc_t rc = ctx->init(key_length, value_length);
+		nldb_rc_t rc = ctx->init(key_length);
 		if (rc)
 			return rc;
 	}
@@ -247,14 +237,44 @@ static inline nldb_rc_t check_key_length(table_context_t * ctx, const key_length
 	return NLDB_OK;
 }
 
-static inline nldb_rc_t check_value_length(table_context_t * ctx, const value_length_t & value_length)
-{
-	if ( ctx->value_length() != value_length)
-	{
-		return NLDB_ERROR_VARIABLE_VALUE_SIZE_NOT_SUPPORTED;
-	}
-	return NLDB_OK;
+inline void pack_value_object(nldb_object_pool * pool, value_length_t value_length, void * value, void **o_packed_value_object) {
+	tx_debug_assert(pool);
+	tx_debug_assert(value);
+	tx_debug_assert(o_packed_value_object);
+
+	// These sizes are from length, actual value, magic.
+	int value_object_size = sizeof(value_length_t) + value_length + sizeof(int);
+
+	char * value_object_ptr = (char *) pool->malloc(value_object_size);
+	// set the length.
+	*((value_length_t*) value_object_ptr) = value_length;
+	// copy value.
+	memcpy( value_object_ptr+sizeof(value_length_t), value, value_length);
+	// set magic of value tail.
+	*( (int*) (value_object_ptr + sizeof(value_length_t) + value_length) ) = NLDB_VALUE_TAIL_MAGIC;
+
+	*o_packed_value_object = value_object_ptr;
 }
+
+inline void unpack_value_object(void * packed_value_object, value_length_t * o_value_length, void ** o_value) {
+	tx_debug_assert(packed_value_object);
+	tx_debug_assert(o_value_length);
+	tx_debug_assert(o_value);
+
+	char * p = (char *)packed_value_object;
+
+	value_length_t value_length = *((value_length_t*)p);
+	tx_assert(value_length > 0);
+
+	char * value_ptr = p + sizeof(value_length_t);
+
+	int magic = *( (int*) (value_ptr + value_length) );
+	assert( magic == NLDB_VALUE_TAIL_MAGIC );
+
+	*o_value_length = value_length;
+	*o_value = (void*)value_ptr;
+}
+
 // errors : NLDB_ERROR_KEY_ALREADY_EXISTS
 nldb_rc_t nldb_plugin_array_tree_t::table_put(nldb_table_context_t table_ctx, const nldb_key_t & key, const nldb_value_t & value)
 {
@@ -262,12 +282,12 @@ nldb_rc_t nldb_plugin_array_tree_t::table_put(nldb_table_context_t table_ctx, co
 
 	table_context_t * ctx = (table_context_t*) table_ctx;
 
-	tx_assert( check_context_initialized(ctx, key.length, value.length) == NLDB_OK );
+	tx_assert( check_context_initialized(ctx, key.length) == NLDB_OK );
 
-	void * value_ptr = ctx->value_pool().malloc();
-	memcpy(value_ptr, value.data, value.length);
+	void * packed_value_ptr;
+	pack_value_object(&ctx->value_pool(), value.length, value.data, &packed_value_ptr);
 
-	rc = ctx->tree().put(key.data, value_ptr);
+	rc = ctx->tree().put(key.data, packed_value_ptr);
 	if (rc) return rc;
 
 	return NLDB_OK;
@@ -287,15 +307,14 @@ nldb_rc_t nldb_plugin_array_tree_t::table_get(nldb_table_context_t table_ctx, co
 		return NLDB_ERROR_KEY_NOT_FOUND;
 	}
 
-	void * value_ptr = NULL;
+	void * packed_value_ptr = NULL;
 	// order is passed to tree().get function. it assigns the order of the key to *order only if order is not NULL.
-	rc = ctx->tree().get(key.data, &value_ptr, order);
+	rc = ctx->tree().get(key.data, &packed_value_ptr, order);
 	if (rc) return rc;
 
-	if (value_ptr )
+	if (packed_value_ptr )
 	{
-		value->length = ctx->value_length();
-		value->data = value_ptr;
+		unpack_value_object(packed_value_ptr, &value->length, &value->data);
 	}
 	else
 	{
@@ -319,13 +338,13 @@ nldb_rc_t nldb_plugin_array_tree_t::table_get(nldb_table_context_t table_ctx, co
 	}
 
 	void * key_ptr = NULL;
-	void * value_ptr = NULL;
+	void * packed_value_ptr = NULL;
 
-	rc = ctx->tree().get(order, &key_ptr, &value_ptr);
+	rc = ctx->tree().get(order, &key_ptr, &packed_value_ptr);
 	if (rc) return rc;
 
-	value->length = ctx->value_length();
-	value->data = value_ptr;
+	tx_debug_assert(packed_value_ptr);
+	unpack_value_object(packed_value_ptr, &value->length, &value->data);
 
 	key->length = ctx->key_length();
 	key->data = key_ptr;
@@ -347,14 +366,14 @@ nldb_rc_t nldb_plugin_array_tree_t::table_del(nldb_table_context_t table_ctx, co
 		return NLDB_ERROR_KEY_NOT_FOUND;
 	}
 
-	void * value_ptr;
-	rc = ctx->tree().del(key.data, &value_ptr);
+	void * packed_value_ptr;
+	rc = ctx->tree().del(key.data, &packed_value_ptr);
 	if (rc) return rc;
 
-	if ( value_ptr )
+	if ( packed_value_ptr )
 	{
 		// return the value ptr to the value pool if the key was found.
-		ctx->value_pool().free(value_ptr);
+		ctx->value_pool().free(packed_value_ptr);
 	}
 	else
 	{
@@ -529,13 +548,13 @@ nldb_rc_t nldb_plugin_array_tree_t::cursor_fetch (nldb_cursor_context_t cursor_c
 	{
 		bool end_of_iteration = false;
 		void * key_data = NULL;
-		void * value_data = NULL;
+		void * packed_value_data = NULL;
 		nldb_order_t order;
 
 		switch(the_cursor_ctx->dir_) {
 		case NLDB_CURSOR_FORWARD :
 		{
-			nldb_rc_t rc = the_table_ctx->tree().move_forward( the_cursor_ctx->iter_, & key_data, & value_data, & end_of_iteration);
+			nldb_rc_t rc = the_table_ctx->tree().move_forward( the_cursor_ctx->iter_, & key_data, & packed_value_data, & end_of_iteration);
 			if (rc) return rc;
 
 			order = the_cursor_ctx->key_order_++;
@@ -544,7 +563,7 @@ nldb_rc_t nldb_plugin_array_tree_t::cursor_fetch (nldb_cursor_context_t cursor_c
 		}
 		case NLDB_CURSOR_BACKWARD :
 		{
-			nldb_rc_t rc = the_table_ctx->tree().move_backward( the_cursor_ctx->iter_, & key_data, & value_data, & end_of_iteration);
+			nldb_rc_t rc = the_table_ctx->tree().move_backward( the_cursor_ctx->iter_, & key_data, & packed_value_data, & end_of_iteration);
 			if (rc) return rc;
 
 			order = the_cursor_ctx->key_order_--;
@@ -562,8 +581,7 @@ nldb_rc_t nldb_plugin_array_tree_t::cursor_fetch (nldb_cursor_context_t cursor_c
 		o_key->data = key_data;
 
 		if (o_value) {
-			o_value->length = the_table_ctx->value_length();
-			o_value->data = value_data;
+			unpack_value_object( packed_value_data, &o_value->length, &o_value->data );
 		}
 
 		if (o_order) {

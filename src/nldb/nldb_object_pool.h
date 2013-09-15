@@ -45,14 +45,11 @@
 
 class nldb_object_pool {
 public :
-	nldb_object_pool(size_t object_size) {
-		assert( object_size > 0 );
-
-		object_size_ = object_size;
+	nldb_object_pool() {
 	}
 
-	void * malloc() {
-		void * p = ::malloc(object_size_);
+	void * malloc(int size) {
+		void * p = ::malloc(size);
 		assert(p);
 		return p;
 	}
