@@ -3,9 +3,9 @@ Nanolat Database
 
 What is it?
 -----------
-- An in-memory key/value store supporting put/get/del, and cursors for range search.
+- An in-memory key/value store supporting put/get/del, and range search on cursors.
 - Supports searching keys by rank. (Ex> Get 100 keys from the 1000th key)
-- Supports transaction and master-slave replication.
+- Supports transactions and master-slave replication.
 - Adds transactional log replication feature on top of LevelDB and TokyoCabinet.
 - Supports Table Plugins to implement your own data structure for efficient data processing for your specific domain.
 
@@ -63,7 +63,7 @@ How to build?
 How to run a test for the master-slave replication example?
 -----------------------------------------------------------
 Before running a test, build it by running build.sh .
-Before runnigg a test, set LD_LIBRARY_PATH by executing *env.sh* command after going to the src directory.
+Before running a test, set LD_LIBRARY_PATH by executing *env.sh* command after going to the src directory.
 
     cd src
     source env.sh
